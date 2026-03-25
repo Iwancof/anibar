@@ -178,7 +178,7 @@ window.Bar {
   padding: 0;
   margin-top: 6px;
   margin-right: 8px;
-  min-width: 380px;
+  min-width: 420px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
   opacity: 0;
 }
@@ -204,13 +204,32 @@ window.Bar {
   color: rgba(224, 230, 240, 0.3);
 }
 
+@keyframes dot-pulse-charge {
+  0%   { background: #00ffcc; min-width: 8px; min-height: 8px; }
+  30%  { background: #00ffcc; min-width: 12px; min-height: 12px; }
+  100% { background: #00ffcc; min-width: 8px; min-height: 8px; }
+}
+
+@keyframes header-flash {
+  0%   { border-bottom-color: #00ffcc; }
+  40%  { border-bottom-color: rgba(0, 255, 204, 0.5); }
+  100% { border-bottom-color: #1a1e2e; }
+}
+
 .HudDot {
   border-radius: 99px;
   background: #555;
 }
 .HudDotNormal { background: #00aaff; }
-.HudDotCharge { background: #00ffcc; }
-.HudDotCrit   { background: #ff2266; }
+.HudDotCharge {
+  background: #00ffcc;
+  animation: dot-pulse-charge 2s ease-in-out infinite;
+}
+.HudDotCrit { background: #ff2266; }
+
+.HudHeaderCharge {
+  animation: header-flash 1s ease-out forwards;
+}
 
 .HudBody {
   padding: 20px 16px 16px;
@@ -219,7 +238,9 @@ window.Bar {
 .HudPercent {
   font-size: 46px;
   font-weight: 700;
+  font-family: $font-family;
   color: #00aaff;
+  min-width: 120px;
 }
 .HudPercentNormal { color: #00aaff; }
 .HudPercentCharge { color: #00ffcc; }
@@ -294,6 +315,7 @@ window.Bar {
 .HudStatValue {
   font-size: 15px;
   font-weight: 600;
+  font-family: $font-family;
 }
 .HudStatNormal { color: #00aaff; }
 .HudStatCharge { color: #00ffcc; }
