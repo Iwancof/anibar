@@ -23,7 +23,7 @@ export default function BatteryPopup(props: BatteryPopupProps) {
       application={app}
       gdkmonitor={props.gdkmonitor}
       anchor={TOP | LEFT | RIGHT | BOTTOM}
-      exclusivity={Astal.Exclusivity.IGNORE}
+      exclusivity={Astal.Exclusivity.NORMAL}
       keymode={Astal.Keymode.ON_DEMAND}
       layer={Astal.Layer.TOP}
       onKeyPressed={(self: any, keyval: number) => {
