@@ -1,6 +1,6 @@
 import { createPoll } from "ags/time"
 
-import { parsePsOutput, type SystemStatsSnapshot } from "../modules/system-stats/domain.ts"
+import { parseTopOutput, type SystemStatsSnapshot } from "../modules/system-stats/domain.ts"
 import type { SystemStatsSource } from "../modules/system-stats/ports.ts"
 import { safeExec } from "./command.ts"
 import { readTextFile } from "./fs.ts"
@@ -31,8 +31,8 @@ function readCpuPercent(): number {
 
 async function readSnapshot(): Promise<SystemStatsSnapshot> {
   const cpuPercent = readCpuPercent()
-  const psOut = await safeExec(["ps", "aux", "--sort=-%cpu"])
-  const topProcesses = parsePsOutput(psOut, TOP_N)
+  const topOut = await safeExec(["top", "-bn1", "-o", "%CPU"])
+  const topProcesses = parseTopOutput(topOut, TOP_N)
   return { cpuPercent, topProcesses }
 }
 

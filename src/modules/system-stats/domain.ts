@@ -9,21 +9,26 @@ export interface SystemStatsSnapshot {
   topProcesses: ProcessInfo[]
 }
 
-// ps aux format: USER PID %CPU %MEM VSZ RSS TTY STAT START TIME COMMAND...
-export function parsePsOutput(output: string, limit: number): ProcessInfo[] {
-  return output
-    .split("\n")
-    .slice(1) // skip header
+// top -bn1 format: PID USER PR NI VIRT RES SHR S %CPU %MEM TIME+ COMMAND
+// Header lines (7) are skipped by caller
+export function parseTopOutput(output: string, limit: number): ProcessInfo[] {
+  const lines = output.split("\n")
+  // Skip header lines (everything before the PID line)
+  const dataStart = lines.findIndex((l) => l.trimStart().startsWith("PID"))
+  if (dataStart < 0) return []
+
+  return lines
+    .slice(dataStart + 1)
     .filter((line) => line.trim().length > 0)
     .slice(0, limit)
     .map((line) => {
       const parts = line.trim().split(/\s+/)
-      const pid = parseInt(parts[1], 10)
-      const cpu = parseFloat(parts[2])
-      const command = parts.slice(10).join(" ")
-      const isWrapped = /^[[\(]/.test(command)
+      const pid = parseInt(parts[0], 10)
+      const cpu = parseFloat(parts[8])
+      const command = (parts[11] ?? "").replace(/\+$/, "")
       const cleaned = command.replace(/[[\]()]/g, "")
-      const name = isWrapped ? cleaned.split(/\s/)[0] : cleaned.replace(/^.*\//, "").split(/\s/)[0]
+      // Only extract basename for absolute paths (starting with /)
+      const name = cleaned.startsWith("/") ? cleaned.replace(/^.*\//, "") : cleaned
       return { pid, name, cpu }
     })
     .filter((p) => !isNaN(p.pid) && !isNaN(p.cpu) && p.name.length > 0)
