@@ -22,10 +22,10 @@ export default function BatteryPopup(props: BatteryPopupProps) {
       visible={false}
       application={app}
       gdkmonitor={props.gdkmonitor}
-      anchor={LEFT | RIGHT | BOTTOM}
+      anchor={TOP | LEFT | RIGHT | BOTTOM}
       exclusivity={Astal.Exclusivity.IGNORE}
       keymode={Astal.Keymode.ON_DEMAND}
-      layer={Astal.Layer.OVERLAY}
+      layer={Astal.Layer.TOP}
       onKeyPressed={(self: any, keyval: number) => {
         if (keyval === Gdk.KEY_Escape) {
           closeBatteryPopup()
