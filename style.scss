@@ -1,0 +1,357 @@
+@use "theme" as *;
+
+// ── バー ──────────────────────────────────
+window.Bar {
+  background: transparent;
+  color: $colors-text;
+  font-family: $font-family;
+  font-weight: 600;
+
+  > centerbox {
+    background: $bar-background;
+    border: $bar-border $colors-outline;
+    border-radius: $bar-border-radius;
+    margin: $bar-margin;
+    padding: $bar-padding;
+  }
+
+  button {
+    border-radius: $bar-button-border-radius;
+    margin: 0;
+  }
+}
+
+.BarButton {
+  background: $colors-surface;
+  border: 1px solid rgba(122, 162, 247, 0.26);
+  color: $colors-text;
+  padding: $bar-button-padding;
+}
+
+.BarLabel {
+  color: $colors-muted;
+}
+
+.BarClock {
+  color: $colors-text;
+  font-size: $font-clock-size;
+}
+
+// ── バーインジケータ ──────────────────────
+.BarIndicator {
+  padding: 0;
+}
+
+.BarIndicatorIcon {
+  font-size: $bar-indicator-icon-size;
+  color: $colors-muted;
+}
+
+.BarIndicatorLabel {
+  color: $colors-text;
+  font-size: $bar-indicator-label-size;
+}
+
+// ── バッテリー視覚インジケータ ────────────
+.BatIndicator {
+  padding: 0;
+}
+
+.BatBody {
+  border: 2px solid $colors-muted;
+  border-radius: 3px;
+  padding: 2px;
+}
+
+.BatBodyLow {
+  border-color: $colors-warning;
+}
+
+.BatBodyEmpty {
+  border-color: rgba(138, 149, 179, 0.4);
+}
+
+.BatFill {
+  background: $colors-healthy;
+  border-radius: 1px;
+  min-height: 1px;
+  min-width: 0px;
+}
+
+.BatFillCharging {
+  background: $colors-healthy;
+}
+
+.BatFillLow {
+  background: $colors-warning;
+}
+
+.BatNub {
+  background: $colors-muted;
+  border-radius: 0 2px 2px 0;
+}
+
+.BatChargingIcon {
+  font-family: "HackGen Console NF";
+  font-size: 12px;
+  color: $colors-bg;
+}
+
+.BatButton {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+// ── バッテリーポップアップ ────────────────
+@keyframes popup-slide-in {
+  from {
+    opacity: 0;
+    margin-top: 20px;
+  }
+  to {
+    opacity: 1;
+    margin-top: 36px;
+  }
+}
+
+@keyframes popup-slide-out {
+  from {
+    opacity: 1;
+    margin-top: 36px;
+  }
+  to {
+    opacity: 0;
+    margin-top: 20px;
+  }
+}
+
+@keyframes backdrop-fade-in {
+  from { background: transparent; }
+  to   { background: rgba(8, 10, 16, 0.3); }
+}
+
+@keyframes backdrop-fade-out {
+  from { background: rgba(8, 10, 16, 0.3); }
+  to   { background: transparent; }
+}
+
+@keyframes glow-pulse {
+  0%   { border-color: rgba(122, 162, 247, 0.4); }
+  50%  { border-color: rgba(122, 162, 247, 0.15); }
+  100% { border-color: rgba(122, 162, 247, 0.4); }
+}
+
+.BatPopup {
+  background: transparent;
+}
+
+.BatPopupBackdrop {
+  background: transparent;
+  border: none;
+}
+
+// 開きアニメーション
+.BatPopup.open .BatPopupBackdrop {
+  animation: backdrop-fade-in 200ms ease-out forwards;
+}
+
+.BatPopup.open .BatPopupPanel {
+  animation: popup-slide-in 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards,
+             glow-pulse 3s ease-in-out 400ms infinite;
+}
+
+// 閉じアニメーション
+.BatPopup.closing .BatPopupBackdrop {
+  animation: backdrop-fade-out 200ms ease-in forwards;
+}
+
+.BatPopup.closing .BatPopupPanel {
+  animation: popup-slide-out 200ms ease-in forwards;
+}
+
+.BatPopupPanel {
+  background: $colors-panel;
+  border: 1px solid rgba(122, 162, 247, 0.3);
+  border-radius: 14px;
+  padding: 16px;
+  margin-top: 36px;
+  margin-right: 8px;
+  min-width: 260px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+              0 0 0 1px rgba(122, 162, 247, 0.1);
+  opacity: 0;
+}
+
+.BatPopupTitle {
+  color: $colors-accent;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+}
+
+.BatPopupHeadline {
+  color: $colors-text;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.BatPopupDetail {
+  color: $colors-text;
+  font-size: 13px;
+}
+
+.BatPopupMeta {
+  color: $colors-muted;
+  font-size: 12px;
+}
+
+.BatPopupFooter {
+  color: $colors-muted;
+  font-size: 11px;
+  font-style: italic;
+}
+
+// ── ダッシュボード ────────────────────────
+window.Dashboard {
+  background: transparent;
+}
+
+.DashboardBackdrop {
+  background: $dashboard-backdrop;
+  padding: $dashboard-backdrop-padding;
+}
+
+.DashboardShell {
+  min-width: 1px;
+}
+
+.DashboardPanel {
+  min-width: $dashboard-panel-min-width;
+  background: $colors-panel;
+  border: 1px solid $colors-outline;
+  border-radius: $dashboard-panel-border-radius;
+  padding: $dashboard-panel-padding;
+  box-shadow: $dashboard-panel-shadow;
+}
+
+.DashboardHeader {
+  margin-bottom: $dashboard-header-margin-bottom;
+}
+
+.DashboardEyebrow {
+  color: $colors-accent;
+  font-size: $dashboard-header-eyebrow-size;
+  letter-spacing: 0.08em;
+}
+
+.DashboardTitle {
+  color: $colors-text;
+  font-size: $dashboard-header-title-size;
+  font-weight: 800;
+}
+
+.DashboardSubtitle,
+.DashboardHint {
+  color: $colors-muted;
+}
+
+.DashboardClose {
+  background: $colors-surface;
+  border: 1px solid $colors-outline;
+  color: $colors-text;
+  padding: $dashboard-close-padding;
+  border-radius: $dashboard-close-border-radius;
+}
+
+// ── モジュールカード ──────────────────────
+.ModuleCard {
+  background: $colors-surface;
+  border: 1px solid $colors-outline;
+  border-radius: $module-card-border-radius;
+  padding: $module-card-padding;
+}
+
+.ModuleCardTitle {
+  color: $colors-muted;
+  font-size: $module-card-title-size;
+  letter-spacing: 0.08em;
+}
+
+.ModuleCardHeadline {
+  color: $colors-text;
+  font-size: $module-card-headline-size;
+  font-weight: 800;
+}
+
+.ModuleCardDetail,
+.ModuleCardMeta,
+.ModuleCardFooter,
+.ServiceRow {
+  color: $colors-muted;
+}
+
+.ModuleCardMeta {
+  font-size: $module-card-meta-size;
+}
+
+.ModuleCardFooter {
+  font-size: $module-card-footer-size;
+}
+
+// ── トーン ────────────────────────────────
+.tone-healthy {
+  border-left: $tone-border-width solid $colors-healthy;
+}
+
+.tone-warning {
+  border-left: $tone-border-width solid $colors-warning;
+}
+
+.tone-critical {
+  border-left: $tone-border-width solid $colors-critical;
+}
+
+.tone-muted {
+  border-left: $tone-border-width solid $tone-muted-color;
+}
+
+// ── サービス行 ────────────────────────────
+.ServiceRows {
+  margin-top: 4px;
+}
+
+.ServiceRow {
+  background: $colors-surface-2;
+  border-radius: $service-row-border-radius;
+  padding: $service-row-padding;
+}
+
+// ── プレビュー ────────────────────────────
+window.PreviewWindow {
+  background: $colors-bg;
+  color: $colors-text;
+}
+
+.PreviewRoot {
+  background: $colors-bg;
+  padding: $preview-padding;
+}
+
+.PreviewTitle {
+  color: $colors-text;
+  font-size: $preview-title-size;
+  font-weight: 800;
+}
+
+.PreviewSubtitle {
+  color: $colors-muted;
+}
+
+.DashboardPreviewFrame {
+  background: $dashboard-backdrop;
+  border: 1px solid $colors-outline;
+  border-radius: $preview-frame-radius;
+  padding: $preview-frame-padding;
+}

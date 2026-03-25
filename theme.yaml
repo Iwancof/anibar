@@ -1,0 +1,81 @@
+# ── フォント ────────────────────────────────
+font:
+  family:    "Consolas, Noto Sans Mono CJK JP, monospace"
+  clock-size: 17px
+
+# ── 色 ──────────────────────────────────────
+colors:
+  bg:        "#0d1118"
+  panel:     "#141a24"
+  surface:   "#1a2230"
+  surface-2: "#111722"
+  text:      "#d5def4"
+  muted:     "#8a95b3"
+  outline:   "rgba(164, 178, 215, 0.18)"
+  healthy:   "#9ece6a"
+  warning:   "#e0af68"
+  critical:  "#f7768e"
+  accent:    "#7aa2f7"
+
+# ── バー ────────────────────────────────────
+bar:
+  margin:        "2px 2px 0"     # 外側余白 (上 左右 下)
+  padding:       "2px 8px"      # 内側余白 (上下 左右)
+  border-radius: 6px
+  background:    "rgba(20, 26, 36, 0.92)"
+  border:        "1px solid"
+
+  button:
+    padding:       "0px 10px"
+    border-radius: 8px
+
+  indicator:
+    spacing:    12px
+    icon-size:  13px
+    label-size: 13px
+
+# ── ダッシュボード ──────────────────────────
+dashboard:
+  backdrop:    "rgba(8, 10, 16, 0.74)"
+  backdrop-padding: 32px
+
+  panel:
+    min-width:     500px
+    padding:       24px
+    border-radius: 24px
+    shadow:        "0 24px 64px rgba(0, 0, 0, 0.48)"
+
+  header:
+    margin-bottom: 4px
+    eyebrow-size:  12px
+    title-size:    26px
+
+  close:
+    padding:       "10px 14px"
+    border-radius: 12px
+
+# ── モジュールカード ────────────────────────
+module-card:
+  padding:       16px
+  border-radius: 18px
+  title-size:    12px
+  headline-size: 20px
+  meta-size:     12px
+  footer-size:   12px
+
+# ── サービス行 ──────────────────────────────
+service-row:
+  padding:       "8px 10px"
+  border-radius: 10px
+
+# ── トーン (左ボーダー幅) ──────────────────
+tone:
+  border-width: 4px
+  muted-color:  "rgba(138, 149, 179, 0.48)"
+
+# ── プレビュー ──────────────────────────────
+preview:
+  padding:       24px
+  title-size:    28px
+  frame-radius:  28px
+  frame-padding: 16px
