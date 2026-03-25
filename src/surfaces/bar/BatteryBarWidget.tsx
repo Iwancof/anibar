@@ -39,17 +39,8 @@ export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
 
   const isCharging = props.snapshot((s) => isOnAC(s))
 
-  function setupClick(self: any) {
-    const gesture = new Gtk.GestureClick()
-    gesture.set_button(1)
-    gesture.connect("pressed", () => {
-      props.onClicked()
-    })
-    self.add_controller(gesture)
-  }
-
   return (
-    <box class="BatButton" onRealize={setupClick} valign={Gtk.Align.CENTER}>
+    <button class="BatButton" onClicked={props.onClicked} valign={Gtk.Align.CENTER}>
       <box class="BatIndicator" spacing={0} valign={Gtk.Align.CENTER}>
         <overlay>
           <box
@@ -77,6 +68,6 @@ export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
         </overlay>
         <box class="BatNub" widthRequest={3} heightRequest={7} valign={Gtk.Align.CENTER} />
       </box>
-    </box>
+    </button>
   )
 }
