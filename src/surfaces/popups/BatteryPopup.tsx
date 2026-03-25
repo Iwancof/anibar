@@ -26,10 +26,16 @@ export default function BatteryPopup(props: BatteryPopupProps) {
       exclusivity={Astal.Exclusivity.NORMAL}
       keymode={Astal.Keymode.ON_DEMAND}
       layer={Astal.Layer.TOP}
-      onKeyPressed={(self: any, keyval: number) => {
-        if (keyval === Gdk.KEY_Escape) {
-          closeBatteryPopup()
-        }
+      onRealize={(self: any) => {
+        const keyCtrl = new Gtk.EventControllerKey()
+        keyCtrl.connect("key-pressed", (_ctrl: any, keyval: number) => {
+          if (keyval === Gdk.KEY_Escape) {
+            closeBatteryPopup()
+            return true
+          }
+          return false
+        })
+        self.add_controller(keyCtrl)
       }}
     >
       <overlay>
