@@ -26,7 +26,6 @@ export default function BatteryPopup(props: BatteryPopupProps) {
       exclusivity={Astal.Exclusivity.IGNORE}
       keymode={Astal.Keymode.ON_DEMAND}
       layer={Astal.Layer.OVERLAY}
-      marginTop={34}
       onRealize={(self: any) => {
         const keyCtrl = new Gtk.EventControllerKey()
         keyCtrl.connect("key-pressed", (_ctrl: any, keyval: number) => {
