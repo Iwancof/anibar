@@ -1,0 +1,25 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "theme": "python3 scripts/gen-theme.py",
+    "dev": "bash scripts/dev.sh",
+    "run": "npm run theme && ags run --gtk 4",
+    "check": "npm run typecheck && npm run test",
+    "typecheck": "tsc --noEmit --project tsconfig.pure.json",
+    "test": "node --experimental-strip-types --test tests/shared/*.test.ts tests/modules/*.test.ts",
+    "preview:dashboard": "ags run src/preview/dashboard.tsx --gtk 4",
+    "preview:battery": "ags run src/preview/battery.tsx --gtk 4",
+    "preview:network": "ags run src/preview/network.tsx --gtk 4",
+    "preview:service-health": "ags run src/preview/service-health.tsx --gtk 4",
+    "preview:volume": "ags run src/preview/volume.tsx --gtk 4"
+  },
+  "dependencies": {
+    "ags": "*",
+    "gnim": "*"
+  },
+  "prettier": {
+    "semi": false,
+    "tabWidth": 2
+  }
+}

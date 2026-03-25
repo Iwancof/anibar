@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "strict": true,
+    "module": "NodeNext",
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "moduleResolution": "NodeNext",
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  },
+  "include": [
+    "src/shared/format.ts",
+    "src/shared/health.ts",
+    "src/shared/bar-indicator.ts",
+    "src/modules/**/domain.ts",
+    "src/modules/**/view-model.ts",
+    "src/modules/**/bar-view-model.ts"
+  ]
+}
