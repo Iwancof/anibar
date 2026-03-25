@@ -55,13 +55,10 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
     return "HudPercent HudPercentNormal"
   })
 
-  const filledCount = props.snapshot((s) =>
-    !s || !s.present ? 0 : Math.round((s.percent / 100) * SEGMENTS),
-  )
-
-  const isCharging = props.snapshot((s) =>
-    s?.present === true && s.state === "charging",
-  )
+  const segState = props.snapshot((s) => ({
+    filled: !s || !s.present ? 0 : Math.round((s.percent / 100) * SEGMENTS),
+    charging: s?.present === true && s.state === "charging",
+  }))
 
   const timeLeft = props.snapshot((s) => {
     if (!s || !s.present) return "--"
@@ -136,11 +133,7 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
             <box class="HudSegBar" spacing={3} homogeneous>
               {Array.from({ length: SEGMENTS }).map((_, i) => (
                 <box
-                  class={(() => {
-                    const fc = filledCount
-                    const ch = isCharging
-                    return fc((n: number) => ch((c: boolean) => segmentClass(i, n, c)))
-                  })()}
+                  class={segState((s) => segmentClass(i, s.filled, s.charging))}
                   heightRequest={20}
                 />
               ))}
