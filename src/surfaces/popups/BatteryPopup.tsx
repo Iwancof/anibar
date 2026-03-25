@@ -22,7 +22,7 @@ export default function BatteryPopup(props: BatteryPopupProps) {
       visible={false}
       application={app}
       gdkmonitor={props.gdkmonitor}
-      anchor={TOP | LEFT | RIGHT | BOTTOM}
+      anchor={LEFT | RIGHT | BOTTOM}
       exclusivity={Astal.Exclusivity.IGNORE}
       keymode={Astal.Keymode.ON_DEMAND}
       layer={Astal.Layer.OVERLAY}
