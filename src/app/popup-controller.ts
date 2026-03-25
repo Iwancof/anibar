@@ -12,13 +12,14 @@ export function anyBatteryPopupVisible(): boolean {
   return getBatteryPopupWindows().some((w) => w.visible)
 }
 
-let closing = false
+let animating = false
 
 export function closeBatteryPopup(): void {
-  if (closing || !anyBatteryPopupVisible()) return
-
-  closing = true
+  if (animating) return
   const windows = getBatteryPopupWindows()
+  if (!windows.some((w) => w.visible)) return
+
+  animating = true
   windows.forEach((w) => {
     w.cssClasses = [...w.cssClasses.filter((c) => c !== "open"), "closing"]
   })
@@ -27,13 +28,13 @@ export function closeBatteryPopup(): void {
       w.visible = false
       w.cssClasses = w.cssClasses.filter((c) => c !== "closing")
     })
-    closing = false
+    animating = false
     return false
   })
 }
 
 export function openBatteryPopup(): void {
-  if (closing) return
+  if (animating) return
   const windows = getBatteryPopupWindows()
   windows.forEach((w) => {
     w.visible = true
@@ -43,6 +44,7 @@ export function openBatteryPopup(): void {
 }
 
 export function toggleBatteryPopup(): void {
+  if (animating) return
   if (anyBatteryPopupVisible()) {
     closeBatteryPopup()
   } else {
