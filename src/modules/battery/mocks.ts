@@ -10,7 +10,9 @@ export const batteryPreviewStates: BatterySnapshot[] = [
     state: "charging",
     energyNowWh: 47.2,
     energyFullWh: 56.0,
+    energyFullDesignWh: 57.0,
     powerNowW: 24.8,
+    cycleCount: 42,
   },
   {
     present: true,
@@ -18,7 +20,9 @@ export const batteryPreviewStates: BatterySnapshot[] = [
     state: "discharging",
     energyNowWh: 28.1,
     energyFullWh: 56.0,
+    energyFullDesignWh: 57.0,
     powerNowW: 11.6,
+    cycleCount: 42,
   },
   {
     present: true,
@@ -26,7 +30,9 @@ export const batteryPreviewStates: BatterySnapshot[] = [
     state: "discharging",
     energyNowWh: 6.1,
     energyFullWh: 56.0,
+    energyFullDesignWh: 57.0,
     powerNowW: 15.4,
+    cycleCount: 42,
   },
 ]
 

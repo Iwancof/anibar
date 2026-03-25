@@ -172,45 +172,134 @@ window.Bar {
 }
 
 .BatPopupPanel {
-  background: $colors-panel;
-  border: 1px solid rgba(122, 162, 247, 0.3);
-  border-radius: 14px;
-  padding: 16px;
+  background: #0c0e14;
+  border: 1px solid #1a1e2e;
+  border-radius: 8px;
+  padding: 0;
   margin-top: 6px;
   margin-right: 8px;
-  min-width: 260px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
-              0 0 0 1px rgba(122, 162, 247, 0.1);
+  min-width: 380px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
   opacity: 0;
 }
 
-.BatPopupTitle {
-  color: $colors-accent;
+// ── HUD ──────────────────────────────────
+.Hud {
+  font-family: $font-family;
+}
+
+.HudHeader {
+  padding: 10px 16px;
+  border-bottom: 1px solid #1a1e2e;
+}
+
+.HudHeaderLabel {
   font-size: 11px;
-  letter-spacing: 0.1em;
+  letter-spacing: 2px;
+  color: rgba(224, 230, 240, 0.5);
+}
+
+.HudHeaderRight {
+  font-size: 10px;
+  color: rgba(224, 230, 240, 0.3);
+}
+
+.HudDot {
+  border-radius: 99px;
+  background: #555;
+}
+.HudDotNormal { background: #00aaff; }
+.HudDotCharge { background: #00ffcc; }
+.HudDotCrit   { background: #ff2266; }
+
+.HudBody {
+  padding: 20px 16px 16px;
+}
+
+.HudPercent {
+  font-size: 46px;
   font-weight: 700;
+  color: #00aaff;
+}
+.HudPercentNormal { color: #00aaff; }
+.HudPercentCharge { color: #00ffcc; }
+.HudPercentCrit   { color: #ff2266; }
+
+.HudPercentUnit {
+  font-size: 20px;
+  color: rgba(224, 230, 240, 0.5);
+  margin-bottom: 8px;
 }
 
-.BatPopupHeadline {
-  color: $colors-text;
-  font-size: 24px;
-  font-weight: 800;
+.HudSegBar {
+  margin-bottom: 2px;
 }
 
-.BatPopupDetail {
-  color: $colors-text;
-  font-size: 13px;
+.HudSeg {
+  border-radius: 2px;
+  min-width: 1px;
+}
+.HudSegEmpty {
+  background: #151822;
+  border: 1px solid #1e2235;
+}
+.HudSegOk {
+  background: #00ffcc;
+  border: 1px solid transparent;
+}
+.HudSegCharge {
+  background: #00ffcc;
+  border: 1px solid transparent;
+}
+.HudSegWarn {
+  background: #ffaa00;
+  border: 1px solid transparent;
+}
+.HudSegCrit {
+  background: #ff2266;
+  border: 1px solid transparent;
 }
 
-.BatPopupMeta {
-  color: $colors-muted;
-  font-size: 12px;
+.HudSegScale {
+  font-size: 9px;
+  color: rgba(224, 230, 240, 0.3);
+  letter-spacing: 1px;
 }
 
-.BatPopupFooter {
-  color: $colors-muted;
+.HudStat {
+  background: #111420;
+  border-radius: 4px;
+  padding: 8px 10px;
+  border: 1px solid #1a1e2e;
+}
+
+.HudStatLabel {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: rgba(224, 230, 240, 0.35);
+}
+
+.HudStatValue {
+  font-size: 15px;
+  font-weight: 600;
+}
+.HudStatNormal { color: #00aaff; }
+.HudStatCharge { color: #00ffcc; }
+.HudStatWarn   { color: #ffaa00; }
+
+.HudFooterSection {
+  padding-top: 8px;
+  border-top: 1px solid #1a1e2e;
+}
+
+.HudFooterLine {
   font-size: 11px;
-  font-style: italic;
+  color: rgba(224, 230, 240, 0.5);
+}
+
+.HudFooterDim {
+  font-size: 11px;
+  color: rgba(224, 230, 240, 0.3);
 }
 
 // ── ダッシュボード ────────────────────────

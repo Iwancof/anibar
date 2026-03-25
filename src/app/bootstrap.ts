@@ -38,7 +38,7 @@ export function startMainApp() {
         BatteryPopup({
           gdkmonitor,
           monitorIndex,
-          viewModel: modules.battery.viewModel,
+          snapshot: modules.battery.snapshot,
         })
 
         DashboardWindow({

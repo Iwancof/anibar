@@ -3,13 +3,14 @@ import { Astal, Gdk, Gtk } from "ags/gtk4"
 
 import type { Accessor } from "gnim"
 
-import type { BatteryViewModel } from "../../modules/battery/view-model.ts"
+import type { BatterySnapshot } from "../../modules/battery/domain.ts"
 import { closeBatteryPopup } from "../../app/popup-controller.ts"
+import BatteryHudView from "./BatteryHudView.tsx"
 
 export interface BatteryPopupProps {
   gdkmonitor: Gdk.Monitor
   monitorIndex: number
-  viewModel: Accessor<BatteryViewModel>
+  snapshot: Accessor<BatterySnapshot | null>
 }
 
 export default function BatteryPopup(props: BatteryPopupProps) {
@@ -45,40 +46,8 @@ export default function BatteryPopup(props: BatteryPopupProps) {
           halign={Gtk.Align.END}
           valign={Gtk.Align.START}
         >
-          <box class="BatPopupPanel" orientation={Gtk.Orientation.VERTICAL} spacing={6}>
-            <label
-              class="BatPopupTitle"
-              halign={Gtk.Align.START}
-              xalign={0}
-              label={props.viewModel((vm) => vm.title)}
-            />
-            <label
-              class="BatPopupHeadline"
-              halign={Gtk.Align.START}
-              xalign={0}
-              label={props.viewModel((vm) => vm.headline)}
-            />
-            <label
-              class="BatPopupDetail"
-              halign={Gtk.Align.START}
-              xalign={0}
-              wrap
-              label={props.viewModel((vm) => vm.detail)}
-            />
-            <label
-              class="BatPopupMeta"
-              halign={Gtk.Align.START}
-              xalign={0}
-              wrap
-              label={props.viewModel((vm) => vm.meta)}
-            />
-            <label
-              class="BatPopupFooter"
-              halign={Gtk.Align.START}
-              xalign={0}
-              wrap
-              label={props.viewModel((vm) => vm.footer)}
-            />
+          <box class="BatPopupPanel" >
+            <BatteryHudView snapshot={props.snapshot} />
           </box>
         </box>
       </overlay>

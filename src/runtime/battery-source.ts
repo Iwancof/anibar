@@ -37,7 +37,9 @@ function readBatterySnapshot(root: string): BatterySnapshot | null {
     state: normalizeBatteryState(readTextFile(`${root}/status`)),
     energyNowWh: readMicroScaled(root, "energy_now", "charge_now"),
     energyFullWh: readMicroScaled(root, "energy_full", "charge_full"),
+    energyFullDesignWh: readMicroScaled(root, "energy_full_design", "charge_full_design"),
     powerNowW: readMicroScaled(root, "power_now", "current_now"),
+    cycleCount: readNumberFile(`${root}/cycle_count`),
   }
 }
 

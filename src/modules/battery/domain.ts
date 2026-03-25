@@ -8,7 +8,16 @@ export interface BatterySnapshot {
   state: BatteryState
   energyNowWh: number | null
   energyFullWh: number | null
+  energyFullDesignWh: number | null
   powerNowW: number | null
+  cycleCount: number | null
+}
+
+export function batteryHealthPercent(snapshot: BatterySnapshot): number | null {
+  if (snapshot.energyFullWh == null || snapshot.energyFullDesignWh == null || snapshot.energyFullDesignWh <= 0) {
+    return null
+  }
+  return Math.round((snapshot.energyFullWh / snapshot.energyFullDesignWh) * 100)
 }
 
 export function normalizeBatteryState(raw: string | null | undefined): BatteryState {
