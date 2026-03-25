@@ -44,9 +44,6 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
     return "HudDot HudDotNormal"
   })
 
-  const headerClass = props.snapshot((s) =>
-    isOnAC(s) ? "HudHeader HudHeaderCharge" : "HudHeader",
-  )
 
   const percentText = props.snapshot((s) =>
     !s || !s.present ? "--" : `${Math.round(s.percent)}`,
@@ -115,7 +112,7 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
   return (
     <box class="Hud" orientation={Gtk.Orientation.VERTICAL} spacing={0}>
       {/* ── Header ── */}
-      <box class={headerClass} spacing={0}>
+      <box class="HudHeader" spacing={0}>
         <box spacing={8} halign={Gtk.Align.START} hexpand>
           <box class={dotClass} widthRequest={8} heightRequest={8} valign={Gtk.Align.CENTER} />
           <label class="HudHeaderLabel" label="POWER::SYSTEM" />
