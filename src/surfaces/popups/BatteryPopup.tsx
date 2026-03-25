@@ -4,6 +4,7 @@ import { Astal, Gdk, Gtk } from "ags/gtk4"
 import type { Accessor } from "gnim"
 
 import type { BatterySnapshot } from "../../modules/battery/domain.ts"
+import type { SystemStatsSnapshot } from "../../modules/system-stats/domain.ts"
 import { closeBatteryPopup } from "../../app/popup-controller.ts"
 import BatteryHudView from "./BatteryHudView.tsx"
 
@@ -11,6 +12,7 @@ export interface BatteryPopupProps {
   gdkmonitor: Gdk.Monitor
   monitorIndex: number
   snapshot: Accessor<BatterySnapshot | null>
+  systemStats: Accessor<SystemStatsSnapshot | null>
 }
 
 export default function BatteryPopup(props: BatteryPopupProps) {
@@ -47,7 +49,7 @@ export default function BatteryPopup(props: BatteryPopupProps) {
           valign={Gtk.Align.START}
         >
           <box class="BatPopupPanel" >
-            <BatteryHudView snapshot={props.snapshot} />
+            <BatteryHudView snapshot={props.snapshot} systemStats={props.systemStats} />
           </box>
         </box>
       </overlay>

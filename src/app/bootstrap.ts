@@ -4,6 +4,7 @@ import app from "ags/gtk4/app"
 
 import style from "../../style.scss"
 import { createRuntimeAppModules, barIndicators } from "../modules/index.ts"
+import { createSystemStatsSource } from "../runtime/system-stats-source.ts"
 import { createClock } from "../shared/runtime/clock.ts"
 import Bar from "../surfaces/bar/Bar.tsx"
 import DashboardWindow from "../surfaces/dashboard/DashboardWindow.tsx"
@@ -14,6 +15,7 @@ import { handleAppRequest } from "./request-handler.ts"
 
 export function startMainApp() {
   const modules = createRuntimeAppModules()
+  const systemStats = createSystemStatsSource()
   const clock = createClock()
   const hostname = GLib.get_host_name() ?? "unknown-host"
   const indicators = barIndicators(modules)
@@ -39,6 +41,7 @@ export function startMainApp() {
           gdkmonitor,
           monitorIndex,
           snapshot: modules.battery.snapshot,
+          systemStats: systemStats.snapshot,
         })
 
         DashboardWindow({
