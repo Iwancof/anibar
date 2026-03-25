@@ -1,4 +1,5 @@
 import { anyDashboardVisible, setDashboardVisibility, toggleDashboardVisibility } from "./dashboard-controller.ts"
+import { anyLauncherVisible, toggleLauncher, openLauncher, closeLauncher } from "./launcher-controller.ts"
 
 function normalizeArgs(args: string[]): string[] {
   return args.filter(Boolean).filter((arg, index) => {
@@ -17,8 +18,24 @@ function normalizeArgs(args: string[]): string[] {
 export function handleAppRequest(args: string[]): string {
   const [scope, action = "toggle"] = normalizeArgs(args)
 
+  if (scope === "launcher") {
+    switch (action) {
+      case "toggle":
+        toggleLauncher()
+        return `launcher ${anyLauncherVisible() ? "visible" : "hidden"}`
+      case "open":
+        openLauncher()
+        return "launcher visible"
+      case "close":
+        closeLauncher()
+        return "launcher hidden"
+      default:
+        return `unknown launcher action "${action}"`
+    }
+  }
+
   if (scope !== "dashboard") {
-    return 'unknown request. use "ags request dashboard toggle|open|close|status"'
+    return 'unknown request. use "ags request dashboard|launcher toggle"'
   }
 
   switch (action) {

@@ -9,6 +9,7 @@ import { createClock } from "../shared/runtime/clock.ts"
 import Bar from "../surfaces/bar/Bar.tsx"
 import DashboardWindow from "../surfaces/dashboard/DashboardWindow.tsx"
 import BatteryPopup from "../surfaces/popups/BatteryPopup.tsx"
+import LauncherWindow from "../surfaces/launcher/LauncherWindow.tsx"
 import { toggleDashboardVisibility } from "./dashboard-controller.ts"
 import { toggleBatteryPopup } from "./popup-controller.ts"
 import { handleAppRequest } from "./request-handler.ts"
@@ -42,6 +43,11 @@ export function startMainApp() {
           monitorIndex,
           snapshot: modules.battery.snapshot,
           systemStats: systemStats.snapshot,
+        })
+
+        LauncherWindow({
+          gdkmonitor,
+          monitorIndex,
         })
 
         DashboardWindow({
