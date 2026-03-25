@@ -10,8 +10,8 @@ export interface SystemStatsSnapshot {
 }
 
 // top -bn1 format: PID USER PR NI VIRT RES SHR S %CPU %MEM TIME+ COMMAND
-// Header lines (7) are skipped by caller
-export function parseTopOutput(output: string, limit: number): ProcessInfo[] {
+// top %CPU is per-core (100% = 1 core). Normalize to total CPU (100% = all cores).
+export function parseTopOutput(output: string, limit: number, numCpus = 1): ProcessInfo[] {
   const lines = output.split("\n")
   // Skip header lines (everything before the PID line)
   const dataStart = lines.findIndex((l) => l.trimStart().startsWith("PID"))
@@ -24,7 +24,8 @@ export function parseTopOutput(output: string, limit: number): ProcessInfo[] {
     .map((line) => {
       const parts = line.trim().split(/\s+/)
       const pid = parseInt(parts[0], 10)
-      const cpu = parseFloat(parts[8])
+      const rawCpu = parseFloat(parts[8])
+      const cpu = Math.round((rawCpu / numCpus) * 10) / 10
       const command = (parts[11] ?? "").replace(/\+$/, "")
       const cleaned = command.replace(/[[\]()]/g, "")
       // Only extract basename for absolute paths (starting with /)

@@ -17,34 +17,39 @@ MiB Swap: 102400.0 total, 102400.0 free,      0.0 used.  81273.5 avail Mem
     682 root      20   0   39104  12576   8124 S   3.9   0.0   3:19.32 systemd+`
 
 test("parseTopOutput parses top -bn1 output correctly", () => {
-  const result = parseTopOutput(SAMPLE_TOP, 3)
+  const result = parseTopOutput(SAMPLE_TOP, 3, 16)
   assert.equal(result.length, 3)
 
   assert.equal(result[0].pid, 106211)
-  assert.equal(result[0].cpu, 43.4)
+  assert.equal(result[0].cpu, 2.7) // 43.4 / 16
   assert.equal(result[0].name, "btop")
 
   assert.equal(result[1].pid, 16020)
-  assert.equal(result[1].cpu, 19.7)
+  assert.equal(result[1].cpu, 1.2) // 19.7 / 16
   assert.equal(result[1].name, "claude")
 
   assert.equal(result[2].pid, 129)
-  assert.equal(result[2].cpu, 7.9)
+  assert.equal(result[2].cpu, 0.5) // 7.9 / 16
   assert.equal(result[2].name, "irq/9-a")
 })
 
+test("parseTopOutput with numCpus=1 keeps raw values", () => {
+  const result = parseTopOutput(SAMPLE_TOP, 1, 1)
+  assert.equal(result[0].cpu, 43.4)
+})
+
 test("parseTopOutput handles truncated command names", () => {
-  const result = parseTopOutput(SAMPLE_TOP, 5)
+  const result = parseTopOutput(SAMPLE_TOP, 5, 1)
   assert.equal(result[3].name, "upowerd")
   assert.equal(result[4].name, "systemd")
 })
 
 test("parseTopOutput respects limit", () => {
-  const result = parseTopOutput(SAMPLE_TOP, 2)
+  const result = parseTopOutput(SAMPLE_TOP, 2, 1)
   assert.equal(result.length, 2)
 })
 
 test("parseTopOutput handles empty input", () => {
-  const result = parseTopOutput("", 3)
+  const result = parseTopOutput("", 3, 1)
   assert.equal(result.length, 0)
 })

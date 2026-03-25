@@ -5,8 +5,11 @@ import type { SystemStatsSource } from "../modules/system-stats/ports.ts"
 import { safeExec } from "./command.ts"
 import { readTextFile } from "./fs.ts"
 
+import GLib from "gi://GLib?version=2.0"
+
 const POLL_MS = 3_000
 const TOP_N = 3
+const NUM_CPUS = GLib.get_num_processors()
 
 let prevIdle = 0
 let prevTotal = 0
@@ -32,7 +35,7 @@ function readCpuPercent(): number {
 async function readSnapshot(): Promise<SystemStatsSnapshot> {
   const cpuPercent = readCpuPercent()
   const topOut = await safeExec(["top", "-bn1", "-o", "%CPU"])
-  const topProcesses = parseTopOutput(topOut, TOP_N)
+  const topProcesses = parseTopOutput(topOut, TOP_N, NUM_CPUS)
   return { cpuPercent, topProcesses }
 }
 
