@@ -24,11 +24,7 @@ export function createLidActionSource(): LidActionSource {
   }
 
   async function setAction(newAction: LidAction) {
-    await safeExec([
-      "sudo", "bash", "-c",
-      `mkdir -p /etc/systemd/logind.conf.d && printf '[Login]\\nHandleLidSwitch=${newAction}\\n' > ${LOGIND_DROPIN}`,
-    ])
-    await safeExec(["sudo", "systemctl", "kill", "-s", "HUP", "systemd-logind"])
+    await safeExec(["sudo", "lidctl", newAction])
     setActionState(newAction)
   }
 
