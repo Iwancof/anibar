@@ -53,7 +53,22 @@ export function fuzzyScore(entry: AppEntry, query: string): number {
   return 0
 }
 
-export function searchApps(apps: AppEntry[], query: string, limit: number): AppEntry[] {
+export function searchApps(
+  apps: AppEntry[],
+  query: string,
+  limit: number,
+  recentIds: string[] = [],
+): AppEntry[] {
+  if (query.length === 0 && recentIds.length > 0) {
+    // 空クエリ: 最近使ったアプリを先頭に、残りはアルファベット順
+    const recentSet = new Set(recentIds)
+    const recent = recentIds
+      .map((id) => apps.find((a) => a.id === id))
+      .filter((a): a is AppEntry => a != null)
+    const rest = apps.filter((a) => !recentSet.has(a.id))
+    return [...recent, ...rest].slice(0, limit)
+  }
+
   return apps
     .map((app) => ({ app, score: fuzzyScore(app, query) }))
     .filter((r) => r.score > 0)

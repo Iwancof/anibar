@@ -70,6 +70,17 @@ test("searchApps: returns sorted results", () => {
   assert.equal(results[0].id, "firefox")
 })
 
+test("searchApps: empty query with recents shows recent first", () => {
+  const results = searchApps(apps, "", 10, ["discord", "kitty"])
+  assert.equal(results[0].id, "discord")
+  assert.equal(results[1].id, "kitty")
+})
+
+test("searchApps: empty query without recents shows all", () => {
+  const results = searchApps(apps, "", 10, [])
+  assert.equal(results.length, 4)
+})
+
 test("searchApps: respects limit", () => {
   const results = searchApps(apps, "", 2)
   assert.equal(results.length, 2)

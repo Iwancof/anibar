@@ -3,7 +3,7 @@ import { createState, createMemo } from "gnim"
 import type { Accessor } from "gnim"
 
 import { searchApps, type AppEntry } from "../../modules/launcher/domain.ts"
-import { loadAllApps, launchApp } from "../../runtime/app-source.ts"
+import { loadAllApps, launchApp, loadRecentIds } from "../../runtime/app-source.ts"
 import { closeLauncher } from "../../app/launcher-controller.ts"
 
 const MAX_RESULTS = 8
@@ -14,8 +14,11 @@ export default function LauncherView() {
   const allApps = loadAllApps()
   const [query, setQuery] = createState("")
   const [selectedIndex, setSelectedIndex] = createState(0)
+  const [recentIds, setRecentIds] = createState<string[]>(loadRecentIds())
 
-  const results = createMemo(() => searchApps(allApps, query(), MAX_RESULTS))
+  const results = createMemo(() =>
+    searchApps(allApps, query(), MAX_RESULTS, recentIds()),
+  )
 
   function getResult(i: number): Accessor<AppEntry> {
     return createMemo(() => results()[i] ?? EMPTY_ENTRY)
@@ -25,13 +28,15 @@ export default function LauncherView() {
     return createMemo(() => i < results().length)
   }
 
+  let entryRef: any = null
+
   function onActivateIndex(i: number) {
     const r = results()
     if (i < r.length) {
       launchApp(r[i].id)
       closeLauncher()
-      setQuery("")
-      setSelectedIndex(0)
+      // 履歴を更新
+      setRecentIds(loadRecentIds())
     }
   }
 
@@ -67,6 +72,16 @@ export default function LauncherView() {
         const keyCtrl = new Gtk.EventControllerKey()
         keyCtrl.connect("key-pressed", (_ctrl: any, keyval: number) => onKeyNav(self, keyval))
         self.add_controller(keyCtrl)
+
+        // ランチャーが表示されるたびに entry の text で query を同期
+        self.connect("map", () => {
+          if (entryRef) {
+            setQuery(entryRef.text ?? "")
+            setSelectedIndex(0)
+            setRecentIds(loadRecentIds())
+            entryRef.grab_focus()
+          }
+        })
       }}
     >
       <box class="LauncherSearch" spacing={10}>
@@ -77,7 +92,10 @@ export default function LauncherView() {
           placeholder_text="Search applications..."
           onChanged={onQueryChanged}
           onActivate={() => onActivateIndex(selectedIndex())}
-          onRealize={(self: any) => self.grab_focus()}
+          onRealize={(self: any) => {
+            entryRef = self
+            self.grab_focus()
+          }}
         />
       </box>
 
