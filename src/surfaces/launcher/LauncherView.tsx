@@ -76,6 +76,7 @@ export default function LauncherView() {
           hexpand
           placeholder_text="Search applications..."
           onChanged={onQueryChanged}
+          onActivate={() => onActivateIndex(selectedIndex())}
           onRealize={(self: any) => self.grab_focus()}
         />
       </box>

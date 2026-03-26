@@ -35,11 +35,16 @@ export default function LauncherWindow(props: LauncherWindowProps) {
         self.add_controller(keyCtrl)
       }}
     >
-      <button class="LauncherBackdrop" hexpand vexpand onClicked={closeLauncher}>
-        <box halign={Gtk.Align.CENTER} valign={Gtk.Align.START}>
+      <overlay>
+        <button class="LauncherBackdrop" hexpand vexpand onClicked={closeLauncher} />
+        <box
+          $type="overlay"
+          halign={Gtk.Align.CENTER}
+          valign={Gtk.Align.START}
+        >
           <LauncherView />
         </box>
-      </button>
+      </overlay>
     </window>
   )
 }
