@@ -38,6 +38,7 @@ export function startMainApp() {
           indicators,
           batterySnapshot: modules.battery.snapshot,
           imeSnapshot: imeSource.snapshot,
+          workspaceSnapshot: workspaceSource.snapshot,
           onToggleDashboard: toggleDashboardVisibility,
           onToggleBatteryPopup: toggleBatteryPopup,
         })
