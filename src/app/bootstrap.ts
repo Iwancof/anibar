@@ -12,12 +12,18 @@ import { createPwsaveSource } from "../runtime/pwsave-source.ts"
 import { createLidActionSource } from "../runtime/lid-action-source.ts"
 import { createSpectrumSource } from "../runtime/spectrum-source.ts"
 import { createPlayerSource } from "../runtime/player-source.ts"
+import { createNotificationSource } from "../runtime/notification-source.ts"
+import { createWifiSource } from "../runtime/wifi-source.ts"
 import Bar from "../surfaces/bar/Bar.tsx"
 import WorkspaceWindow from "../surfaces/workspace/WorkspaceWindow.tsx"
 import BatteryPopup from "../surfaces/popups/BatteryPopup.tsx"
+import NetworkPopup from "../surfaces/popups/NetworkPopup.tsx"
 import LauncherWindow from "../surfaces/launcher/LauncherWindow.tsx"
+import NotificationPopup from "../surfaces/notifications/NotificationPopup.tsx"
+import NotificationCenter from "../surfaces/notifications/NotificationCenter.tsx"
+import { toggleNotifCenter } from "./notification-controller.ts"
 import { toggleDashboardVisibility } from "./dashboard-controller.ts"
-import { toggleBatteryPopup } from "./popup-controller.ts"
+import { toggleBatteryPopup, toggleNetworkPopup } from "./popup-controller.ts"
 import { handleAppRequest } from "./request-handler.ts"
 
 export function startMainApp() {
@@ -28,6 +34,8 @@ export function startMainApp() {
   const clock = createClock()
   const pwsaveSource = createPwsaveSource()
   const lidActionSource = createLidActionSource()
+  const notificationSource = createNotificationSource()
+  const wifiSource = createWifiSource()
   const spectrumSource = createSpectrumSource()
   const playerSource = createPlayerSource()
   const indicators = barIndicators(modules)
@@ -46,11 +54,26 @@ export function startMainApp() {
           indicators,
           spectrumBars: spectrumSource.bars,
           player: playerSource,
+          networkSnapshot: modules.network.snapshot,
+          notifUnreadCount: notificationSource.unreadCount,
           batterySnapshot: modules.battery.snapshot,
           imeSnapshot: imeSource.snapshot,
           workspaceSnapshot: workspaceSource.snapshot,
           onToggleDashboard: toggleDashboardVisibility,
           onToggleBatteryPopup: toggleBatteryPopup,
+          onToggleNotifCenter: () => {
+            notificationSource.markAllRead()
+            toggleNotifCenter()
+          },
+          onToggleNetworkPopup: toggleNetworkPopup,
+        })
+
+        NetworkPopup({
+          gdkmonitor,
+          monitorIndex,
+          networkSnapshot: modules.network.snapshot,
+          wifiSnapshot: wifiSource.snapshot,
+          onConnect: (ssid) => { wifiSource.connect(ssid) },
         })
 
         BatteryPopup({
@@ -68,6 +91,18 @@ export function startMainApp() {
         LauncherWindow({
           gdkmonitor,
           monitorIndex,
+        })
+
+        NotificationPopup({
+          gdkmonitor,
+          monitorIndex,
+          notifications: notificationSource,
+        })
+
+        NotificationCenter({
+          gdkmonitor,
+          monitorIndex,
+          notifications: notificationSource,
         })
 
         WorkspaceWindow({

@@ -51,3 +51,51 @@ export function toggleBatteryPopup(): void {
     openBatteryPopup()
   }
 }
+
+// ── Network popup ──────────────────────────
+
+const NETWORK_POPUP_PREFIX = "network-popup:"
+
+function getNetworkPopupWindows() {
+  return app.windows.filter((w) => w.name.startsWith(NETWORK_POPUP_PREFIX))
+}
+
+let netAnimating = false
+
+export function closeNetworkPopup(): void {
+  if (netAnimating) return
+  const windows = getNetworkPopupWindows()
+  if (!windows.some((w) => w.visible)) return
+
+  netAnimating = true
+  windows.forEach((w) => {
+    w.cssClasses = [...w.cssClasses.filter((c) => c !== "open"), "closing"]
+  })
+  GLib.timeout_add(GLib.PRIORITY_DEFAULT, CLOSE_ANIMATION_MS, () => {
+    windows.forEach((w) => {
+      w.visible = false
+      w.cssClasses = w.cssClasses.filter((c) => c !== "closing")
+    })
+    netAnimating = false
+    return false
+  })
+}
+
+export function openNetworkPopup(): void {
+  if (netAnimating) return
+  const windows = getNetworkPopupWindows()
+  windows.forEach((w) => {
+    w.visible = true
+    w.present()
+    w.cssClasses = [...w.cssClasses.filter((c) => c !== "closing"), "open"]
+  })
+}
+
+export function toggleNetworkPopup(): void {
+  if (netAnimating) return
+  if (getNetworkPopupWindows().some((w) => w.visible)) {
+    closeNetworkPopup()
+  } else {
+    openNetworkPopup()
+  }
+}

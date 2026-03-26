@@ -695,6 +695,188 @@ window.Bar {
   margin: 4px 0;
 }
 
+// ── ネットワークポップアップ ──────────────
+window.NetPopup {
+  background: transparent;
+}
+
+.NetPopupBackdrop {
+  background: transparent;
+  border: none;
+}
+
+.NetPopup.open .NetPopupBackdrop {
+  animation: backdrop-fade-in 200ms ease-out forwards;
+}
+
+.NetPopup.open .NetPopupPanel {
+  animation: popup-slide-in 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.NetPopup.closing .NetPopupBackdrop {
+  animation: backdrop-fade-out 200ms ease-in forwards;
+}
+
+.NetPopup.closing .NetPopupPanel {
+  animation: popup-slide-out 200ms ease-in forwards;
+}
+
+.NetPopupPanel {
+  background: rgba(12, 14, 20, 0.75);
+  border: 1px solid rgba(122, 162, 247, 0.2);
+  border-radius: 12px;
+  padding: 0;
+  margin-top: 6px;
+  margin-right: 8px;
+  min-width: 360px;
+  max-height: 480px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+}
+
+.NetPopupHeader {
+  padding: 12px 16px;
+  border-bottom: 1px solid #1a1e2e;
+}
+
+.NetPopupTitle {
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  color: rgba(224, 230, 240, 0.4);
+}
+
+.NetPopupStatus {
+  font-size: 12px;
+  font-weight: 600;
+  color: #00ffcc;
+}
+
+.NetIpRow {
+  padding: 8px 16px;
+  border-bottom: 1px solid rgba(26, 30, 46, 0.5);
+}
+
+.NetIpLabel {
+  font-size: 11px;
+  color: rgba(224, 230, 240, 0.4);
+  letter-spacing: 0.5px;
+}
+
+.NetIpValue {
+  font-size: 12px;
+  font-weight: 600;
+  font-family: $font-family;
+  color: #00aaff;
+}
+
+.NetIfRow {
+  padding: 6px 16px 8px;
+  border-bottom: 1px solid rgba(26, 30, 46, 0.5);
+}
+
+.NetIfLabel {
+  font-size: 10px;
+  color: rgba(224, 230, 240, 0.3);
+  letter-spacing: 0.5px;
+}
+
+.NetTailscale {
+  font-size: 11px;
+  font-weight: 600;
+  color: #00ffcc;
+}
+
+.NetApHeader {
+  padding: 10px 16px 4px;
+}
+
+.NetApHeaderLabel {
+  font-size: 9px;
+  letter-spacing: 2px;
+  font-weight: 600;
+  color: rgba(224, 230, 240, 0.3);
+}
+
+.NetApScroll {
+  background: transparent;
+}
+
+.NetApList {
+  padding: 4px 8px 8px;
+}
+
+.NetApRow {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.NetApRow:hover {
+  background: rgba(122, 162, 247, 0.06);
+  border-color: rgba(122, 162, 247, 0.15);
+}
+
+.NetApRowActive {
+  background: rgba(0, 255, 204, 0.04);
+  border-color: rgba(0, 255, 204, 0.15);
+}
+
+.NetApSignal {
+  font-family: "HackGen Console NF";
+  font-size: 16px;
+  min-width: 22px;
+}
+
+.NetApSignalHigh { color: #00ffcc; }
+.NetApSignalMid  { color: #00aaff; }
+.NetApSignalLow  { color: #ffaa00; }
+.NetApSignalWeak { color: #ff2266; }
+
+.NetApSsid {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(224, 230, 240, 0.85);
+}
+
+.NetApMeta {
+  font-size: 10px;
+  color: rgba(224, 230, 240, 0.3);
+}
+
+.NetApCheck {
+  font-family: "HackGen Console NF";
+  font-size: 14px;
+  color: #00ffcc;
+}
+
+.NetApSignalPct {
+  font-size: 11px;
+  color: rgba(224, 230, 240, 0.35);
+  min-width: 32px;
+}
+
+.NetApEmpty {
+  font-size: 13px;
+  color: rgba(224, 230, 240, 0.3);
+  padding: 24px;
+}
+
+// ── ネットワークアイコン (バー) ────────────
+.NetBarBtn {
+  background: transparent;
+  border: none;
+  padding: 0 4px;
+  margin: 0;
+}
+
+.NetBarIcon {
+  font-family: "HackGen Console NF";
+  font-size: 14px;
+  color: $colors-muted;
+}
+
 // ── 通知ポップアップ ──────────────────────
 window.NotifPopupWindow {
   background: transparent;

@@ -9,6 +9,7 @@ import type { BatterySnapshot } from "../../modules/battery/domain.ts"
 import type { WorkspaceSnapshot } from "../../modules/workspace/domain.ts"
 import type { ImeSnapshot } from "../../runtime/ime-source.ts"
 import { switchToWorkspace } from "../../runtime/workspace-source.ts"
+import type { NetworkSnapshot } from "../../modules/network/domain.ts"
 import type { PlayerSource } from "../../runtime/player-source.ts"
 import BarIndicatorStrip from "./BarIndicatorStrip.tsx"
 import BatteryBarWidget from "./BatteryBarWidget.tsx"
@@ -25,10 +26,12 @@ export interface BarProps {
   workspaceSnapshot: Accessor<WorkspaceSnapshot | null>
   spectrumBars: Accessor<number[]>
   player: PlayerSource
+  networkSnapshot: Accessor<NetworkSnapshot>
   notifUnreadCount: Accessor<number>
   onToggleDashboard: () => void
   onToggleBatteryPopup: () => void
   onToggleNotifCenter: () => void
+  onToggleNetworkPopup: () => void
 }
 
 const MAX_WS_DOTS = 9
@@ -101,6 +104,21 @@ export default function Bar(props: BarProps) {
         <label $type="center" class="BarClock" label={props.clock} />
         <box $type="end" spacing={10} halign={Gtk.Align.END} valign={Gtk.Align.CENTER}>
           <BarIndicatorStrip indicators={props.indicators} />
+          <button
+            class="NetBarBtn"
+            valign={Gtk.Align.CENTER}
+            onClicked={props.onToggleNetworkPopup}
+          >
+            <label
+              class="NetBarIcon"
+              label={props.networkSnapshot((s) =>
+                s.online
+                  ? s.linkKind === "wifi" ? "󰤨" : "󰈁"
+                  : "󰤭"
+              )}
+              valign={Gtk.Align.CENTER}
+            />
+          </button>
           <button
             class="NotifBellBtn"
             valign={Gtk.Align.CENTER}
