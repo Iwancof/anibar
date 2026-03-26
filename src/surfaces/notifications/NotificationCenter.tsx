@@ -30,7 +30,7 @@ function urgencyBorder(urgency: number): string {
 }
 
 export default function NotificationCenter(props: NotificationCenterProps) {
-  const { TOP, RIGHT, BOTTOM } = Astal.WindowAnchor
+  const { TOP, LEFT, RIGHT, BOTTOM } = Astal.WindowAnchor
   const { notifications } = props
 
   const emptyLabel = createMemo(() =>
@@ -45,7 +45,7 @@ export default function NotificationCenter(props: NotificationCenterProps) {
       visible={false}
       application={app}
       gdkmonitor={props.gdkmonitor}
-      anchor={TOP | RIGHT | BOTTOM}
+      anchor={TOP | LEFT | RIGHT | BOTTOM}
       exclusivity={Astal.Exclusivity.NORMAL}
       keymode={Astal.Keymode.ON_DEMAND}
       layer={Astal.Layer.TOP}
