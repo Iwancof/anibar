@@ -3,6 +3,8 @@ import { createMemo } from "gnim"
 import type { Accessor } from "gnim"
 
 import type { WorkspaceSnapshot, WorkspaceInfo } from "../../modules/workspace/domain.ts"
+import { switchToWorkspace } from "../../runtime/workspace-source.ts"
+import { toggleDashboardVisibility } from "../../app/dashboard-controller.ts"
 
 export interface WorkspaceViewProps {
   snapshot: Accessor<WorkspaceSnapshot | null>
@@ -48,7 +50,13 @@ export default function WorkspaceView(props: WorkspaceViewProps) {
           const exists = createMemo(() => ws().id > 0)
 
           return (
-            <WsCard ws={ws} isActive={isActive} visible={exists} />
+            <WsCard ws={ws} isActive={isActive} visible={exists} onClicked={() => {
+              const w = ws()
+              if (w.id > 0) {
+                switchToWorkspace(w.id)
+                toggleDashboardVisibility()
+              }
+            }} />
           )
         })}
       </box>
@@ -60,6 +68,7 @@ interface WsCardProps {
   ws: Accessor<WorkspaceInfo>
   isActive: Accessor<boolean>
   visible: Accessor<boolean>
+  onClicked: () => void
 }
 
 function WsCard(props: WsCardProps) {
@@ -79,19 +88,20 @@ function WsCard(props: WsCardProps) {
   )
 
   return (
-    <box
+    <button
       class={cardClass}
       visible={props.visible}
-      orientation={Gtk.Orientation.VERTICAL}
-      spacing={6}
+      onClicked={props.onClicked}
       hexpand
     >
-      <box spacing={0}>
-        <label class="WsCardId" label={wsName} halign={Gtk.Align.START} hexpand />
-        <label class="WsCardBadge" label={windowCount} halign={Gtk.Align.END} />
+      <box orientation={Gtk.Orientation.VERTICAL} spacing={6}>
+        <box spacing={0}>
+          <label class="WsCardId" label={wsName} halign={Gtk.Align.START} hexpand />
+          <label class="WsCardBadge" label={windowCount} halign={Gtk.Align.END} />
+        </box>
+        <label class="WsCardTitle" label={lastTitle} halign={Gtk.Align.START} xalign={0} ellipsize={3} />
+        <label class="WsCardClients" label={clientList} halign={Gtk.Align.START} xalign={0} ellipsize={3} />
       </box>
-      <label class="WsCardTitle" label={lastTitle} halign={Gtk.Align.START} xalign={0} ellipsize={3} />
-      <label class="WsCardClients" label={clientList} halign={Gtk.Align.START} xalign={0} ellipsize={3} />
-    </box>
+    </button>
   )
 }

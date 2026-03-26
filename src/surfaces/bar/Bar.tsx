@@ -8,6 +8,7 @@ import type { BarIndicatorViewModel } from "../../shared/bar-indicator.ts"
 import type { BatterySnapshot } from "../../modules/battery/domain.ts"
 import type { WorkspaceSnapshot } from "../../modules/workspace/domain.ts"
 import type { ImeSnapshot } from "../../runtime/ime-source.ts"
+import { switchToWorkspace } from "../../runtime/workspace-source.ts"
 import BarIndicatorStrip from "./BarIndicatorStrip.tsx"
 import BatteryBarWidget from "./BatteryBarWidget.tsx"
 
@@ -77,12 +78,14 @@ export default function Bar(props: BarProps) {
             })
 
             return (
-              <label
+              <button
                 class={dotClass}
-                label={dotLabel}
                 visible={visible}
                 valign={Gtk.Align.CENTER}
-              />
+                onClicked={() => switchToWorkspace(wsId)}
+              >
+                <label label={dotLabel} />
+              </button>
             )
           })}
         </box>

@@ -18,3 +18,7 @@ export function createWorkspaceSource() {
   const snapshot = createPoll<WorkspaceSnapshot | null>(null, POLL_MS, readSnapshot)
   return { snapshot }
 }
+
+export function switchToWorkspace(id: number): void {
+  safeExec(["hyprctl", "dispatch", "workspace", `${id}`])
+}
