@@ -17,6 +17,41 @@ def flatten(d: dict, prefix: str = "") -> dict[str, str]:
     return out
 
 
+def gen_cava_conf(data: dict, base: Path) -> None:
+    """spectrum セクションから cava-bar.conf を生成"""
+    spec = data.get("spectrum", {})
+    bars = spec.get("bars", 10)
+    framerate = spec.get("framerate", 60)
+    sensitivity = spec.get("sensitivity", 150)
+    noise_reduction = spec.get("noise-reduction", 0)
+
+    dst = base / "cava-bar.conf"
+    dst.write_text(
+        f"[general]\n"
+        f"bars = {bars}\n"
+        f"framerate = {framerate}\n"
+        f"sensitivity = {sensitivity}\n"
+        f"\n"
+        f"[smoothing]\n"
+        f"noise_reduction = {noise_reduction}\n"
+        f"\n"
+        f"[input]\n"
+        f"method = pipewire\n"
+        f"source = auto\n"
+        f"\n"
+        f"[output]\n"
+        f"method = raw\n"
+        f"raw_target = /dev/stdout\n"
+        f"data_format = ascii\n"
+        f"ascii_max_range = 100\n"
+        f"bar_delimiter = 59\n"
+        f"frame_delimiter = 10\n"
+        f"channels = mono\n"
+        f"mono_option = average\n"
+    )
+    print(f"✓ {dst.relative_to(base)}")
+
+
 def main() -> None:
     base = Path(__file__).resolve().parent.parent
     src = base / "theme.yaml"
@@ -35,6 +70,8 @@ def main() -> None:
     lines.append("")
     dst.write_text("\n".join(lines))
     print(f"✓ {dst.relative_to(base)}")
+
+    gen_cava_conf(data, base)
 
 
 if __name__ == "__main__":

@@ -9,8 +9,11 @@ import type { BatterySnapshot } from "../../modules/battery/domain.ts"
 import type { WorkspaceSnapshot } from "../../modules/workspace/domain.ts"
 import type { ImeSnapshot } from "../../runtime/ime-source.ts"
 import { switchToWorkspace } from "../../runtime/workspace-source.ts"
+import type { PlayerSource } from "../../runtime/player-source.ts"
 import BarIndicatorStrip from "./BarIndicatorStrip.tsx"
 import BatteryBarWidget from "./BatteryBarWidget.tsx"
+import SpectrumWidget from "./SpectrumWidget.tsx"
+import PlayerWidget from "./PlayerWidget.tsx"
 
 export interface BarProps {
   gdkmonitor: Gdk.Monitor
@@ -20,6 +23,8 @@ export interface BarProps {
   batterySnapshot: Accessor<BatterySnapshot | null>
   imeSnapshot: Accessor<ImeSnapshot | null>
   workspaceSnapshot: Accessor<WorkspaceSnapshot | null>
+  spectrumBars: Accessor<number[]>
+  player: PlayerSource
   onToggleDashboard: () => void
   onToggleBatteryPopup: () => void
 }
@@ -49,7 +54,9 @@ export default function Bar(props: BarProps) {
       application={app}
     >
       <centerbox cssName="centerbox">
-        <box $type="start" spacing={4} halign={Gtk.Align.START} valign={Gtk.Align.CENTER}>
+        <box $type="start" spacing={8} halign={Gtk.Align.START} valign={Gtk.Align.CENTER}>
+          <SpectrumWidget bars={props.spectrumBars} />
+          <PlayerWidget player={props.player} />
           {Array.from({ length: MAX_WS_DOTS }).map((_, i) => {
             const wsId = i + 1
             const dotClass = createMemo(() => {

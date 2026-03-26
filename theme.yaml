@@ -73,6 +73,13 @@ tone:
   border-width: 4px
   muted-color:  "rgba(138, 149, 179, 0.48)"
 
+# ── スペクトラム (CAVA) ──────────────────────
+spectrum:
+  bars:            10
+  framerate:       60
+  sensitivity:     150
+  noise-reduction: 0
+
 # ── プレビュー ──────────────────────────────
 preview:
   padding:       24px

@@ -10,6 +10,8 @@ import { createImeSource } from "../runtime/ime-source.ts"
 import { createClock } from "../shared/runtime/clock.ts"
 import { createPwsaveSource } from "../runtime/pwsave-source.ts"
 import { createLidActionSource } from "../runtime/lid-action-source.ts"
+import { createSpectrumSource } from "../runtime/spectrum-source.ts"
+import { createPlayerSource } from "../runtime/player-source.ts"
 import Bar from "../surfaces/bar/Bar.tsx"
 import WorkspaceWindow from "../surfaces/workspace/WorkspaceWindow.tsx"
 import BatteryPopup from "../surfaces/popups/BatteryPopup.tsx"
@@ -26,6 +28,8 @@ export function startMainApp() {
   const clock = createClock()
   const pwsaveSource = createPwsaveSource()
   const lidActionSource = createLidActionSource()
+  const spectrumSource = createSpectrumSource()
+  const playerSource = createPlayerSource()
   const indicators = barIndicators(modules)
 
   app.start({
@@ -40,6 +44,8 @@ export function startMainApp() {
           monitorIndex,
           clock,
           indicators,
+          spectrumBars: spectrumSource.bars,
+          player: playerSource,
           batterySnapshot: modules.battery.snapshot,
           imeSnapshot: imeSource.snapshot,
           workspaceSnapshot: workspaceSource.snapshot,
