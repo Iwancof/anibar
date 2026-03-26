@@ -446,6 +446,84 @@ window.Launcher {
   font-size: 11px;
 }
 
+// ── ワークスペース概要 ────────────────────
+window.WsOverview {
+  background: transparent;
+  font-family: $font-family;
+}
+
+.WsBackdrop {
+  background: rgba(8, 10, 16, 0.5);
+  border: none;
+}
+
+.WsPanel {
+  background: rgba(12, 14, 20, 0.88);
+  border: 1px solid rgba(122, 162, 247, 0.2);
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.6);
+}
+
+.WsHeader {
+  padding-bottom: 8px;
+  border-bottom: 1px solid #1a1e2e;
+}
+
+.WsHeaderLabel {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: rgba(224, 230, 240, 0.4);
+  font-weight: 700;
+}
+
+.WsHeaderActive {
+  font-size: 11px;
+  color: #00ffcc;
+}
+
+.WsGrid {
+  margin-top: 4px;
+}
+
+.WsCard {
+  background: #111420;
+  border: 1px solid #1a1e2e;
+  border-radius: 10px;
+  padding: 12px;
+  min-width: 140px;
+}
+
+.WsCardActive {
+  background: rgba(122, 162, 247, 0.1);
+  border-color: rgba(122, 162, 247, 0.35);
+}
+
+.WsCardId {
+  font-size: 22px;
+  font-weight: 800;
+  color: $colors-text;
+}
+
+.WsCardActive .WsCardId {
+  color: #7aa2f7;
+}
+
+.WsCardBadge {
+  font-size: 10px;
+  color: rgba(224, 230, 240, 0.35);
+}
+
+.WsCardTitle {
+  font-size: 11px;
+  color: rgba(224, 230, 240, 0.6);
+}
+
+.WsCardClients {
+  font-size: 10px;
+  color: rgba(224, 230, 240, 0.3);
+}
+
 // ── ダッシュボード ────────────────────────
 window.Dashboard {
   background: transparent;

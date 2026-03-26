@@ -5,9 +5,10 @@ import app from "ags/gtk4/app"
 import style from "../../style.scss"
 import { createRuntimeAppModules, barIndicators } from "../modules/index.ts"
 import { createSystemStatsSource } from "../runtime/system-stats-source.ts"
+import { createWorkspaceSource } from "../runtime/workspace-source.ts"
 import { createClock } from "../shared/runtime/clock.ts"
 import Bar from "../surfaces/bar/Bar.tsx"
-import DashboardWindow from "../surfaces/dashboard/DashboardWindow.tsx"
+import WorkspaceWindow from "../surfaces/workspace/WorkspaceWindow.tsx"
 import BatteryPopup from "../surfaces/popups/BatteryPopup.tsx"
 import LauncherWindow from "../surfaces/launcher/LauncherWindow.tsx"
 import { toggleDashboardVisibility } from "./dashboard-controller.ts"
@@ -17,8 +18,8 @@ import { handleAppRequest } from "./request-handler.ts"
 export function startMainApp() {
   const modules = createRuntimeAppModules()
   const systemStats = createSystemStatsSource()
+  const workspaceSource = createWorkspaceSource()
   const clock = createClock()
-  const hostname = GLib.get_host_name() ?? "unknown-host"
   const indicators = barIndicators(modules)
 
   app.start({
@@ -50,12 +51,10 @@ export function startMainApp() {
           monitorIndex,
         })
 
-        DashboardWindow({
+        WorkspaceWindow({
           gdkmonitor,
           monitorIndex,
-          modules,
-          clock,
-          hostname,
+          snapshot: workspaceSource.snapshot,
           onClose: () => {
             void toggleDashboardVisibility()
           },
