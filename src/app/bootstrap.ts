@@ -6,6 +6,7 @@ import style from "../../style.scss"
 import { createRuntimeAppModules, barIndicators } from "../modules/index.ts"
 import { createSystemStatsSource } from "../runtime/system-stats-source.ts"
 import { createWorkspaceSource } from "../runtime/workspace-source.ts"
+import { createImeSource } from "../runtime/ime-source.ts"
 import { createClock } from "../shared/runtime/clock.ts"
 import Bar from "../surfaces/bar/Bar.tsx"
 import WorkspaceWindow from "../surfaces/workspace/WorkspaceWindow.tsx"
@@ -19,6 +20,7 @@ export function startMainApp() {
   const modules = createRuntimeAppModules()
   const systemStats = createSystemStatsSource()
   const workspaceSource = createWorkspaceSource()
+  const imeSource = createImeSource()
   const clock = createClock()
   const indicators = barIndicators(modules)
 
@@ -35,6 +37,7 @@ export function startMainApp() {
           clock,
           indicators,
           batterySnapshot: modules.battery.snapshot,
+          imeSnapshot: imeSource.snapshot,
           onToggleDashboard: toggleDashboardVisibility,
           onToggleBatteryPopup: toggleBatteryPopup,
         })

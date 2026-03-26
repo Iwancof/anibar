@@ -52,6 +52,23 @@ window.Bar {
   font-size: $bar-indicator-label-size;
 }
 
+// ── IME インジケータ ──────────────────────
+.ImeIndicator {
+  font-family: "Noto Sans Mono CJK JP", $font-family;
+  font-size: 13px;
+  font-weight: 700;
+  color: $colors-muted;
+  background: rgba(138, 149, 179, 0.1);
+  border-radius: 4px;
+  padding: 0 5px;
+  min-width: 20px;
+}
+
+.ImeActive {
+  color: #00ffcc;
+  background: rgba(0, 255, 204, 0.1);
+}
+
 // ── バッテリー視覚インジケータ ────────────
 .BatIndicator {
   padding: 0;
