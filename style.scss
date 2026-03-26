@@ -286,8 +286,8 @@ window.Bar {
 }
 
 .BatPopupPanel {
-  background: #0c0e14;
-  border: 1px solid #1a1e2e;
+  background: rgba(12, 14, 20, 0.75);
+  border: 1px solid rgba(26, 30, 46, 0.8);
   border-radius: 8px;
   padding: 0;
   margin-top: 6px;
@@ -395,10 +395,10 @@ window.Bar {
 }
 
 .HudStat {
-  background: #111420;
+  background: rgba(17, 20, 32, 0.6);
   border-radius: 4px;
   padding: 8px 10px;
-  border: 1px solid #1a1e2e;
+  border: 1px solid rgba(26, 30, 46, 0.7);
 }
 
 .HudStatLabel {
@@ -505,8 +505,8 @@ window.Bar {
 }
 
 .HudPulldownTrigger {
-  background: #151822;
-  border: 1px solid #2a2e3e;
+  background: rgba(21, 24, 34, 0.6);
+  border: 1px solid rgba(42, 46, 62, 0.7);
   border-radius: 8px;
   padding: 5px 12px;
   min-width: 100px;
@@ -523,7 +523,7 @@ window.Bar {
 
 // ── Pull-down menu (overlay) ──
 .HudPdMenu {
-  background: rgba(17, 20, 32, 0.95);
+  background: rgba(17, 20, 32, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
   padding: 4px;
@@ -632,7 +632,7 @@ window.Bar {
   min-width: 51px;
   min-height: 31px;
   border-radius: 16px;
-  background: #151822;
+  background: rgba(21, 24, 34, 0.6);
   border: 1.5px solid #2a2e3e;
   transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -693,6 +693,227 @@ window.Bar {
   min-height: 1px;
   background: #1a1e2e;
   margin: 4px 0;
+}
+
+// ── 通知ポップアップ ──────────────────────
+window.NotifPopupWindow {
+  background: transparent;
+}
+
+.NotifPopupList {
+  padding: 6px 8px;
+}
+
+.NotifCard {
+  background: rgba(12, 14, 20, 0.75);
+  border: 1px solid rgba(122, 162, 247, 0.2);
+  border-radius: 12px;
+  padding: 12px 16px;
+  min-width: 320px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  margin-top: 4px;
+}
+
+.NotifCard:hover {
+  border-color: rgba(122, 162, 247, 0.4);
+}
+
+.NotifCritical {
+  border-color: rgba(255, 34, 102, 0.4);
+}
+
+.NotifCritical:hover {
+  border-color: rgba(255, 34, 102, 0.6);
+}
+
+.NotifLow {
+  border-color: rgba(138, 149, 179, 0.15);
+}
+
+.NotifAppName {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: rgba(224, 230, 240, 0.4);
+  font-weight: 600;
+}
+
+.NotifTime {
+  font-size: 10px;
+  color: rgba(224, 230, 240, 0.25);
+}
+
+.NotifSummary {
+  font-size: 14px;
+  font-weight: 700;
+  color: $colors-text;
+}
+
+.NotifBody {
+  font-size: 12px;
+  color: $colors-muted;
+}
+
+// ── 通知ベルアイコン (バー) ────────────────
+.NotifBellBtn {
+  background: transparent;
+  border: none;
+  padding: 0 4px;
+  margin: 0;
+}
+
+.NotifBellIcon {
+  font-size: 14px;
+  color: $colors-muted;
+}
+
+.NotifBellBadge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #ff2266;
+}
+
+// ── 通知センター ──────────────────────────
+window.NotifCenter {
+  background: transparent;
+}
+
+.NotifCenterBackdrop {
+  background: transparent;
+  border: none;
+}
+
+.NotifCenter.open .NotifCenterBackdrop {
+  animation: backdrop-fade-in 200ms ease-out forwards;
+}
+
+.NotifCenter.open .NotifCenterPanel {
+  animation: popup-slide-in 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.NotifCenter.closing .NotifCenterBackdrop {
+  animation: backdrop-fade-out 200ms ease-in forwards;
+}
+
+.NotifCenter.closing .NotifCenterPanel {
+  animation: popup-slide-out 200ms ease-in forwards;
+}
+
+.NotifCenterPanel {
+  background: rgba(12, 14, 20, 0.75);
+  border: 1px solid rgba(122, 162, 247, 0.2);
+  border-radius: 12px;
+  padding: 0;
+  margin-top: 6px;
+  margin-right: 8px;
+  min-width: 380px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+}
+
+.NotifCenterHeader {
+  padding: 12px 16px;
+  border-bottom: 1px solid #1a1e2e;
+}
+
+.NotifCenterTitle {
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  color: rgba(224, 230, 240, 0.4);
+}
+
+.NotifDndBtn {
+  background: rgba(138, 149, 179, 0.08);
+  border: 1px solid rgba(138, 149, 179, 0.2);
+  border-radius: 6px;
+  padding: 4px 10px;
+}
+
+.NotifDndBtn label {
+  font-size: 11px;
+  color: $colors-muted;
+}
+
+.NotifDndOn {
+  background: rgba(255, 170, 0, 0.1);
+  border-color: rgba(255, 170, 0, 0.3);
+}
+
+.NotifDndOn label {
+  color: #ffaa00;
+  font-weight: 700;
+}
+
+.NotifIcon {
+  opacity: 0.9;
+}
+
+.NotifCenterClearBtn {
+  background: rgba(255, 34, 102, 0.08);
+  border: 1px solid rgba(255, 34, 102, 0.2);
+  border-radius: 6px;
+  padding: 4px 10px;
+}
+
+.NotifCenterClearBtn label {
+  font-size: 11px;
+  color: #ff2266;
+}
+
+.NotifCenterScroll {
+  background: transparent;
+}
+
+.NotifCenterList {
+  padding: 8px;
+}
+
+.NotifCenterEmpty {
+  font-size: 13px;
+  color: rgba(224, 230, 240, 0.3);
+  padding: 24px;
+}
+
+.NotifHistoryCard {
+  background: rgba(17, 20, 32, 0.5);
+  border: 1px solid rgba(26, 30, 46, 0.7);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.NotifHistoryCard:hover {
+  border-color: rgba(122, 162, 247, 0.3);
+}
+
+.NotifHistoryCritical {
+  border-color: rgba(255, 34, 102, 0.3);
+}
+
+.NotifHistoryLow {
+  border-color: rgba(138, 149, 179, 0.1);
+}
+
+.NotifHistoryApp {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: rgba(224, 230, 240, 0.35);
+  font-weight: 600;
+}
+
+.NotifHistoryTime {
+  font-size: 10px;
+  color: rgba(224, 230, 240, 0.2);
+}
+
+.NotifHistorySummary {
+  font-size: 13px;
+  font-weight: 700;
+  color: $colors-text;
+}
+
+.NotifHistoryBody {
+  font-size: 11px;
+  color: $colors-muted;
 }
 
 // ── ランチャー ────────────────────────────
@@ -996,7 +1217,7 @@ window.PreviewWindow {
 
 // Preview 用 — opacity:0 を上書き
 .HudPreviewPanel {
-  background: #0c0e14;
+  background: rgba(12, 14, 20, 0.75);
   border: 1px solid #1a1e2e;
   border-radius: 8px;
   padding: 0;
