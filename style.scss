@@ -700,6 +700,11 @@ window.NotifPopupWindow {
   background: transparent;
 }
 
+.NotifPopupBackdrop {
+  background: transparent;
+  border: none;
+}
+
 .NotifPopupList {
   padding: 6px 8px;
 }
