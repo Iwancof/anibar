@@ -25,8 +25,10 @@ export interface BarProps {
   workspaceSnapshot: Accessor<WorkspaceSnapshot | null>
   spectrumBars: Accessor<number[]>
   player: PlayerSource
+  notifUnreadCount: Accessor<number>
   onToggleDashboard: () => void
   onToggleBatteryPopup: () => void
+  onToggleNotifCenter: () => void
 }
 
 const MAX_WS_DOTS = 9
@@ -99,6 +101,21 @@ export default function Bar(props: BarProps) {
         <label $type="center" class="BarClock" label={props.clock} />
         <box $type="end" spacing={10} halign={Gtk.Align.END} valign={Gtk.Align.CENTER}>
           <BarIndicatorStrip indicators={props.indicators} />
+          <button
+            class="NotifBellBtn"
+            valign={Gtk.Align.CENTER}
+            onClicked={props.onToggleNotifCenter}
+          >
+            <box spacing={4} valign={Gtk.Align.CENTER}>
+              <label class="NotifBellIcon" label={"󰂚"} valign={Gtk.Align.CENTER} />
+              <label
+                class="NotifBellBadge"
+                label={props.notifUnreadCount((c) => c > 0 ? `${c}` : "")}
+                visible={props.notifUnreadCount((c) => c > 0)}
+                valign={Gtk.Align.CENTER}
+              />
+            </box>
+          </button>
           <label class={imeClass} label={imeLabel} valign={Gtk.Align.CENTER} />
           <BatteryBarWidget
             snapshot={props.batterySnapshot}
