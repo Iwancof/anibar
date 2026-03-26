@@ -8,6 +8,8 @@ import { createSystemStatsSource } from "../runtime/system-stats-source.ts"
 import { createWorkspaceSource } from "../runtime/workspace-source.ts"
 import { createImeSource } from "../runtime/ime-source.ts"
 import { createClock } from "../shared/runtime/clock.ts"
+import { createPwsaveSource } from "../runtime/pwsave-source.ts"
+import { createLidActionSource } from "../runtime/lid-action-source.ts"
 import Bar from "../surfaces/bar/Bar.tsx"
 import WorkspaceWindow from "../surfaces/workspace/WorkspaceWindow.tsx"
 import BatteryPopup from "../surfaces/popups/BatteryPopup.tsx"
@@ -22,6 +24,8 @@ export function startMainApp() {
   const workspaceSource = createWorkspaceSource()
   const imeSource = createImeSource()
   const clock = createClock()
+  const pwsaveSource = createPwsaveSource()
+  const lidActionSource = createLidActionSource()
   const indicators = barIndicators(modules)
 
   app.start({
@@ -48,6 +52,11 @@ export function startMainApp() {
           monitorIndex,
           snapshot: modules.battery.snapshot,
           systemStats: systemStats.snapshot,
+          pwsaveStatus: pwsaveSource.status,
+          lidAction: lidActionSource.action,
+          onToggleMeasure: pwsaveSource.toggleMeasure,
+          onToggleAll: pwsaveSource.toggleAll,
+          onSetLidAction: lidActionSource.setAction,
         })
 
         LauncherWindow({

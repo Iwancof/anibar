@@ -5,6 +5,7 @@ import type { Accessor } from "gnim"
 
 import type { BatterySnapshot } from "../../modules/battery/domain.ts"
 import type { SystemStatsSnapshot } from "../../modules/system-stats/domain.ts"
+import type { PwsaveStatus, MeasureName, LidAction } from "../../modules/power-save/domain.ts"
 import { closeBatteryPopup } from "../../app/popup-controller.ts"
 import BatteryHudView from "./BatteryHudView.tsx"
 
@@ -13,6 +14,11 @@ export interface BatteryPopupProps {
   monitorIndex: number
   snapshot: Accessor<BatterySnapshot | null>
   systemStats: Accessor<SystemStatsSnapshot | null>
+  pwsaveStatus: Accessor<PwsaveStatus | null>
+  lidAction: Accessor<LidAction>
+  onToggleMeasure: (name: MeasureName, enable: boolean) => void
+  onToggleAll: (enable: boolean) => void
+  onSetLidAction: (action: LidAction) => void
 }
 
 export default function BatteryPopup(props: BatteryPopupProps) {
@@ -49,7 +55,15 @@ export default function BatteryPopup(props: BatteryPopupProps) {
           valign={Gtk.Align.START}
         >
           <box class="BatPopupPanel" >
-            <BatteryHudView snapshot={props.snapshot} systemStats={props.systemStats} />
+            <BatteryHudView
+              snapshot={props.snapshot}
+              systemStats={props.systemStats}
+              pwsaveStatus={props.pwsaveStatus}
+              lidAction={props.lidAction}
+              onToggleMeasure={props.onToggleMeasure}
+              onToggleAll={props.onToggleAll}
+              onSetLidAction={props.onSetLidAction}
+            />
           </box>
         </box>
       </overlay>

@@ -12,7 +12,8 @@
     "preview:battery": "ags run src/preview/battery.tsx --gtk 4",
     "preview:network": "ags run src/preview/network.tsx --gtk 4",
     "preview:service-health": "ags run src/preview/service-health.tsx --gtk 4",
-    "preview:volume": "ags run src/preview/volume.tsx --gtk 4"
+    "preview:volume": "ags run src/preview/volume.tsx --gtk 4",
+    "preview:power": "npm run theme && ags run src/preview/power-controls.tsx --gtk 4"
   },
   "dependencies": {
     "ags": "*",
