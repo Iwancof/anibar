@@ -52,6 +52,7 @@ export default function LauncherView() {
       class="LauncherPanel"
       orientation={Gtk.Orientation.VERTICAL}
       spacing={0}
+      widthRequest={560}
       onRealize={(self: any) => {
         // Key navigation on the panel
         const keyCtrl = new Gtk.EventControllerKey()
