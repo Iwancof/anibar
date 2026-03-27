@@ -1832,6 +1832,64 @@ window.NpWindow {
   color: rgba($np-magenta, 0.5);
 }
 
+// ── Phase 2: Bandwidth + Quality ──
+
+.NpSparkline {
+  margin: 4px 8px 0;
+  border-radius: 4px;
+  background: rgba($np-bg3, 0.4);
+}
+
+.NpBwLabels {
+  margin: 2px 8px 4px;
+}
+
+.NpBwTx {
+  font-size: 15px;
+  font-weight: bold;
+  color: $np-cyan;
+}
+
+.NpBwRx {
+  font-size: 15px;
+  font-weight: bold;
+  color: $np-magenta;
+}
+
+.NpQualRow {
+  margin: 4px 8px;
+}
+
+.NpMiniCard {
+  padding: 6px 4px;
+  border-radius: 4px;
+  background: rgba($np-bg3, 0.5);
+  border: 1px solid $np-border;
+}
+
+.NpMiniValue {
+  font-size: 15px;
+  font-weight: bold;
+  color: $np-text;
+}
+
+.NpMiniLabel {
+  font-size: 9px;
+  color: $np-text-dim;
+}
+
+.NpQualGood .NpMiniValue {
+  color: $np-green;
+}
+
+.NpQualWarn .NpMiniValue {
+  color: $np-amber;
+}
+
+.NpQualBad .NpMiniValue {
+  color: $np-red;
+}
+
 // ── Scanline ──
 @keyframes np-scanline {
   0%   { margin-top: -200px; }
