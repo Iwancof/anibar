@@ -4,32 +4,38 @@ import { Astal, Gdk, Gtk } from "ags/gtk4"
 import type { Accessor } from "gnim"
 
 import type { NetworkSnapshot } from "../../modules/network/domain.ts"
-import type { WifiAccessPoint, WifiSnapshot } from "../../runtime/wifi-source.ts"
-import { closeNetworkPopup } from "../../app/popup-controller.ts"
+import { signalLevel, type WifiNetwork, type WifiSnapshot } from "../../modules/wifi/domain.ts"
+import { closeNetworkPopup } from "../../app/network-controller.ts"
 
 export interface NetworkPopupProps {
   gdkmonitor: Gdk.Monitor
   monitorIndex: number
   networkSnapshot: Accessor<NetworkSnapshot>
   wifiSnapshot: Accessor<WifiSnapshot>
-  onConnect: (ssid: string) => void
+  onConnect: (ssid: string, password?: string) => void
+  onRescan: () => void
 }
 
 function signalIcon(signal: number): string {
-  if (signal >= 75) return "󰤨"  // nf-md-wifi_strength_4
-  if (signal >= 50) return "󰤥"  // nf-md-wifi_strength_3
-  if (signal >= 25) return "󰤢"  // nf-md-wifi_strength_2
-  return "󰤟"                    // nf-md-wifi_strength_1
+  const level = signalLevel(signal)
+  switch (level) {
+    case 4: return "󰤨"
+    case 3: return "󰤥"
+    case 2: return "󰤢"
+    case 1: return "󰤟"
+    default: return "󰤯"
+  }
 }
 
 function signalClass(signal: number): string {
-  if (signal >= 75) return "NetApSignalHigh"
-  if (signal >= 50) return "NetApSignalMid"
-  if (signal >= 25) return "NetApSignalLow"
+  const level = signalLevel(signal)
+  if (level >= 3) return "NetApSignalHigh"
+  if (level >= 2) return "NetApSignalMid"
+  if (level >= 1) return "NetApSignalLow"
   return "NetApSignalWeak"
 }
 
-function ApRow({ ap, onConnect }: { ap: WifiAccessPoint; onConnect: (ssid: string) => void }) {
+function ApRow({ ap, onConnect }: { ap: WifiNetwork; onConnect: (ssid: string) => void }) {
   return (
     <button
       class={ap.inUse ? "NetApRow NetApRowActive" : "NetApRow"}
@@ -41,7 +47,7 @@ function ApRow({ ap, onConnect }: { ap: WifiAccessPoint; onConnect: (ssid: strin
           label={signalIcon(ap.signal)}
           valign={Gtk.Align.CENTER}
         />
-        <box vertical valign={Gtk.Align.CENTER} hexpand>
+        <box orientation={Gtk.Orientation.VERTICAL} valign={Gtk.Align.CENTER} hexpand>
           <label class="NetApSsid" label={ap.ssid} halign={Gtk.Align.START} />
           <label
             class="NetApMeta"
@@ -110,15 +116,51 @@ export default function NetworkPopup(props: NetworkPopupProps) {
               />
             </box>
 
+            {/* Connected section */}
+            <box class="NetConnectedSection" vertical spacing={4}>
+              <box spacing={8}>
+                <label class="NetConnectedLabel" label="Connected" halign={Gtk.Align.START} />
+                <label
+                  class="NetConnectedSsid"
+                  label={props.wifiSnapshot((s) => s.connected?.ssid ?? "—")}
+                  halign={Gtk.Align.END}
+                  hexpand
+                />
+              </box>
+              <box spacing={8}>
+                <label class="NetIpLabel" label="Local IP" halign={Gtk.Align.START} />
+                <label
+                  class="NetIpValue"
+                  label={props.wifiSnapshot((s) => s.localIp ?? "—")}
+                  halign={Gtk.Align.END}
+                  hexpand
+                  selectable
+                />
+              </box>
+            </box>
+
             {/* Global IP */}
-            <box class="NetIpRow" spacing={8}>
-              <label class="NetIpLabel" label="Global IP" halign={Gtk.Align.START} />
+            <box class="NetIpRow" vertical spacing={2}>
+              <box spacing={8}>
+                <label class="NetIpLabel" label="Global IP" halign={Gtk.Align.START} />
+                <label
+                  class="NetIpValue"
+                  label={props.wifiSnapshot((s) => s.globalIp?.ip ?? "—")}
+                  halign={Gtk.Align.END}
+                  hexpand
+                  selectable
+                />
+              </box>
               <label
-                class="NetIpValue"
-                label={props.wifiSnapshot((s) => s.globalIp ?? "—")}
-                halign={Gtk.Align.END}
-                hexpand
-                selectable
+                class="NetGeoLabel"
+                label={props.wifiSnapshot((s) => {
+                  const g = s.globalIp
+                  if (!g) return ""
+                  const parts = [g.city, g.country].filter(Boolean)
+                  const loc = parts.length > 0 ? parts.join(", ") : null
+                  return [loc, g.org].filter(Boolean).join(" • ")
+                })}
+                halign={Gtk.Align.START}
               />
             </box>
 
@@ -146,6 +188,9 @@ export default function NetworkPopup(props: NetworkPopupProps) {
             {/* Wi-Fi AP list */}
             <box class="NetApHeader" spacing={4}>
               <label class="NetApHeaderLabel" label="WI-FI NETWORKS" halign={Gtk.Align.START} hexpand />
+              <button class="NetRescanBtn" onClicked={props.onRescan}>
+                <label class="NetRescanIcon" label="󰑐" />
+              </button>
             </box>
 
             <scrollable
@@ -156,11 +201,11 @@ export default function NetworkPopup(props: NetworkPopupProps) {
             >
               <box class="NetApList" vertical spacing={2}>
                 {props.wifiSnapshot((s) => {
-                  if (s.accessPoints.length === 0) {
+                  if (s.networks.length === 0) {
                     return <label class="NetApEmpty" label="No Wi-Fi networks found" />
                   }
-                  return s.accessPoints.map((ap) => (
-                    <ApRow ap={ap} onConnect={props.onConnect} />
+                  return s.networks.map((ap) => (
+                    <ApRow ap={ap} onConnect={(ssid) => props.onConnect(ssid)} />
                   ))
                 })}
               </box>
