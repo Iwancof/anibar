@@ -31,9 +31,9 @@ function parseResolvectl(raw: string): DnsSnapshot {
     if (trimmed === "Global") { inGlobal = true; inLink = false; continue }
     if (trimmed.startsWith("Link ")) { inGlobal = false; inLink = true; continue }
 
-    // Global DNS servers
+    // Global DNS servers + Fallback DNS
     if (inGlobal) {
-      const dnsMatch = trimmed.match(/(?:Current )?DNS Servers?:\s*(.+)/)
+      const dnsMatch = trimmed.match(/(?:Current |Fallback )?DNS Servers?:\s*(.+)/)
       if (dnsMatch) {
         for (const s of dnsMatch[1].split(/\s+/)) {
           const addr = s.replace(/#.*$/, "").trim()

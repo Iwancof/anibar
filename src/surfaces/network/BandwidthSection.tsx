@@ -130,9 +130,9 @@ export default function BandwidthSection(props: BandwidthSectionProps) {
           })
         }}
       />
-      <box class="NpBwLabels" spacing={12}>
-        <label class="NpBwTx" label={txLabel} halign={Gtk.Align.START} />
-        <label class="NpBwRx" label={rxLabel} halign={Gtk.Align.START} />
+      <box class="NpBwLabels" spacing={0}>
+        <label class="NpBwTx" label={txLabel} xalign={0} widthRequest={140} />
+        <label class="NpBwRx" label={rxLabel} xalign={0} widthRequest={140} />
       </box>
     </box>
   )

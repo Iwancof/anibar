@@ -34,7 +34,7 @@ export default function TabArea(props: TabAreaProps) {
   const logVisible = createMemo(() => activeTab() === "log")
 
   return (
-    <box class="NpTabArea" orientation={Gtk.Orientation.VERTICAL} spacing={0}>
+    <box class="NpTabArea" orientation={Gtk.Orientation.VERTICAL} spacing={0} vexpand>
       <box class="NpTabBar" spacing={0}>
         <button class={apsBtn} onClicked={() => setActiveTab("aps")}>
           <label label="APs" />
@@ -50,7 +50,7 @@ export default function TabArea(props: TabAreaProps) {
         class="NpTabScroll"
         vscrollbarPolicy={Gtk.PolicyType.AUTOMATIC}
         hscrollbarPolicy={Gtk.PolicyType.NEVER}
-        heightRequest={180}
+        vexpand
       >
         <box orientation={Gtk.Orientation.VERTICAL} spacing={0}>
           <WifiTab

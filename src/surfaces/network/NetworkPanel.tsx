@@ -74,7 +74,7 @@ export default function NetworkPanel(props: NetworkPanelProps) {
           halign={Gtk.Align.END}
           valign={Gtk.Align.START}
         >
-          <box class="NpPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={560} heightRequest={800}>
+          <box class="NpPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={560} vexpand>
             <HeaderSection wifiSnapshot={props.wifiSnapshot} />
             <box class="NpContent" orientation={Gtk.Orientation.VERTICAL} spacing={0}>
               <IdentitySection wifiSnapshot={props.wifiSnapshot} />
