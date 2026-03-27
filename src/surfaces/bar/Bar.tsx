@@ -10,7 +10,7 @@ import type { WorkspaceSnapshot } from "../../modules/workspace/domain.ts"
 import type { ImeSnapshot } from "../../runtime/ime-source.ts"
 import { switchToWorkspace } from "../../runtime/workspace-source.ts"
 import type { NetworkSnapshot } from "../../modules/network/domain.ts"
-import type { WifiSnapshot } from "../../modules/wifi/domain.ts"
+import { signalLevel, type WifiSnapshot } from "../../modules/wifi/domain.ts"
 import type { PlayerSource } from "../../runtime/player-source.ts"
 import BarIndicatorStrip from "./BarIndicatorStrip.tsx"
 import BatteryBarWidget from "./BatteryBarWidget.tsx"
@@ -125,12 +125,27 @@ export default function Bar(props: BarProps) {
                 valign={Gtk.Align.CENTER}
               />
               <label
-                class="NetBarIcon"
-                label={props.networkSnapshot((s) =>
-                  s.online
-                    ? s.linkKind === "wifi" ? "󰤨" : "󰈁"
-                    : "󰤭"
-                )}
+                class={createMemo(() => {
+                  const net = props.networkSnapshot()
+                  if (!net.online) return "NetBarIcon NetBarIconOff"
+                  if (net.linkKind !== "wifi") return "NetBarIcon NetBarIconWired"
+                  return "NetBarIcon"
+                })}
+                label={createMemo(() => {
+                  const net = props.networkSnapshot()
+                  if (!net.online) return "󰤭"
+                  if (net.linkKind !== "wifi") return "󰈁"
+                  const ws = props.wifiSnapshot()
+                  const sig = ws?.connected?.signal ?? 0
+                  const level = signalLevel(sig)
+                  switch (level) {
+                    case 4: return "󰤨"
+                    case 3: return "󰤥"
+                    case 2: return "󰤢"
+                    case 1: return "󰤟"
+                    default: return "󰤯"
+                  }
+                })}
                 valign={Gtk.Align.CENTER}
               />
             </box>

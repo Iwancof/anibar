@@ -64,7 +64,7 @@ const EMPTY: WifiSnapshot = {
 export function createWifiSource(): WifiSource {
   const snapshot = createPoll<WifiSnapshot>(EMPTY, WIFI_POLL_MS, async () => {
     const [wifiOutput, globalIp, activeIface] = await Promise.all([
-      safeExec(["nmcli", "-t", "-f", "SSID,SIGNAL,SECURITY,BSSID,IN-USE", "device", "wifi", "list", "--rescan", "no"]),
+      safeExec(["nmcli", "-t", "-f", "SSID,SIGNAL,SECURITY,BSSID,IN-USE", "device", "wifi", "list", "--rescan", "auto"]),
       fetchGlobalIp(),
       fetchActiveInterface(),
     ])

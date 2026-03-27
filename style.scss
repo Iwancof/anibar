@@ -927,6 +927,14 @@ window.NetPopup {
   color: $colors-muted;
 }
 
+.NetBarIconWired {
+  color: rgba(138, 149, 179, 0.4);
+}
+
+.NetBarIconOff {
+  color: rgba(255, 34, 102, 0.5);
+}
+
 // ── 通知ポップアップ ──────────────────────
 window.NotifPopupWindow {
   background: transparent;
