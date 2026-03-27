@@ -23,6 +23,7 @@ import LatencySection from "./LatencySection.tsx"
 import SessionSection from "./SessionSection.tsx"
 import ConnectionsSection from "./ConnectionsSection.tsx"
 import TabArea from "./TabArea.tsx"
+import WifiTab from "./WifiTab.tsx"
 
 export interface NetworkPanelProps {
   gdkmonitor: Gdk.Monitor
@@ -72,18 +73,20 @@ export default function NetworkPanel(props: NetworkPanelProps) {
         <box
           $type="overlay"
           halign={Gtk.Align.END}
-          valign={Gtk.Align.START}
+          valign={Gtk.Align.FILL}
+          spacing={6}
         >
-          <box class="NpPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={560} vexpand>
+          {/* 左パネル: メイン情報 + Flows/Log */}
+          <box class="NpPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={520} vexpand>
             <HeaderSection wifiSnapshot={props.wifiSnapshot} />
             <box class="NpContent" orientation={Gtk.Orientation.VERTICAL} spacing={0}>
               <IdentitySection wifiSnapshot={props.wifiSnapshot} />
               <DnsSection dnsSnapshot={props.dnsSnapshot} />
               <BandwidthSection bandwidthSnapshot={props.bandwidthSnapshot} />
-              <box class="NpSection" spacing={8}>
+              <box spacing={8}>
                 <box hexpand><QualitySection qualitySnapshot={props.qualitySnapshot} /></box>
               </box>
-              <box class="NpSection" spacing={8}>
+              <box spacing={8}>
                 <box hexpand><LatencySection latencySnapshot={props.latencySnapshot} /></box>
               </box>
               <box class="NpCompactRow" spacing={12}>
@@ -92,11 +95,26 @@ export default function NetworkPanel(props: NetworkPanelProps) {
               </box>
             </box>
             <TabArea
-              wifiSnapshot={props.wifiSnapshot}
               flows={props.flows}
               logs={props.logs}
-              onConnect={props.onConnect}
             />
+          </box>
+          {/* 右パネル: APs 専用 */}
+          <box class="NpApPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={380} vexpand>
+            <box class="NpApPanelHeader" spacing={6}>
+              <label class="NpSectionLabel" label="ACCESS POINTS" hexpand halign={Gtk.Align.START} />
+            </box>
+            <Gtk.ScrolledWindow
+              class="NpApPanelScroll"
+              vscrollbarPolicy={Gtk.PolicyType.AUTOMATIC}
+              hscrollbarPolicy={Gtk.PolicyType.NEVER}
+              vexpand
+            >
+              <WifiTab
+                wifiSnapshot={props.wifiSnapshot}
+                onConnect={props.onConnect}
+              />
+            </Gtk.ScrolledWindow>
           </box>
         </box>
       </overlay>

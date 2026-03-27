@@ -2013,7 +2013,7 @@ window.NpWindow {
 
 .NpTabBtn {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 600;
   color: $np-text-sec;
   background: transparent;
@@ -2255,4 +2255,22 @@ window.NpWindow {
   font-size: $network-panel-info-label;
   color: $np-text-dim;
   margin-top: 2px;
+}
+
+// ── AP Side Panel ──
+.NpApPanel {
+  background: rgba($np-bg1, 0.92);
+  border: 1px solid $np-border;
+  border-radius: 8px;
+  margin-top: 6px;
+  margin-right: 8px;
+}
+
+.NpApPanelHeader {
+  padding: 10px 13px;
+  border-bottom: 1px solid $np-border;
+}
+
+.NpApPanelScroll {
+  background: transparent;
 }

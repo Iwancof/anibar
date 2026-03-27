@@ -7,7 +7,7 @@ const MAX_APS = 50
 
 export interface WifiTabProps {
   wifiSnapshot: Accessor<WifiSnapshot>
-  visible: Accessor<boolean>
+  visible?: Accessor<boolean>
   onConnect: (ssid: string, password?: string) => void
 }
 
@@ -77,7 +77,7 @@ export default function WifiTab(props: WifiTabProps) {
       class="NpTabContent"
       orientation={Gtk.Orientation.VERTICAL}
       spacing={0}
-      visible={props.visible}
+      visible={props.visible ?? true}
       onRealize={(self: Gtk.Widget) => {
         const keyCtrl = new Gtk.EventControllerKey()
         keyCtrl.connect("key-pressed", (_ctrl: any, keyval: number) => {
