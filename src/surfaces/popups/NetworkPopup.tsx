@@ -144,27 +144,27 @@ export default function NetworkPopup(props: NetworkPopupProps) {
             <box class="NetInfoSection" orientation={Gtk.Orientation.VERTICAL} spacing={3}>
               <box spacing={0}>
                 <label class="NetInfoLabel" label="Connected" halign={Gtk.Align.START} hexpand />
-                <box class="NetValueBox" widthRequest={180}><label class="NetIpFixed" label={props.wifiSnapshot((s) => s.connected?.ssid ?? "—")} halign={Gtk.Align.START} /></box>
+                <box class="NetValueBox" widthRequest={180}><label class="NetIpFixed" xalign={0} label={props.wifiSnapshot((s) => s.connected?.ssid ?? "—")} hexpand /></box>
               </box>
               <box spacing={0}>
                 <label class="NetInfoLabel" label="Interface" halign={Gtk.Align.START} hexpand />
-                <box class="NetValueBox" widthRequest={180}><label class="NetIpFixed NetIpv6" label={props.wifiSnapshot((s) => s.iface?.name ?? "—")} halign={Gtk.Align.START} /></box>
+                <box class="NetValueBox" widthRequest={180}><label class="NetIpFixed NetIpv6" xalign={0} label={props.wifiSnapshot((s) => s.iface?.name ?? "—")} hexpand /></box>
               </box>
               <box spacing={0}>
                 <label class="NetInfoLabel" label="IPv4" halign={Gtk.Align.START} hexpand />
-                <box class="NetValueBox" widthRequest={180}><label class="NetIpFixed" label={props.wifiSnapshot((s) => s.iface?.ipv4 ?? "—")} halign={Gtk.Align.START} /></box>
+                <box class="NetValueBox" widthRequest={180}><label class="NetIpFixed" xalign={0} label={props.wifiSnapshot((s) => s.iface?.ipv4 ?? "—")} hexpand /></box>
               </box>
               <box spacing={0}>
                 <label class="NetInfoLabel" label="IPv6" halign={Gtk.Align.START} hexpand />
-                <box class="NetValueBox" widthRequest={180}><label class="NetIpFixed NetIpv6" label={props.wifiSnapshot((s) => s.iface?.ipv6 ?? "—")} halign={Gtk.Align.START} /></box>
+                <box class="NetValueBox" widthRequest={180}><label class="NetIpFixed NetIpv6" xalign={0} label={props.wifiSnapshot((s) => s.iface?.ipv6 ?? "—")} hexpand /></box>
               </box>
               <box spacing={0}>
                 <label class="NetInfoLabel" label="Gateway" halign={Gtk.Align.START} hexpand />
-                <box class="NetValueBox" widthRequest={180}><label class="NetIpFixed" label={props.wifiSnapshot((s) => s.iface?.gateway ?? "—")} halign={Gtk.Align.START} /></box>
+                <box class="NetValueBox" widthRequest={180}><label class="NetIpFixed" xalign={0} label={props.wifiSnapshot((s) => s.iface?.gateway ?? "—")} hexpand /></box>
               </box>
               <box spacing={0}>
                 <label class="NetInfoLabel" label="Global IP" halign={Gtk.Align.START} hexpand />
-                <box class="NetValueBox" widthRequest={180}><label class="NetIpFixed" label={props.wifiSnapshot((s) => s.globalIp?.ip ?? "—")} halign={Gtk.Align.START} /></box>
+                <box class="NetValueBox" widthRequest={180}><label class="NetIpFixed" xalign={0} label={props.wifiSnapshot((s) => s.globalIp?.ip ?? "—")} hexpand /></box>
               </box>
               <label
                 class="NetGeoLabel"
@@ -180,7 +180,7 @@ export default function NetworkPopup(props: NetworkPopupProps) {
               />
               <box spacing={0}>
                 <label class="NetInfoLabel NetTorLabel" label="Tor IP" halign={Gtk.Align.START} hexpand />
-                <box class="NetValueBox" widthRequest={180}><label class="NetIpFixed NetTorIp" label={props.wifiSnapshot((s) => s.torIp?.ip ?? "—")} halign={Gtk.Align.START} /></box>
+                <box class="NetValueBox" widthRequest={180}><label class="NetIpFixed NetTorIp" xalign={0} label={props.wifiSnapshot((s) => s.torIp?.ip ?? "—")} hexpand /></box>
               </box>
               <label
                 class="NetGeoLabel NetTorGeo"
