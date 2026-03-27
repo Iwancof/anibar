@@ -74,7 +74,7 @@ export default function NetworkPanel(props: NetworkPanelProps) {
           halign={Gtk.Align.END}
           valign={Gtk.Align.START}
         >
-          <box class="NpPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={480} heightRequest={700}>
+          <box class="NpPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={560} heightRequest={720}>
             <HeaderSection wifiSnapshot={props.wifiSnapshot} />
             <Gtk.ScrolledWindow
               class="NpScrollArea"

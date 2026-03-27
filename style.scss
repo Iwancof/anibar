@@ -1755,7 +1755,7 @@ window.NpWindow {
 
 .NpSectionLabel {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   letter-spacing: 1.5px;
   color: $np-cyan-dim;
@@ -1773,43 +1773,43 @@ window.NpWindow {
 
 .NpInfoLabel {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 12px;
+  font-size: 13px;
   color: $np-text-dim;
 }
 
 .NpInfoValue {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 13px;
+  font-size: 15px;
   color: $np-text;
 }
 
 .NpInfoValueCyan {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 13px;
+  font-size: 15px;
   color: $np-cyan;
 }
 
 .NpInfoValueMagenta {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 13px;
+  font-size: 15px;
   color: $np-magenta;
 }
 
 .NpInfoValueDim {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 13px;
+  font-size: 15px;
   color: $np-text-sec;
 }
 
 .NpInfoValueSmall {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 13px;
+  font-size: 15px;
   color: $np-text;
 }
 
 .NpGeoLabel {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 10px;
+  font-size: 12px;
   color: $np-text-dim;
 }
 
@@ -2176,7 +2176,8 @@ window.NpWindow {
 
 .NpApSsid {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 10px;
+  font-size: 14px;
+  font-weight: 500;
   color: $np-text;
 }
 

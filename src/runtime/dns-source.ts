@@ -6,60 +6,66 @@ const DNS_POLL_MS = 30_000
 
 export interface DnsSnapshot {
   servers: string[]
-  dot: boolean
-  dnssec: boolean
+  protocols: string[]  // "dnscrypt", "DoT", "DNSSEC" etc.
+  linkDns: string | null  // リンク単位の DNS
 }
 
 const EMPTY: DnsSnapshot = {
   servers: [],
-  dot: false,
-  dnssec: false,
+  protocols: [],
+  linkDns: null,
 }
 
 function parseResolvectl(raw: string): DnsSnapshot {
   if (!raw) return EMPTY
 
   const servers: string[] = []
-  let dot = false
-  let dnssec = false
+  const protocols: string[] = []
+  let linkDns: string | null = null
+  let inGlobal = false
+  let inLink = false
 
   for (const line of raw.split("\n")) {
     const trimmed = line.trim()
 
-    // "DNS Servers: 192.168.11.1" or "Current DNS Server: ..."
-    const dnsMatch = trimmed.match(/DNS Servers?:\s*(.+)/)
-    if (dnsMatch) {
-      for (const s of dnsMatch[1].split(/\s+/)) {
-        const addr = s.trim()
-        if (addr && !servers.includes(addr)) servers.push(addr)
+    if (trimmed === "Global") { inGlobal = true; inLink = false; continue }
+    if (trimmed.startsWith("Link ")) { inGlobal = false; inLink = true; continue }
+
+    // Global DNS servers
+    if (inGlobal) {
+      const dnsMatch = trimmed.match(/(?:Current )?DNS Servers?:\s*(.+)/)
+      if (dnsMatch) {
+        for (const s of dnsMatch[1].split(/\s+/)) {
+          const addr = s.replace(/#.*$/, "").trim()
+          if (addr && !servers.includes(addr)) servers.push(addr)
+        }
+      }
+      if (trimmed.startsWith("Protocols:")) {
+        if (trimmed.includes("+DNSOverTLS")) protocols.push("DoT")
+        if (/DNSSEC=(yes|allow-downgrade)/.test(trimmed)) protocols.push("DNSSEC")
       }
     }
 
-    // "Protocols: +DefaultRoute +LLMNR ... -DNSOverTLS DNSSEC=no/unsupported"
-    if (trimmed.startsWith("Protocols:")) {
-      dot = trimmed.includes("+DNSOverTLS")
-      dnssec = /DNSSEC=(yes|allow-downgrade)/.test(trimmed)
+    // Link DNS
+    if (inLink) {
+      const linkMatch = trimmed.match(/Current DNS Server:\s*(.+)/)
+      if (linkMatch && !linkDns) {
+        linkDns = linkMatch[1].trim()
+      }
     }
   }
 
-  return { servers, dot, dnssec }
-}
-
-async function fetchActiveWifiInterface(): Promise<string | null> {
-  const out = await safeExec(["nmcli", "-t", "-f", "DEVICE,TYPE,STATE", "device", "status"])
-  for (const line of out.split("\n")) {
-    const [device, type, state] = line.split(":")
-    if (state?.trim() === "connected" && type?.trim() === "wifi") {
-      return device?.trim() ?? null
-    }
+  // dnscrypt-proxy detection: if server is 127.0.0.1:5300 or similar local
+  if (servers.some((s) => s.startsWith("127.0.0.1") || s.startsWith("::1"))) {
+    protocols.push("dnscrypt")
   }
-  return null
+
+  return { servers, protocols, linkDns }
 }
 
 async function fetchDns(): Promise<DnsSnapshot> {
-  const iface = await fetchActiveWifiInterface()
-  if (!iface) return EMPTY
-  const raw = await safeExec(["resolvectl", "status", iface])
+  // Global + all links
+  const raw = await safeExec(["resolvectl", "status"])
   return parseResolvectl(raw)
 }
 
