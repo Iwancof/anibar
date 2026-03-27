@@ -1923,32 +1923,16 @@ window.NpWindow {
   color: $np-text-sec;
 }
 
-.NpLatencyGood {
+.NpLatencyMs {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  color: $np-green;
-}
-
-.NpLatencyWarn {
-  font-family: $network-panel-font-family, $font-family;
-  font-size: 11px;
-  font-weight: 600;
-  color: $np-amber;
-}
-
-.NpLatencyBad {
-  font-family: $network-panel-font-family, $font-family;
-  font-size: 11px;
-  font-weight: 600;
-  color: $np-red;
-}
-
-.NpLatencyUnknown {
-  font-family: $network-panel-font-family, $font-family;
-  font-size: 11px;
   color: $np-text-dim;
 }
+
+.NpLatencyGood { color: $np-green; }
+.NpLatencyWarn { color: $np-amber; }
+.NpLatencyBad  { color: $np-red; }
 
 .NpLatencyBar {
   background: $np-bg3;
