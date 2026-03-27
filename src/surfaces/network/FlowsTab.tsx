@@ -13,14 +13,18 @@ export interface FlowsTabProps {
 function FlowRow(props: { entry: Accessor<FlowEntry | null> }) {
   const visible = createMemo(() => props.entry() != null)
   const dstPort = createMemo(() => props.entry()?.dstPort ?? "")
-  const dstIp = createMemo(() => props.entry()?.dstIp ?? "")
+  const dstHost = createMemo(() => {
+    const e = props.entry()
+    if (!e) return ""
+    return e.hostname || e.dstIp
+  })
   const proto = createMemo(() => props.entry()?.proto ?? "")
 
   return (
     <box class="NpFlowRow" spacing={4} visible={visible}>
       <label class="NpFlowPort" label={dstPort} widthRequest={42} xalign={1} />
       <label class="NpFlowProto" label={proto} widthRequest={32} xalign={0} />
-      <label class="NpFlowHost" label={dstIp} hexpand xalign={0} ellipsize={3} />
+      <label class="NpFlowHost" label={dstHost} hexpand xalign={0} ellipsize={3} />
     </box>
   )
 }
