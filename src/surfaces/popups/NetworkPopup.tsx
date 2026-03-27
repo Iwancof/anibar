@@ -158,8 +158,8 @@ export default function NetworkPopup(props: NetworkPopupProps) {
               vscrollbarPolicy={Gtk.PolicyType.AUTOMATIC}
               hscrollbarPolicy={Gtk.PolicyType.NEVER}
               vexpand
-              minContentHeight={100}
-              maxContentHeight={300}
+              minContentHeight={200}
+              maxContentHeight={500}
             >
               <box class="NetApList" orientation={Gtk.Orientation.VERTICAL} spacing={2}>
                 {Array.from({ length: MAX_APS }).map((_, i) => {
