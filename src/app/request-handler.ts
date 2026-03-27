@@ -1,6 +1,9 @@
 import { anyDashboardVisible, setDashboardVisibility, toggleDashboardVisibility } from "./dashboard-controller.ts"
 import { anyLauncherVisible, toggleLauncher, openLauncher, closeLauncher } from "./launcher-controller.ts"
 import { anySwipeDashboardVisible, setSwipeDashboardVisibility, toggleSwipeDashboard } from "./swipe-dashboard-controller.ts"
+import { toggleBatteryPopup, openBatteryPopup, closeBatteryPopup, anyBatteryPopupVisible } from "./popup-controller.ts"
+import { toggleNetworkPopup, openNetworkPopup, closeNetworkPopup } from "./network-controller.ts"
+import { toggleNotifCenter, openNotifCenter, closeNotifCenter } from "./notification-controller.ts"
 
 function normalizeArgs(args: string[]): string[] {
   return args.filter(Boolean).filter((arg, index) => {
@@ -55,8 +58,35 @@ export function handleAppRequest(args: string[]): string {
     }
   }
 
+  if (scope === "battery") {
+    switch (action) {
+      case "toggle": toggleBatteryPopup(); return "ok"
+      case "open": openBatteryPopup(); return "ok"
+      case "close": closeBatteryPopup(); return "ok"
+      default: return `unknown battery action "${action}"`
+    }
+  }
+
+  if (scope === "network") {
+    switch (action) {
+      case "toggle": toggleNetworkPopup(); return "ok"
+      case "open": openNetworkPopup(); return "ok"
+      case "close": closeNetworkPopup(); return "ok"
+      default: return `unknown network action "${action}"`
+    }
+  }
+
+  if (scope === "notif-center") {
+    switch (action) {
+      case "toggle": toggleNotifCenter(); return "ok"
+      case "open": openNotifCenter(); return "ok"
+      case "close": closeNotifCenter(); return "ok"
+      default: return `unknown notif-center action "${action}"`
+    }
+  }
+
   if (scope !== "dashboard") {
-    return 'unknown request. use "ags request dashboard|launcher|swipe-dashboard toggle"'
+    return 'unknown request. use "ags request battery|network|notif-center|dashboard|launcher|swipe-dashboard toggle"'
   }
 
   switch (action) {
