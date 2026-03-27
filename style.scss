@@ -908,10 +908,10 @@ window.NetPopup {
 }
 
 .NetIpFixed {
-  font-family: $font-family;
+  font-family: "Consolas", $font-family;
   font-size: 12px;
   color: $colors-text;
-  min-width: 120px;
+  min-width: 130px;
 }
 
 .NetTorLabel {

@@ -144,11 +144,13 @@ export default function NetworkPopup(props: NetworkPopupProps) {
             <box class="NetConnectedSection" orientation={Gtk.Orientation.VERTICAL} spacing={4}>
               <box spacing={8}>
                 <label class="NetInfoLabel" label="Connected" halign={Gtk.Align.START} hexpand />
-                <label
-                  class="NetInfoValue"
-                  label={props.wifiSnapshot((s) => s.connected?.ssid ?? "—")}
-                  halign={Gtk.Align.END}
-                />
+                <box widthRequest={130} halign={Gtk.Align.END}>
+                  <label
+                    class="NetInfoValue"
+                    label={props.wifiSnapshot((s) => s.connected?.ssid ?? "—")}
+                    halign={Gtk.Align.START}
+                  />
+                </box>
               </box>
               <box spacing={8}>
                 <label class="NetInfoLabel" label="Local IP" halign={Gtk.Align.START} hexpand />
