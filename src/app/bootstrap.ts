@@ -58,6 +58,7 @@ export function startMainApp() {
           spectrumBars: spectrumSource.bars,
           player: playerSource,
           networkSnapshot: modules.network.snapshot,
+          wifiSnapshot: wifiSource.snapshot,
           notifUnreadCount: notificationSource.unreadCount,
           batterySnapshot: modules.battery.snapshot,
           imeSnapshot: imeSource.snapshot,

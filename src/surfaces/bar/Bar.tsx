@@ -10,6 +10,7 @@ import type { WorkspaceSnapshot } from "../../modules/workspace/domain.ts"
 import type { ImeSnapshot } from "../../runtime/ime-source.ts"
 import { switchToWorkspace } from "../../runtime/workspace-source.ts"
 import type { NetworkSnapshot } from "../../modules/network/domain.ts"
+import type { WifiSnapshot } from "../../modules/wifi/domain.ts"
 import type { PlayerSource } from "../../runtime/player-source.ts"
 import BarIndicatorStrip from "./BarIndicatorStrip.tsx"
 import BatteryBarWidget from "./BatteryBarWidget.tsx"
@@ -27,6 +28,7 @@ export interface BarProps {
   spectrumBars: Accessor<number[]>
   player: PlayerSource
   networkSnapshot: Accessor<NetworkSnapshot>
+  wifiSnapshot: Accessor<WifiSnapshot>
   notifUnreadCount: Accessor<number>
   onToggleDashboard: () => void
   onToggleBatteryPopup: () => void
@@ -109,15 +111,29 @@ export default function Bar(props: BarProps) {
             valign={Gtk.Align.CENTER}
             onClicked={props.onToggleNetworkPopup}
           >
-            <label
-              class="NetBarIcon"
-              label={props.networkSnapshot((s) =>
-                s.online
-                  ? s.linkKind === "wifi" ? "󰤨" : "󰈁"
-                  : "󰤭"
-              )}
-              valign={Gtk.Align.CENTER}
-            />
+            <box spacing={6} valign={Gtk.Align.CENTER}>
+              <label
+                class="NetBarGlobalIp"
+                label={props.wifiSnapshot((s) => s?.globalIp?.ip ?? "")}
+                visible={props.wifiSnapshot((s) => s?.globalIp?.ip != null)}
+                valign={Gtk.Align.CENTER}
+              />
+              <label
+                class="NetBarSsid"
+                label={props.wifiSnapshot((s) => s?.connected?.ssid ?? "")}
+                visible={props.wifiSnapshot((s) => s?.connected != null)}
+                valign={Gtk.Align.CENTER}
+              />
+              <label
+                class="NetBarIcon"
+                label={props.networkSnapshot((s) =>
+                  s.online
+                    ? s.linkKind === "wifi" ? "󰤨" : "󰈁"
+                    : "󰤭"
+                )}
+                valign={Gtk.Align.CENTER}
+              />
+            </box>
           </button>
           <button
             class="NotifBellBtn"

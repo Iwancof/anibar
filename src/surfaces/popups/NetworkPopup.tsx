@@ -1,11 +1,13 @@
 import app from "ags/gtk4/app"
 import { Astal, Gdk, Gtk } from "ags/gtk4"
-
+import { createMemo } from "gnim"
 import type { Accessor } from "gnim"
 
 import type { NetworkSnapshot } from "../../modules/network/domain.ts"
-import { signalLevel, type WifiNetwork, type WifiSnapshot } from "../../modules/wifi/domain.ts"
+import { signalLevel, type WifiSnapshot } from "../../modules/wifi/domain.ts"
 import { closeNetworkPopup } from "../../app/network-controller.ts"
+
+const MAX_APS = 15
 
 export interface NetworkPopupProps {
   gdkmonitor: Gdk.Monitor
@@ -16,8 +18,7 @@ export interface NetworkPopupProps {
   onRescan: () => void
 }
 
-function signalIcon(signal: number): string {
-  const level = signalLevel(signal)
+function signalIcon(level: number): string {
   switch (level) {
     case 4: return "󰤨"
     case 3: return "󰤥"
@@ -27,45 +28,11 @@ function signalIcon(signal: number): string {
   }
 }
 
-function signalClass(signal: number): string {
-  const level = signalLevel(signal)
+function signalColorClass(level: number): string {
   if (level >= 3) return "NetApSignalHigh"
   if (level >= 2) return "NetApSignalMid"
   if (level >= 1) return "NetApSignalLow"
   return "NetApSignalWeak"
-}
-
-function ApRow({ ap, onConnect }: { ap: WifiNetwork; onConnect: (ssid: string) => void }) {
-  return (
-    <button
-      class={ap.inUse ? "NetApRow NetApRowActive" : "NetApRow"}
-      onClicked={() => { if (!ap.inUse) onConnect(ap.ssid) }}
-    >
-      <box spacing={10} valign={Gtk.Align.CENTER}>
-        <label
-          class={`NetApSignal ${signalClass(ap.signal)}`}
-          label={signalIcon(ap.signal)}
-          valign={Gtk.Align.CENTER}
-        />
-        <box orientation={Gtk.Orientation.VERTICAL} valign={Gtk.Align.CENTER} hexpand>
-          <label class="NetApSsid" label={ap.ssid} halign={Gtk.Align.START} />
-          <label
-            class="NetApMeta"
-            label={ap.security || "Open"}
-            halign={Gtk.Align.START}
-          />
-        </box>
-        {ap.inUse && (
-          <label class="NetApCheck" label="󰄬" valign={Gtk.Align.CENTER} />
-        )}
-        <label
-          class="NetApSignalPct"
-          label={`${ap.signal}%`}
-          valign={Gtk.Align.CENTER}
-        />
-      </box>
-    </button>
-  )
 }
 
 export default function NetworkPopup(props: NetworkPopupProps) {
@@ -101,16 +68,14 @@ export default function NetworkPopup(props: NetworkPopupProps) {
           halign={Gtk.Align.END}
           valign={Gtk.Align.START}
         >
-          <box class="NetPopupPanel" orientation={Gtk.Orientation.VERTICAL}>
+          <box class="NetPopupPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={380}>
             {/* Header */}
             <box class="NetPopupHeader" spacing={8}>
               <label class="NetPopupTitle" label="NETWORK" hexpand halign={Gtk.Align.START} />
               <label
                 class="NetPopupStatus"
                 label={props.networkSnapshot((s) =>
-                  s.online
-                    ? `${s.connectionName ?? s.interfaceName ?? "Connected"}`
-                    : "Offline"
+                  s.online ? (s.connectionName ?? "Connected") : "Offline"
                 )}
                 halign={Gtk.Align.END}
               />
@@ -134,7 +99,6 @@ export default function NetworkPopup(props: NetworkPopupProps) {
                   label={props.wifiSnapshot((s) => s.localIp ?? "—")}
                   halign={Gtk.Align.END}
                   hexpand
-                  selectable
                 />
               </box>
             </box>
@@ -148,7 +112,6 @@ export default function NetworkPopup(props: NetworkPopupProps) {
                   label={props.wifiSnapshot((s) => s.globalIp?.ip ?? "—")}
                   halign={Gtk.Align.END}
                   hexpand
-                  selectable
                 />
               </box>
               <label
@@ -158,34 +121,30 @@ export default function NetworkPopup(props: NetworkPopupProps) {
                   if (!g) return ""
                   const parts = [g.city, g.country].filter(Boolean)
                   const loc = parts.length > 0 ? parts.join(", ") : null
-                  return [loc, g.org].filter(Boolean).join(" • ")
+                  return [loc, g.org].filter(Boolean).join(" · ")
                 })}
                 halign={Gtk.Align.START}
               />
             </box>
 
-            {/* Interface info */}
+            {/* Interface + Tailscale */}
             <box class="NetIfRow" spacing={8}>
               <label
                 class="NetIfLabel"
                 label={props.networkSnapshot((s) =>
-                  s.online
-                    ? `${s.linkKind.toUpperCase()} • ${s.interfaceName ?? ""}`
-                    : "No active interface"
+                  s.online ? `${s.linkKind.toUpperCase()} · ${s.interfaceName ?? ""}` : "No interface"
                 )}
                 halign={Gtk.Align.START}
                 hexpand
               />
               <label
                 class="NetTailscale"
-                label={props.networkSnapshot((s) =>
-                  s.tailscaleOnline ? "󰒒 TS" : ""
-                )}
+                label={props.networkSnapshot((s) => s.tailscaleOnline ? "󰒒 TS" : "")}
                 halign={Gtk.Align.END}
               />
             </box>
 
-            {/* Wi-Fi AP list */}
+            {/* AP list header */}
             <box class="NetApHeader" spacing={4}>
               <label class="NetApHeaderLabel" label="WI-FI NETWORKS" halign={Gtk.Align.START} hexpand />
               <button class="NetRescanBtn" onClicked={props.onRescan}>
@@ -193,21 +152,56 @@ export default function NetworkPopup(props: NetworkPopupProps) {
               </button>
             </box>
 
+            {/* AP list — pre-created rows */}
             <Gtk.ScrolledWindow
               class="NetApScroll"
               vscrollbarPolicy={Gtk.PolicyType.AUTOMATIC}
               hscrollbarPolicy={Gtk.PolicyType.NEVER}
               vexpand
               minContentHeight={100}
+              maxContentHeight={300}
             >
               <box class="NetApList" orientation={Gtk.Orientation.VERTICAL} spacing={2}>
-                {props.wifiSnapshot((s) => {
-                  if (s.networks.length === 0) {
-                    return <label class="NetApEmpty" label="No Wi-Fi networks found" />
-                  }
-                  return s.networks.map((ap) => (
-                    <ApRow ap={ap} onConnect={(ssid) => props.onConnect(ssid)} />
-                  ))
+                {Array.from({ length: MAX_APS }).map((_, i) => {
+                  const ap = createMemo(() => props.wifiSnapshot().networks[i] ?? null)
+                  const rowVisible = createMemo(() => ap() != null)
+                  const ssid = createMemo(() => ap()?.ssid ?? "")
+                  const security = createMemo(() => ap()?.security ?? "")
+                  const signal = createMemo(() => ap()?.signal ?? 0)
+                  const inUse = createMemo(() => ap()?.inUse ?? false)
+                  const rowClass = createMemo(() =>
+                    ap()?.inUse ? "NetApRow NetApRowActive" : "NetApRow"
+                  )
+                  const sigLevel = createMemo(() => signalLevel(signal()))
+                  const sigIconLabel = createMemo(() => signalIcon(sigLevel()))
+                  const sigClass = createMemo(() => `NetApSignal ${signalColorClass(sigLevel())}`)
+                  const sigPct = createMemo(() => `${signal()}%`)
+
+                  return (
+                    <button
+                      class={rowClass}
+                      visible={rowVisible}
+                      onClicked={() => {
+                        const a = ap()
+                        if (a && !a.inUse) props.onConnect(a.ssid)
+                      }}
+                    >
+                      <box spacing={10} valign={Gtk.Align.CENTER}>
+                        <label class={sigClass} label={sigIconLabel} valign={Gtk.Align.CENTER} />
+                        <box orientation={Gtk.Orientation.VERTICAL} valign={Gtk.Align.CENTER} hexpand>
+                          <label class="NetApSsid" label={ssid} halign={Gtk.Align.START} />
+                          <label class="NetApMeta" label={security} halign={Gtk.Align.START} />
+                        </box>
+                        <label
+                          class="NetApCheck"
+                          label="󰄬"
+                          visible={inUse}
+                          valign={Gtk.Align.CENTER}
+                        />
+                        <label class="NetApSignalPct" label={sigPct} valign={Gtk.Align.CENTER} />
+                      </box>
+                    </button>
+                  )
                 })}
               </box>
             </Gtk.ScrolledWindow>

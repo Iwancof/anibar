@@ -909,6 +909,18 @@ window.NetPopup {
   margin: 0;
 }
 
+.NetBarGlobalIp {
+  font-family: $font-family;
+  font-size: 10px;
+  color: rgba(224, 230, 240, 0.35);
+}
+
+.NetBarSsid {
+  font-family: $font-family;
+  font-size: 11px;
+  color: $colors-muted;
+}
+
 .NetBarIcon {
   font-family: "HackGen Console NF";
   font-size: 14px;
