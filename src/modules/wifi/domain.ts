@@ -15,6 +15,7 @@ export interface GlobalIpInfo {
 
 export interface InterfaceInfo {
   name: string
+  mac: string | null       // e.g. "aa:bb:cc:dd:ee:ff"
   ipv4: string | null      // e.g. "192.168.11.25/24"
   ipv6: string | null      // e.g. "fe80::.../64"
   gateway: string | null
@@ -45,7 +46,8 @@ export function parseIpAddrJson(json: string, targetIface?: string): InterfaceIn
           ipv6 = `${addr.local}/${addr.prefixlen}`
         }
       }
-      return { name: iface.ifname, ipv4, ipv6, gateway: null }
+      const mac = iface.address ?? null
+      return { name: iface.ifname, mac, ipv4, ipv6, gateway: null }
     }
   } catch {}
   return null

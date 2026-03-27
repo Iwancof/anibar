@@ -17,7 +17,7 @@ import { createWifiSource } from "../runtime/wifi-source.ts"
 import Bar from "../surfaces/bar/Bar.tsx"
 import WorkspaceWindow from "../surfaces/workspace/WorkspaceWindow.tsx"
 import BatteryPopup from "../surfaces/popups/BatteryPopup.tsx"
-import NetworkPopup from "../surfaces/popups/NetworkPopup.tsx"
+import NetworkPanel from "../surfaces/network/NetworkPanel.tsx"
 import LauncherWindow from "../surfaces/launcher/LauncherWindow.tsx"
 import NotificationPopup from "../surfaces/notifications/NotificationPopup.tsx"
 import NotificationCenter from "../surfaces/notifications/NotificationCenter.tsx"
@@ -72,9 +72,10 @@ export function startMainApp() {
           onToggleNetworkPopup: toggleNetworkPopup,
         })
 
-        NetworkPopup({
+        NetworkPanel({
           gdkmonitor,
           monitorIndex,
+          clock,
           networkSnapshot: modules.network.snapshot,
           wifiSnapshot: wifiSource.snapshot,
           onConnect: (ssid, password) => { wifiSource.connect(ssid, password) },

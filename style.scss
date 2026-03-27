@@ -1670,3 +1670,170 @@ window.SwipeDash {
   color: $colors-text;
   font-size: 14px;
 }
+
+// ══════════════════════════════════════════
+// ── Cyberpunk Network Panel ──────────────
+// ══════════════════════════════════════════
+
+$np-bg0: #080c12;
+$np-bg1: #0d1219;
+$np-bg2: #121a24;
+$np-bg3: #182030;
+$np-cyan: #00e5ff;
+$np-cyan-dim: #007a8a;
+$np-magenta: #ff2d78;
+$np-amber: #ffb627;
+$np-green: #00ff9d;
+$np-red: #ff3d3d;
+$np-text: #c8d3e0;
+$np-text-sec: #5a6a7e;
+$np-text-dim: #2e3d50;
+$np-border: #1a2436;
+
+window.NpWindow {
+  background: transparent;
+}
+
+.NpBackdrop {
+  background: transparent;
+  border: none;
+}
+
+.NpPanel {
+  background: rgba($np-bg1, 0.92);
+  border: 1px solid $np-border;
+  border-radius: 8px;
+  margin-top: 6px;
+  margin-right: 8px;
+  min-height: 680px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.NpScrollArea {
+  background: transparent;
+}
+
+.NpContent {
+  padding: 0;
+}
+
+// ── Header ──
+.NpHeader {
+  padding: 8px 13px;
+  border-bottom: 1px solid $np-border;
+}
+
+.NpHeaderTitle {
+  font-family: "Consolas", $font-family;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 2.5px;
+  color: $np-cyan;
+}
+
+@keyframes np-pulse {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}
+
+.NpLiveDot {
+  border-radius: 99px;
+  background: $np-green;
+  animation: np-pulse 2s ease-in-out infinite;
+}
+
+.NpHeaderTime {
+  font-family: "Consolas", $font-family;
+  font-size: 10px;
+  color: $np-text-sec;
+}
+
+.NpHeaderMac {
+  font-family: "Consolas", $font-family;
+  font-size: 9px;
+  font-weight: 500;
+  color: $np-bg0;
+  background: $np-cyan;
+  border-radius: 3px;
+  padding: 1px 6px;
+}
+
+// ── Section 共通 ──
+.NpSection {
+  padding: 9px 13px;
+  border-bottom: 1px solid $np-border;
+}
+
+.NpSectionHeader {
+  margin-bottom: 4px;
+}
+
+.NpSectionLabel {
+  font-family: "Consolas", $font-family;
+  font-size: 7.5px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  color: $np-text-dim;
+}
+
+.NpSectionLine {
+  min-height: 1px;
+  background: $np-border;
+}
+
+// ── Info Row ──
+.NpInfoRow {
+  padding: 1px 0;
+}
+
+.NpInfoLabel {
+  font-family: "Consolas", $font-family;
+  font-size: 9px;
+  color: $np-text-dim;
+}
+
+.NpInfoValue {
+  font-family: "Consolas", $font-family;
+  font-size: 10px;
+  color: $np-text;
+}
+
+.NpInfoValueCyan {
+  font-family: "Consolas", $font-family;
+  font-size: 10px;
+  color: $np-cyan;
+}
+
+.NpInfoValueMagenta {
+  font-family: "Consolas", $font-family;
+  font-size: 10px;
+  color: $np-magenta;
+}
+
+.NpInfoValueDim {
+  font-family: "Consolas", $font-family;
+  font-size: 10px;
+  color: $np-text-sec;
+}
+
+.NpInfoValueSmall {
+  font-family: "Consolas", $font-family;
+  font-size: 8.5px;
+  color: $np-text;
+}
+
+.NpGeoLabel {
+  font-family: "Consolas", $font-family;
+  font-size: 8px;
+  color: $np-text-dim;
+}
+
+.NpGeoTor {
+  color: rgba($np-magenta, 0.5);
+}
+
+// ── Scanline ──
+@keyframes np-scanline {
+  0%   { margin-top: -200px; }
+  100% { margin-top: 800px; }
+}
