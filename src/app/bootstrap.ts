@@ -90,7 +90,6 @@ export function startMainApp() {
         NetworkPanel({
           gdkmonitor,
           monitorIndex,
-          clock,
           networkSnapshot: modules.network.snapshot,
           wifiSnapshot: wifiSource.snapshot,
           bandwidthSnapshot: bandwidthSource.snapshot,

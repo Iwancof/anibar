@@ -27,7 +27,6 @@ import TabArea from "./TabArea.tsx"
 export interface NetworkPanelProps {
   gdkmonitor: Gdk.Monitor
   monitorIndex: number
-  clock: Accessor<string>
   networkSnapshot: Accessor<NetworkSnapshot>
   wifiSnapshot: Accessor<WifiSnapshot>
   bandwidthSnapshot: Accessor<BandwidthSnapshot>
@@ -97,6 +96,7 @@ export default function NetworkPanel(props: NetworkPanelProps) {
               wifiSnapshot={props.wifiSnapshot}
               flows={props.flows}
               logs={props.logs}
+              onConnect={props.onConnect}
             />
           </box>
         </box>
