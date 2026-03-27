@@ -751,7 +751,8 @@ window.NetPopup {
   color: #00ffcc;
 }
 
-.NetConnectedSection {
+.NetConnectedSection,
+.NetInfoSection {
   padding: 8px 16px;
   border-bottom: 1px solid rgba(26, 30, 46, 0.5);
 }
@@ -888,6 +889,12 @@ window.NetPopup {
   font-family: "HackGen Console NF";
   font-size: 14px;
   color: #00ffcc;
+}
+
+.NetApBssid {
+  font-family: "Consolas", $font-family;
+  font-size: 9px;
+  color: rgba(224, 230, 240, 0.2);
 }
 
 .NetApSignalPct {

@@ -140,37 +140,19 @@ export default function NetworkPopup(props: NetworkPopupProps) {
               />
             </box>
 
-            {/* Connected section */}
-            <box class="NetConnectedSection" orientation={Gtk.Orientation.VERTICAL} spacing={4}>
-              <box spacing={8}>
-                <label class="NetInfoLabel" label="Connected" halign={Gtk.Align.START} hexpand />
-                <box widthRequest={130} halign={Gtk.Align.END}>
-                  <label
-                    class="NetInfoValue"
-                    label={props.wifiSnapshot((s) => s.connected?.ssid ?? "—")}
-                    halign={Gtk.Align.START}
-                  />
-                </box>
+            {/* Info rows — fixed label width for alignment */}
+            <box class="NetInfoSection" orientation={Gtk.Orientation.VERTICAL} spacing={3}>
+              <box spacing={0}>
+                <label class="NetInfoLabel" label="Connected" halign={Gtk.Align.START} widthRequest={90} />
+                <label class="NetInfoValue" label={props.wifiSnapshot((s) => s.connected?.ssid ?? "—")} halign={Gtk.Align.START} hexpand />
               </box>
-              <box spacing={8}>
-                <label class="NetInfoLabel" label="Local IP" halign={Gtk.Align.START} hexpand />
-                <box widthRequest={130} halign={Gtk.Align.END}>
-                  <label
-                    class="NetIpFixed"
-                    label={props.wifiSnapshot((s) => s.localIp ?? "—")}
-                    halign={Gtk.Align.START}
-                  />
-                </box>
+              <box spacing={0}>
+                <label class="NetInfoLabel" label="Local IP" halign={Gtk.Align.START} widthRequest={90} />
+                <label class="NetIpFixed" label={props.wifiSnapshot((s) => s.localIp ?? "—")} halign={Gtk.Align.START} />
               </box>
-              <box spacing={8}>
-                <label class="NetInfoLabel" label="Global IP" halign={Gtk.Align.START} hexpand />
-                <box widthRequest={130} halign={Gtk.Align.END}>
-                  <label
-                    class="NetIpFixed"
-                    label={props.wifiSnapshot((s) => s.globalIp?.ip ?? "—")}
-                    halign={Gtk.Align.START}
-                  />
-                </box>
+              <box spacing={0}>
+                <label class="NetInfoLabel" label="Global IP" halign={Gtk.Align.START} widthRequest={90} />
+                <label class="NetIpFixed" label={props.wifiSnapshot((s) => s.globalIp?.ip ?? "—")} halign={Gtk.Align.START} />
               </box>
               <label
                 class="NetGeoLabel"
@@ -182,18 +164,12 @@ export default function NetworkPopup(props: NetworkPopupProps) {
                   const loc = parts.length > 0 ? parts.join(", ") : null
                   return flag + [loc, g.org].filter(Boolean).join(" · ")
                 })}
-                halign={Gtk.Align.END}
+                halign={Gtk.Align.START}
+                marginStart={90}
               />
-              {/* Tor IP */}
-              <box spacing={8}>
-                <label class="NetInfoLabel NetTorLabel" label="Tor IP" halign={Gtk.Align.START} hexpand />
-                <box widthRequest={130} halign={Gtk.Align.END}>
-                  <label
-                    class="NetIpFixed NetTorIp"
-                    label={props.wifiSnapshot((s) => s.torIp?.ip ?? "—")}
-                    halign={Gtk.Align.START}
-                  />
-                </box>
+              <box spacing={0}>
+                <label class="NetInfoLabel NetTorLabel" label="Tor IP" halign={Gtk.Align.START} widthRequest={90} />
+                <label class="NetIpFixed NetTorIp" label={props.wifiSnapshot((s) => s.torIp?.ip ?? "—")} halign={Gtk.Align.START} />
               </box>
               <label
                 class="NetGeoLabel NetTorGeo"
@@ -205,7 +181,8 @@ export default function NetworkPopup(props: NetworkPopupProps) {
                   const loc = parts.length > 0 ? parts.join(", ") : null
                   return flag + [loc, g.org].filter(Boolean).join(" · ")
                 })}
-                halign={Gtk.Align.END}
+                halign={Gtk.Align.START}
+                marginStart={90}
               />
             </box>
 
@@ -249,6 +226,7 @@ export default function NetworkPopup(props: NetworkPopupProps) {
                   const rowVisible = createMemo(() => ap() != null)
                   const ssid = createMemo(() => ap()?.ssid ?? "")
                   const security = createMemo(() => ap()?.security ?? "")
+                  const bssid = createMemo(() => ap()?.bssid ?? "")
                   const signal = createMemo(() => ap()?.signal ?? 0)
                   const inUse = createMemo(() => ap()?.inUse ?? false)
                   const rowClass = createMemo(() =>
@@ -270,7 +248,10 @@ export default function NetworkPopup(props: NetworkPopupProps) {
                           <label class={sigClass} label={sigIconLabel} valign={Gtk.Align.CENTER} />
                           <box orientation={Gtk.Orientation.VERTICAL} valign={Gtk.Align.CENTER} hexpand>
                             <label class="NetApSsid" label={ssid} halign={Gtk.Align.START} />
-                            <label class="NetApMeta" label={security} halign={Gtk.Align.START} />
+                            <box spacing={8}>
+                              <label class="NetApMeta" label={security} halign={Gtk.Align.START} />
+                              <label class="NetApBssid" label={bssid} halign={Gtk.Align.START} />
+                            </box>
                           </box>
                           <label
                             class="NetApCheck"
