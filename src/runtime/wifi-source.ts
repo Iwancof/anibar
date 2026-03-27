@@ -1,101 +1,100 @@
 import { createPoll } from "ags/time"
 
 import type { Accessor } from "gnim"
+
+import {
+  parseWifiList,
+  parseNmcliIpInfo,
+  parseIpInfoJson,
+  type WifiSnapshot,
+  type GlobalIpInfo,
+} from "../modules/wifi/domain.ts"
 import { safeExec } from "./command.ts"
 
-const WIFI_POLL_MS = 5_000
-const IP_POLL_MS = 30_000
-
-export interface WifiAccessPoint {
-  ssid: string
-  signal: number
-  security: string
-  inUse: boolean
-}
-
-export interface WifiSnapshot {
-  accessPoints: WifiAccessPoint[]
-  globalIp: string | null
-}
+const WIFI_POLL_MS = 30_000
+const IP_CACHE_MS = 60_000
 
 export interface WifiSource {
   snapshot: Accessor<WifiSnapshot>
-  connect: (ssid: string) => Promise<boolean>
+  connect: (ssid: string, password?: string) => Promise<boolean>
+  rescan: () => Promise<void>
 }
 
-function parseWifiList(output: string): WifiAccessPoint[] {
-  if (!output.trim()) return []
-
-  const seen = new Set<string>()
-  return output
-    .split("\n")
-    .filter(Boolean)
-    .map((line) => {
-      // nmcli -t uses : as separator — SSID:SIGNAL:SECURITY:IN-USE
-      const parts = line.split(":")
-      if (parts.length < 4) return null
-
-      const inUseRaw = parts.pop()!.trim()
-      const security = parts.pop()!.trim()
-      const signalRaw = parts.pop()!.trim()
-      // remaining parts are SSID (may contain colons)
-      const ssid = parts.join(":").trim()
-
-      if (!ssid) return null
-
-      const signal = parseInt(signalRaw, 10) || 0
-      const inUse = inUseRaw === "*"
-
-      return { ssid, signal, security, inUse }
-    })
-    .filter((ap): ap is WifiAccessPoint => {
-      if (!ap) return false
-      if (seen.has(ap.ssid)) return false
-      seen.add(ap.ssid)
-      return true
-    })
-    .sort((a, b) => {
-      // Connected first, then by signal strength
-      if (a.inUse !== b.inUse) return a.inUse ? -1 : 1
-      return b.signal - a.signal
-    })
-}
-
-let cachedGlobalIp: string | null = null
+let cachedGlobalIp: GlobalIpInfo | null = null
 let lastIpFetchMs = 0
 
-async function fetchGlobalIp(): Promise<string | null> {
+async function fetchGlobalIp(): Promise<GlobalIpInfo | null> {
   const now = Date.now()
-  if (cachedGlobalIp && now - lastIpFetchMs < IP_POLL_MS) {
+  if (cachedGlobalIp && now - lastIpFetchMs < IP_CACHE_MS) {
     return cachedGlobalIp
   }
-  const ip = await safeExec(["curl", "-s", "--max-time", "3", "https://ifconfig.me"])
-  if (ip && /^\d+\.\d+\.\d+\.\d+$/.test(ip)) {
-    cachedGlobalIp = ip
+  const raw = await safeExec(["curl", "-s", "--connect-timeout", "5", "https://ipinfo.io/json"])
+  const parsed = parseIpInfoJson(raw)
+  if (parsed) {
+    cachedGlobalIp = parsed
     lastIpFetchMs = now
   }
   return cachedGlobalIp
 }
 
-const EMPTY: WifiSnapshot = { accessPoints: [], globalIp: null }
+async function fetchActiveInterface(): Promise<string | null> {
+  const out = await safeExec(["nmcli", "-t", "-f", "DEVICE,TYPE,STATE", "device", "status"])
+  for (const line of out.split("\n")) {
+    const [device, type, state] = line.split(":")
+    if (state?.trim() === "connected" && type?.trim() === "wifi") {
+      return device?.trim() ?? null
+    }
+  }
+  return null
+}
+
+async function fetchIpInfo(iface: string): Promise<{ localIp: string | null; gateway: string | null }> {
+  const out = await safeExec(["nmcli", "-t", "-f", "IP4.ADDRESS,IP4.GATEWAY", "device", "show", iface])
+  return parseNmcliIpInfo(out)
+}
+
+const EMPTY: WifiSnapshot = {
+  connected: null,
+  networks: [],
+  localIp: null,
+  gateway: null,
+  globalIp: null,
+}
 
 export function createWifiSource(): WifiSource {
   const snapshot = createPoll<WifiSnapshot>(EMPTY, WIFI_POLL_MS, async () => {
-    const [wifiOutput, globalIp] = await Promise.all([
-      safeExec(["nmcli", "-t", "-f", "SSID,SIGNAL,SECURITY,IN-USE", "device", "wifi", "list", "--rescan", "no"]),
+    const [wifiOutput, globalIp, activeIface] = await Promise.all([
+      safeExec(["nmcli", "-t", "-f", "SSID,SIGNAL,SECURITY,BSSID,IN-USE", "device", "wifi", "list", "--rescan", "no"]),
       fetchGlobalIp(),
+      fetchActiveInterface(),
     ])
 
-    return {
-      accessPoints: parseWifiList(wifiOutput),
-      globalIp,
+    const networks = parseWifiList(wifiOutput)
+    const connected = networks.find((n) => n.inUse) ?? null
+
+    let localIp: string | null = null
+    let gateway: string | null = null
+    if (activeIface) {
+      const ipInfo = await fetchIpInfo(activeIface)
+      localIp = ipInfo.localIp
+      gateway = ipInfo.gateway
     }
+
+    return { connected, networks, localIp, gateway, globalIp }
   })
 
-  async function connect(ssid: string): Promise<boolean> {
-    const result = await safeExec(["nmcli", "device", "wifi", "connect", ssid])
+  async function connect(ssid: string, password?: string): Promise<boolean> {
+    const args = ["nmcli", "device", "wifi", "connect", ssid]
+    if (password) {
+      args.push("password", password)
+    }
+    const result = await safeExec(args)
     return result.includes("successfully")
   }
 
-  return { snapshot, connect }
+  async function rescan(): Promise<void> {
+    await safeExec(["nmcli", "device", "wifi", "rescan"])
+  }
+
+  return { snapshot, connect, rescan }
 }

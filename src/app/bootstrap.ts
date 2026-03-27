@@ -21,9 +21,12 @@ import NetworkPopup from "../surfaces/popups/NetworkPopup.tsx"
 import LauncherWindow from "../surfaces/launcher/LauncherWindow.tsx"
 import NotificationPopup from "../surfaces/notifications/NotificationPopup.tsx"
 import NotificationCenter from "../surfaces/notifications/NotificationCenter.tsx"
+import SwipeDashboard from "../surfaces/dashboard/SwipeDashboard.tsx"
 import { toggleNotifCenter } from "./notification-controller.ts"
 import { toggleDashboardVisibility } from "./dashboard-controller.ts"
-import { toggleBatteryPopup, toggleNetworkPopup } from "./popup-controller.ts"
+import { toggleSwipeDashboard } from "./swipe-dashboard-controller.ts"
+import { toggleBatteryPopup } from "./popup-controller.ts"
+import { toggleNetworkPopup } from "./network-controller.ts"
 import { handleAppRequest } from "./request-handler.ts"
 
 export function startMainApp() {
@@ -73,7 +76,8 @@ export function startMainApp() {
           monitorIndex,
           networkSnapshot: modules.network.snapshot,
           wifiSnapshot: wifiSource.snapshot,
-          onConnect: (ssid) => { wifiSource.connect(ssid) },
+          onConnect: (ssid, password) => { wifiSource.connect(ssid, password) },
+          onRescan: () => { wifiSource.rescan() },
         })
 
         BatteryPopup({
@@ -103,6 +107,17 @@ export function startMainApp() {
           gdkmonitor,
           monitorIndex,
           notifications: notificationSource,
+        })
+
+        SwipeDashboard({
+          gdkmonitor,
+          monitorIndex,
+          batterySnapshot: modules.battery.snapshot,
+          notifications: notificationSource,
+          player: playerSource,
+          onClose: () => {
+            toggleSwipeDashboard()
+          },
         })
 
         WorkspaceWindow({
