@@ -54,11 +54,11 @@ export function parseWifiList(output: string): WifiNetwork[] {
       // Line format: SSID:SIGNAL:SECURITY:BSSID:IN-USE
       // But BSSID has escaped colons, so we first strip IN-USE from end
 
-      // IN-USE is the last field: ":" followed by "*" or "" at EOL
-      const inUseMatch = line.match(/:(\*?)$/)
-      if (!inUseMatch) return null
-      const inUse = inUseMatch[1] === "*"
-      const withoutInUse = line.slice(0, line.length - inUseMatch[0].length)
+      // IN-USE is the last field: ":" followed by "*" or " " or "" at EOL
+      const trimmed = line.trimEnd()
+      const inUse = trimmed.endsWith(":*")
+      // Strip IN-USE field: remove trailing ":*" or ":" or ": "
+      const withoutInUse = trimmed.replace(/:[\* ]?$/, "")
 
       // Extract BSSID from end of remaining string
       const bssidMatch = withoutInUse.match(BSSID_RE)
