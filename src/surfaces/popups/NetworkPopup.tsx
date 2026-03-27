@@ -1,6 +1,6 @@
 import app from "ags/gtk4/app"
 import { Astal, Gdk, Gtk } from "ags/gtk4"
-import { createMemo } from "gnim"
+import { createState, createMemo } from "gnim"
 import type { Accessor } from "gnim"
 
 import type { NetworkSnapshot } from "../../modules/network/domain.ts"
@@ -38,6 +38,48 @@ function signalColorClass(level: number): string {
 export default function NetworkPopup(props: NetworkPopupProps) {
   const { TOP, LEFT, RIGHT, BOTTOM } = Astal.WindowAnchor
 
+  // 選択中の AP index (-1 = 未選択)
+  const [selectedAp, setSelectedAp] = createState(-1)
+  // パスワード入力用の ref
+  const passwordRefs: (Gtk.Entry | null)[] = new Array(MAX_APS).fill(null)
+
+  function handleApClick(index: number) {
+    const a = props.wifiSnapshot().networks[index]
+    if (!a) return
+
+    // 接続中なら何もしない
+    if (a.inUse) return
+
+    // Open セキュリティならパスワード不要で即接続
+    if (!a.security || a.security === "" || a.security === "Open" || a.security === "--") {
+      props.onConnect(a.ssid)
+      setSelectedAp(-1)
+      return
+    }
+
+    // 既に選択中の AP を再クリック → 閉じる
+    if (selectedAp() === index) {
+      setSelectedAp(-1)
+      return
+    }
+
+    // パスワード入力を展開
+    setSelectedAp(index)
+    // フォーカスを entry に
+    const ref = passwordRefs[index]
+    if (ref) ref.grab_focus()
+  }
+
+  function handleConnect(index: number) {
+    const a = props.wifiSnapshot().networks[index]
+    if (!a) return
+    const ref = passwordRefs[index]
+    const password = ref?.text ?? ""
+    props.onConnect(a.ssid, password || undefined)
+    setSelectedAp(-1)
+    if (ref) ref.text = ""
+  }
+
   return (
     <window
       name={`network-popup:${props.monitorIndex}`}
@@ -53,6 +95,10 @@ export default function NetworkPopup(props: NetworkPopupProps) {
         const keyCtrl = new Gtk.EventControllerKey()
         keyCtrl.connect("key-pressed", (_ctrl: any, keyval: number) => {
           if (keyval === Gdk.KEY_Escape) {
+            if (selectedAp() >= 0) {
+              setSelectedAp(-1)
+              return true
+            }
             closeNetworkPopup()
             return true
           }
@@ -62,7 +108,10 @@ export default function NetworkPopup(props: NetworkPopupProps) {
       }}
     >
       <overlay>
-        <button class="NetPopupBackdrop" hexpand vexpand onClicked={closeNetworkPopup} />
+        <button class="NetPopupBackdrop" hexpand vexpand onClicked={() => {
+          setSelectedAp(-1)
+          closeNetworkPopup()
+        }} />
         <box
           $type="overlay"
           halign={Gtk.Align.END}
@@ -152,7 +201,7 @@ export default function NetworkPopup(props: NetworkPopupProps) {
               </button>
             </box>
 
-            {/* AP list — pre-created rows */}
+            {/* AP list */}
             <Gtk.ScrolledWindow
               class="NetApScroll"
               vscrollbarPolicy={Gtk.PolicyType.AUTOMATIC}
@@ -176,31 +225,53 @@ export default function NetworkPopup(props: NetworkPopupProps) {
                   const sigIconLabel = createMemo(() => signalIcon(sigLevel()))
                   const sigClass = createMemo(() => `NetApSignal ${signalColorClass(sigLevel())}`)
                   const sigPct = createMemo(() => `${signal()}%`)
+                  const showPassword = createMemo(() => selectedAp() === i)
 
                   return (
-                    <button
-                      class={rowClass}
-                      visible={rowVisible}
-                      onClicked={() => {
-                        const a = ap()
-                        if (a && !a.inUse) props.onConnect(a.ssid)
-                      }}
-                    >
-                      <box spacing={10} valign={Gtk.Align.CENTER}>
-                        <label class={sigClass} label={sigIconLabel} valign={Gtk.Align.CENTER} />
-                        <box orientation={Gtk.Orientation.VERTICAL} valign={Gtk.Align.CENTER} hexpand>
-                          <label class="NetApSsid" label={ssid} halign={Gtk.Align.START} />
-                          <label class="NetApMeta" label={security} halign={Gtk.Align.START} />
+                    <box orientation={Gtk.Orientation.VERTICAL} visible={rowVisible} spacing={0}>
+                      <button
+                        class={rowClass}
+                        onClicked={() => handleApClick(i)}
+                      >
+                        <box spacing={10} valign={Gtk.Align.CENTER}>
+                          <label class={sigClass} label={sigIconLabel} valign={Gtk.Align.CENTER} />
+                          <box orientation={Gtk.Orientation.VERTICAL} valign={Gtk.Align.CENTER} hexpand>
+                            <label class="NetApSsid" label={ssid} halign={Gtk.Align.START} />
+                            <label class="NetApMeta" label={security} halign={Gtk.Align.START} />
+                          </box>
+                          <label
+                            class="NetApCheck"
+                            label="󰄬"
+                            visible={inUse}
+                            valign={Gtk.Align.CENTER}
+                          />
+                          <label class="NetApSignalPct" label={sigPct} valign={Gtk.Align.CENTER} />
                         </box>
-                        <label
-                          class="NetApCheck"
-                          label="󰄬"
-                          visible={inUse}
-                          valign={Gtk.Align.CENTER}
+                      </button>
+                      {/* Password input */}
+                      <box
+                        class="NetApPassword"
+                        visible={showPassword}
+                        spacing={6}
+                      >
+                        <entry
+                          class="NetApPasswordEntry"
+                          hexpand
+                          placeholder_text="Password"
+                          visibility={false}
+                          onActivate={() => handleConnect(i)}
+                          onRealize={(self: Gtk.Entry) => {
+                            passwordRefs[i] = self
+                          }}
                         />
-                        <label class="NetApSignalPct" label={sigPct} valign={Gtk.Align.CENTER} />
+                        <button
+                          class="NetApConnectBtn"
+                          onClicked={() => handleConnect(i)}
+                        >
+                          <label label="Connect" />
+                        </button>
                       </box>
-                    </button>
+                    </box>
                   )
                 })}
               </box>

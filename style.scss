@@ -896,6 +896,42 @@ window.NetPopup {
   min-width: 32px;
 }
 
+.NetApPassword {
+  padding: 4px 12px 8px;
+  background: rgba(17, 20, 32, 0.5);
+  border-radius: 0 0 8px 8px;
+  margin-top: -2px;
+}
+
+.NetApPasswordEntry {
+  background: rgba(21, 24, 34, 0.8);
+  border: 1px solid rgba(122, 162, 247, 0.2);
+  border-radius: 6px;
+  color: $colors-text;
+  font-family: $font-family;
+  font-size: 12px;
+  padding: 4px 8px;
+  min-height: 24px;
+  caret-color: #7aa2f7;
+}
+
+.NetApPasswordEntry:focus {
+  border-color: rgba(122, 162, 247, 0.5);
+}
+
+.NetApConnectBtn {
+  background: rgba(122, 162, 247, 0.15);
+  border: 1px solid rgba(122, 162, 247, 0.3);
+  border-radius: 6px;
+  padding: 4px 12px;
+}
+
+.NetApConnectBtn label {
+  font-size: 11px;
+  color: #7aa2f7;
+  font-weight: 600;
+}
+
 .NetApEmpty {
   font-size: 13px;
   color: rgba(224, 230, 240, 0.3);
