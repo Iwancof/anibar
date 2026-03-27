@@ -5,9 +5,11 @@ import { createState, type Accessor } from "gnim"
 import {
   parseWifiList,
   parseNmcliIpInfo,
+  parseIpAddrJson,
   parseIpInfoJson,
   type WifiSnapshot,
   type GlobalIpInfo,
+  type InterfaceInfo,
 } from "../modules/wifi/domain.ts"
 import { safeExec } from "./command.ts"
 
@@ -79,28 +81,31 @@ const EMPTY: WifiSnapshot = {
   gateway: null,
   globalIp: null,
   torIp: null,
+  iface: null,
 }
 
 async function fetchSnapshot(): Promise<WifiSnapshot> {
-  const [wifiOutput, globalIp, torIp, activeIface] = await Promise.all([
+  const [wifiOutput, globalIp, torIp, activeIface, ipAddrJson] = await Promise.all([
     safeExec(["nmcli", "-t", "-f", "SSID,SIGNAL,SECURITY,BSSID,IN-USE", "device", "wifi", "list", "--rescan", "auto"]),
     fetchGlobalIp(),
     fetchTorIp(),
     fetchActiveInterface(),
+    safeExec(["ip", "-j", "addr", "show"]),
   ])
 
   const networks = parseWifiList(wifiOutput)
   const connected = networks.find((n) => n.inUse) ?? null
 
-  let localIp: string | null = null
-  let gateway: string | null = null
-  if (activeIface) {
+  // Interface info from ip addr
+  let iface = parseIpAddrJson(ipAddrJson, activeIface ?? undefined)
+
+  // Gateway from nmcli
+  if (iface && activeIface) {
     const ipInfo = await fetchIpInfo(activeIface)
-    localIp = ipInfo.localIp
-    gateway = ipInfo.gateway
+    iface = { ...iface, gateway: ipInfo.gateway }
   }
 
-  return { connected, networks, localIp, gateway, globalIp, torIp }
+  return { connected, networks, iface, globalIp, torIp }
 }
 
 export function createWifiSource(): WifiSource {

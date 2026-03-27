@@ -13,13 +13,42 @@ export interface GlobalIpInfo {
   org: string | null
 }
 
+export interface InterfaceInfo {
+  name: string
+  ipv4: string | null      // e.g. "192.168.11.25/24"
+  ipv6: string | null      // e.g. "fe80::.../64"
+  gateway: string | null
+}
+
 export interface WifiSnapshot {
   connected: WifiNetwork | null
   networks: WifiNetwork[]
-  localIp: string | null
-  gateway: string | null
+  iface: InterfaceInfo | null
   globalIp: GlobalIpInfo | null
   torIp: GlobalIpInfo | null
+}
+
+export function parseIpAddrJson(json: string, targetIface?: string): InterfaceInfo | null {
+  try {
+    const data = JSON.parse(json) as any[]
+    for (const iface of data) {
+      if (iface.operstate !== "UP" || iface.ifname === "lo") continue
+      if (targetIface && iface.ifname !== targetIface) continue
+
+      let ipv4: string | null = null
+      let ipv6: string | null = null
+      for (const addr of iface.addr_info ?? []) {
+        if (addr.family === "inet" && !ipv4) {
+          ipv4 = `${addr.local}/${addr.prefixlen}`
+        }
+        if (addr.family === "inet6" && !ipv6) {
+          ipv6 = `${addr.local}/${addr.prefixlen}`
+        }
+      }
+      return { name: iface.ifname, ipv4, ipv6, gateway: null }
+    }
+  } catch {}
+  return null
 }
 
 /**
