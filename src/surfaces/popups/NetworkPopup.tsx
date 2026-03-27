@@ -168,6 +168,26 @@ export default function NetworkPopup(props: NetworkPopupProps) {
                 })}
                 halign={Gtk.Align.START}
               />
+              {/* Tor IP */}
+              <box spacing={8}>
+                <label class="NetInfoLabel" label="Tor IP" halign={Gtk.Align.START} widthRequest={80} />
+                <label
+                  class="NetIpFixed NetTorIp"
+                  label={props.wifiSnapshot((s) => s.torIp?.ip ?? "—")}
+                  halign={Gtk.Align.START}
+                />
+              </box>
+              <label
+                class="NetGeoLabel NetTorGeo"
+                label={props.wifiSnapshot((s) => {
+                  const g = s.torIp
+                  if (!g) return ""
+                  const parts = [g.city, g.country].filter(Boolean)
+                  const loc = parts.length > 0 ? parts.join(", ") : null
+                  return [loc, g.org].filter(Boolean).join(" · ")
+                })}
+                halign={Gtk.Align.START}
+              />
             </box>
 
             {/* Interface + Tailscale */}

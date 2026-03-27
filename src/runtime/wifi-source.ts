@@ -22,6 +22,8 @@ export interface WifiSource {
 
 let cachedGlobalIp: GlobalIpInfo | null = null
 let lastIpFetchMs = 0
+let cachedTorIp: GlobalIpInfo | null = null
+let lastTorFetchMs = 0
 
 async function fetchGlobalIp(): Promise<GlobalIpInfo | null> {
   const now = Date.now()
@@ -35,6 +37,23 @@ async function fetchGlobalIp(): Promise<GlobalIpInfo | null> {
     lastIpFetchMs = now
   }
   return cachedGlobalIp
+}
+
+async function fetchTorIp(): Promise<GlobalIpInfo | null> {
+  const now = Date.now()
+  if (cachedTorIp && now - lastTorFetchMs < IP_CACHE_MS) {
+    return cachedTorIp
+  }
+  const raw = await safeExec([
+    "curl", "-s", "--socks5-hostname", "127.0.0.1:9050",
+    "--connect-timeout", "10", "https://ipinfo.io/json",
+  ])
+  const parsed = parseIpInfoJson(raw)
+  if (parsed) {
+    cachedTorIp = parsed
+    lastTorFetchMs = now
+  }
+  return cachedTorIp
 }
 
 async function fetchActiveInterface(): Promise<string | null> {
@@ -59,12 +78,14 @@ const EMPTY: WifiSnapshot = {
   localIp: null,
   gateway: null,
   globalIp: null,
+  torIp: null,
 }
 
 async function fetchSnapshot(): Promise<WifiSnapshot> {
-  const [wifiOutput, globalIp, activeIface] = await Promise.all([
+  const [wifiOutput, globalIp, torIp, activeIface] = await Promise.all([
     safeExec(["nmcli", "-t", "-f", "SSID,SIGNAL,SECURITY,BSSID,IN-USE", "device", "wifi", "list", "--rescan", "no"]),
     fetchGlobalIp(),
+    fetchTorIp(),
     fetchActiveInterface(),
   ])
 
@@ -79,7 +100,7 @@ async function fetchSnapshot(): Promise<WifiSnapshot> {
     gateway = ipInfo.gateway
   }
 
-  return { connected, networks, localIp, gateway, globalIp }
+  return { connected, networks, localIp, gateway, globalIp, torIp }
 }
 
 export function createWifiSource(): WifiSource {

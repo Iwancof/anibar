@@ -19,6 +19,7 @@ export interface WifiSnapshot {
   localIp: string | null
   gateway: string | null
   globalIp: GlobalIpInfo | null
+  torIp: GlobalIpInfo | null
 }
 
 /**
