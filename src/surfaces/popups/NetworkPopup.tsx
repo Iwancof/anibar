@@ -101,7 +101,7 @@ export default function NetworkPopup(props: NetworkPopupProps) {
           halign={Gtk.Align.END}
           valign={Gtk.Align.START}
         >
-          <box class="NetPopupPanel" vertical>
+          <box class="NetPopupPanel" orientation={Gtk.Orientation.VERTICAL}>
             {/* Header */}
             <box class="NetPopupHeader" spacing={8}>
               <label class="NetPopupTitle" label="NETWORK" hexpand halign={Gtk.Align.START} />
@@ -117,7 +117,7 @@ export default function NetworkPopup(props: NetworkPopupProps) {
             </box>
 
             {/* Connected section */}
-            <box class="NetConnectedSection" vertical spacing={4}>
+            <box class="NetConnectedSection" orientation={Gtk.Orientation.VERTICAL} spacing={4}>
               <box spacing={8}>
                 <label class="NetConnectedLabel" label="Connected" halign={Gtk.Align.START} />
                 <label
@@ -140,7 +140,7 @@ export default function NetworkPopup(props: NetworkPopupProps) {
             </box>
 
             {/* Global IP */}
-            <box class="NetIpRow" vertical spacing={2}>
+            <box class="NetIpRow" orientation={Gtk.Orientation.VERTICAL} spacing={2}>
               <box spacing={8}>
                 <label class="NetIpLabel" label="Global IP" halign={Gtk.Align.START} />
                 <label
@@ -199,7 +199,7 @@ export default function NetworkPopup(props: NetworkPopupProps) {
               hscrollbar-policy={Gtk.PolicyType.NEVER}
               vexpand
             >
-              <box class="NetApList" vertical spacing={2}>
+              <box class="NetApList" orientation={Gtk.Orientation.VERTICAL} spacing={2}>
                 {props.wifiSnapshot((s) => {
                   if (s.networks.length === 0) {
                     return <label class="NetApEmpty" label="No Wi-Fi networks found" />
