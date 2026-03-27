@@ -9,6 +9,16 @@ import { closeNetworkPopup } from "../../app/network-controller.ts"
 
 const MAX_APS = 50
 
+/** 国コード (2文字) → 国旗絵文字 */
+function countryFlag(code: string): string {
+  if (!code || code.length !== 2) return ""
+  const offset = 0x1F1E6 - 65
+  return String.fromCodePoint(
+    code.charCodeAt(0) + offset,
+    code.charCodeAt(1) + offset,
+  )
+}
+
 export interface NetworkPopupProps {
   gdkmonitor: Gdk.Monitor
   monitorIndex: number
@@ -133,60 +143,67 @@ export default function NetworkPopup(props: NetworkPopupProps) {
             {/* Connected section */}
             <box class="NetConnectedSection" orientation={Gtk.Orientation.VERTICAL} spacing={4}>
               <box spacing={8}>
-                <label class="NetInfoLabel" label="Connected" halign={Gtk.Align.START} widthRequest={80} />
+                <label class="NetInfoLabel" label="Connected" halign={Gtk.Align.START} hexpand />
                 <label
                   class="NetInfoValue"
                   label={props.wifiSnapshot((s) => s.connected?.ssid ?? "—")}
-                  halign={Gtk.Align.START}
-                  hexpand
+                  halign={Gtk.Align.END}
                 />
               </box>
               <box spacing={8}>
-                <label class="NetInfoLabel" label="Local IP" halign={Gtk.Align.START} widthRequest={80} />
-                <label
-                  class="NetIpFixed"
-                  label={props.wifiSnapshot((s) => s.localIp ?? "—")}
-                  halign={Gtk.Align.START}
-                />
+                <label class="NetInfoLabel" label="Local IP" halign={Gtk.Align.START} hexpand />
+                <box widthRequest={130} halign={Gtk.Align.END}>
+                  <label
+                    class="NetIpFixed"
+                    label={props.wifiSnapshot((s) => s.localIp ?? "—")}
+                    halign={Gtk.Align.START}
+                  />
+                </box>
               </box>
               <box spacing={8}>
-                <label class="NetInfoLabel" label="Global IP" halign={Gtk.Align.START} widthRequest={80} />
-                <label
-                  class="NetIpFixed"
-                  label={props.wifiSnapshot((s) => s.globalIp?.ip ?? "—")}
-                  halign={Gtk.Align.START}
-                />
+                <label class="NetInfoLabel" label="Global IP" halign={Gtk.Align.START} hexpand />
+                <box widthRequest={130} halign={Gtk.Align.END}>
+                  <label
+                    class="NetIpFixed"
+                    label={props.wifiSnapshot((s) => s.globalIp?.ip ?? "—")}
+                    halign={Gtk.Align.START}
+                  />
+                </box>
               </box>
               <label
                 class="NetGeoLabel"
                 label={props.wifiSnapshot((s) => {
                   const g = s.globalIp
                   if (!g) return ""
+                  const flag = g.country ? countryFlag(g.country) + " " : ""
                   const parts = [g.city, g.country].filter(Boolean)
                   const loc = parts.length > 0 ? parts.join(", ") : null
-                  return [loc, g.org].filter(Boolean).join(" · ")
+                  return flag + [loc, g.org].filter(Boolean).join(" · ")
                 })}
-                halign={Gtk.Align.START}
+                halign={Gtk.Align.END}
               />
               {/* Tor IP */}
               <box spacing={8}>
-                <label class="NetInfoLabel" label="Tor IP" halign={Gtk.Align.START} widthRequest={80} />
-                <label
-                  class="NetIpFixed NetTorIp"
-                  label={props.wifiSnapshot((s) => s.torIp?.ip ?? "—")}
-                  halign={Gtk.Align.START}
-                />
+                <label class="NetInfoLabel NetTorLabel" label="Tor IP" halign={Gtk.Align.START} hexpand />
+                <box widthRequest={130} halign={Gtk.Align.END}>
+                  <label
+                    class="NetIpFixed NetTorIp"
+                    label={props.wifiSnapshot((s) => s.torIp?.ip ?? "—")}
+                    halign={Gtk.Align.START}
+                  />
+                </box>
               </box>
               <label
                 class="NetGeoLabel NetTorGeo"
                 label={props.wifiSnapshot((s) => {
                   const g = s.torIp
                   if (!g) return ""
+                  const flag = g.country ? countryFlag(g.country) + " " : ""
                   const parts = [g.city, g.country].filter(Boolean)
                   const loc = parts.length > 0 ? parts.join(", ") : null
-                  return [loc, g.org].filter(Boolean).join(" · ")
+                  return flag + [loc, g.org].filter(Boolean).join(" · ")
                 })}
-                halign={Gtk.Align.START}
+                halign={Gtk.Align.END}
               />
             </box>
 

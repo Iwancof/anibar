@@ -83,7 +83,7 @@ const EMPTY: WifiSnapshot = {
 
 async function fetchSnapshot(): Promise<WifiSnapshot> {
   const [wifiOutput, globalIp, torIp, activeIface] = await Promise.all([
-    safeExec(["nmcli", "-t", "-f", "SSID,SIGNAL,SECURITY,BSSID,IN-USE", "device", "wifi", "list", "--rescan", "no"]),
+    safeExec(["nmcli", "-t", "-f", "SSID,SIGNAL,SECURITY,BSSID,IN-USE", "device", "wifi", "list", "--rescan", "auto"]),
     fetchGlobalIp(),
     fetchTorIp(),
     fetchActiveInterface(),
