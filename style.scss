@@ -2170,8 +2170,8 @@ window.NpWindow {
 }
 
 .NpApSignalHigh { color: $np-green; }
-.NpApSignalMid  { color: $np-yellow; }
-.NpApSignalLow  { color: $np-orange; }
+.NpApSignalMid  { color: $np-amber; }
+.NpApSignalLow  { color: $np-red; }
 .NpApSignalWeak { color: $np-text-dim; }
 
 .NpApSsid {
@@ -2227,14 +2227,14 @@ window.NpWindow {
 .NpApConnectBtn {
   font-family: $network-panel-font-family, $font-family;
   font-size: 9px;
-  color: $np-bg;
+  color: $np-bg0;
   background: $np-cyan;
   border-radius: 3px;
   padding: 3px 10px;
   min-height: 24px;
 
   &:hover {
-    background: lighten($np-cyan, 8%);
+    background: rgba($np-cyan, 0.85);
   }
 }
 
