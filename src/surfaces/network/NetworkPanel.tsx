@@ -4,9 +4,25 @@ import type { Accessor } from "gnim"
 
 import type { NetworkSnapshot } from "../../modules/network/domain.ts"
 import type { WifiSnapshot } from "../../modules/wifi/domain.ts"
+import type { BandwidthSnapshot } from "../../runtime/bandwidth-source.ts"
+import type { QualitySnapshot } from "../../runtime/quality-source.ts"
+import type { DnsSnapshot } from "../../runtime/dns-source.ts"
+import type { LatencySnapshot } from "../../runtime/latency-source.ts"
+import type { SessionSnapshot } from "../../runtime/session-source.ts"
+import type { ConnectionsSnapshot } from "../../runtime/connections-source.ts"
+import type { FlowEntry } from "../../runtime/netmon-source.ts"
+import type { LogEntry } from "../../runtime/netmon-source.ts"
+
 import { closeNetworkPopup } from "../../app/network-controller.ts"
 import HeaderSection from "./HeaderSection.tsx"
 import IdentitySection from "./IdentitySection.tsx"
+import BandwidthSection from "./BandwidthSection.tsx"
+import QualitySection from "./QualitySection.tsx"
+import DnsSection from "./DnsSection.tsx"
+import LatencySection from "./LatencySection.tsx"
+import SessionSection from "./SessionSection.tsx"
+import ConnectionsSection from "./ConnectionsSection.tsx"
+import TabArea from "./TabArea.tsx"
 
 export interface NetworkPanelProps {
   gdkmonitor: Gdk.Monitor
@@ -14,6 +30,14 @@ export interface NetworkPanelProps {
   clock: Accessor<string>
   networkSnapshot: Accessor<NetworkSnapshot>
   wifiSnapshot: Accessor<WifiSnapshot>
+  bandwidthSnapshot: Accessor<BandwidthSnapshot>
+  qualitySnapshot: Accessor<QualitySnapshot>
+  dnsSnapshot: Accessor<DnsSnapshot>
+  latencySnapshot: Accessor<LatencySnapshot>
+  sessionSnapshot: Accessor<SessionSnapshot>
+  connectionsSnapshot: Accessor<ConnectionsSnapshot>
+  flows: Accessor<FlowEntry[]>
+  logs: Accessor<LogEntry[]>
   onConnect: (ssid: string, password?: string) => void
   onRescan: () => void
 }
@@ -51,22 +75,29 @@ export default function NetworkPanel(props: NetworkPanelProps) {
           halign={Gtk.Align.END}
           valign={Gtk.Align.START}
         >
-          <box class="NpPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={420}>
+          <box class="NpPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={420} heightRequest={680}>
             <HeaderSection clock={props.clock} wifiSnapshot={props.wifiSnapshot} />
             <Gtk.ScrolledWindow
               class="NpScrollArea"
               vscrollbarPolicy={Gtk.PolicyType.AUTOMATIC}
               hscrollbarPolicy={Gtk.PolicyType.NEVER}
               vexpand
-              minContentHeight={400}
             >
               <box class="NpContent" orientation={Gtk.Orientation.VERTICAL} spacing={0}>
                 <IdentitySection wifiSnapshot={props.wifiSnapshot} />
-                {/* Phase 2: BandwidthSection, QualitySection */}
-                {/* Phase 3: DnsSection, LatencySection, SessionSection, ConnectionsSection */}
+                <DnsSection dnsSnapshot={props.dnsSnapshot} />
+                <BandwidthSection bandwidthSnapshot={props.bandwidthSnapshot} />
+                <QualitySection qualitySnapshot={props.qualitySnapshot} />
+                <LatencySection latencySnapshot={props.latencySnapshot} />
+                <SessionSection sessionSnapshot={props.sessionSnapshot} />
+                <ConnectionsSection connectionsSnapshot={props.connectionsSnapshot} />
               </box>
             </Gtk.ScrolledWindow>
-            {/* Phase 4: TabArea */}
+            <TabArea
+              wifiSnapshot={props.wifiSnapshot}
+              flows={props.flows}
+              logs={props.logs}
+            />
           </box>
         </box>
       </overlay>

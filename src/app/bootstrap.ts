@@ -14,6 +14,13 @@ import { createSpectrumSource } from "../runtime/spectrum-source.ts"
 import { createPlayerSource } from "../runtime/player-source.ts"
 import { createNotificationSource } from "../runtime/notification-source.ts"
 import { createWifiSource } from "../runtime/wifi-source.ts"
+import { createBandwidthSource } from "../runtime/bandwidth-source.ts"
+import { createQualitySource } from "../runtime/quality-source.ts"
+import { createDnsSource } from "../runtime/dns-source.ts"
+import { createLatencySource } from "../runtime/latency-source.ts"
+import { createSessionSource } from "../runtime/session-source.ts"
+import { createConnectionsSource } from "../runtime/connections-source.ts"
+import { createFlowsSource, createLogSource } from "../runtime/netmon-source.ts"
 import Bar from "../surfaces/bar/Bar.tsx"
 import WorkspaceWindow from "../surfaces/workspace/WorkspaceWindow.tsx"
 import BatteryPopup from "../surfaces/popups/BatteryPopup.tsx"
@@ -41,6 +48,14 @@ export function startMainApp() {
   const wifiSource = createWifiSource()
   const spectrumSource = createSpectrumSource()
   const playerSource = createPlayerSource()
+  const bandwidthSource = createBandwidthSource()
+  const qualitySource = createQualitySource()
+  const dnsSource = createDnsSource()
+  const latencySource = createLatencySource()
+  const sessionSource = createSessionSource()
+  const connectionsSource = createConnectionsSource()
+  const flowsSource = createFlowsSource()
+  const logSource = createLogSource()
   const indicators = barIndicators(modules)
 
   app.start({
@@ -78,6 +93,14 @@ export function startMainApp() {
           clock,
           networkSnapshot: modules.network.snapshot,
           wifiSnapshot: wifiSource.snapshot,
+          bandwidthSnapshot: bandwidthSource.snapshot,
+          qualitySnapshot: qualitySource.snapshot,
+          dnsSnapshot: dnsSource.snapshot,
+          latencySnapshot: latencySource.snapshot,
+          sessionSnapshot: sessionSource.snapshot,
+          connectionsSnapshot: connectionsSource.snapshot,
+          flows: flowsSource.flows,
+          logs: logSource.logs,
           onConnect: (ssid, password) => { wifiSource.connect(ssid, password) },
           onRescan: () => { wifiSource.rescan() },
         })
