@@ -1,5 +1,6 @@
 import { anyDashboardVisible, setDashboardVisibility, toggleDashboardVisibility } from "./dashboard-controller.ts"
 import { anyLauncherVisible, toggleLauncher, openLauncher, closeLauncher } from "./launcher-controller.ts"
+import { anySwipeDashboardVisible, setSwipeDashboardVisibility, toggleSwipeDashboard } from "./swipe-dashboard-controller.ts"
 
 function normalizeArgs(args: string[]): string[] {
   return args.filter(Boolean).filter((arg, index) => {
@@ -34,8 +35,28 @@ export function handleAppRequest(args: string[]): string {
     }
   }
 
+  if (scope === "swipe-dashboard") {
+    switch (action) {
+      case "toggle":
+        toggleSwipeDashboard()
+        return `swipe-dashboard ${anySwipeDashboardVisible() ? "visible" : "hidden"}`
+      case "open":
+      case "show":
+        setSwipeDashboardVisibility(true)
+        return "swipe-dashboard visible"
+      case "close":
+      case "hide":
+        setSwipeDashboardVisibility(false)
+        return "swipe-dashboard hidden"
+      case "status":
+        return anySwipeDashboardVisible() ? "swipe-dashboard visible" : "swipe-dashboard hidden"
+      default:
+        return `unknown swipe-dashboard action "${action}"`
+    }
+  }
+
   if (scope !== "dashboard") {
-    return 'unknown request. use "ags request dashboard|launcher toggle"'
+    return 'unknown request. use "ags request dashboard|launcher|swipe-dashboard toggle"'
   }
 
   switch (action) {
