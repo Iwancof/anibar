@@ -1773,43 +1773,43 @@ window.NpWindow {
 
 .NpInfoLabel {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 10px;
+  font-size: 12px;
   color: $np-text-dim;
 }
 
 .NpInfoValue {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 12px;
+  font-size: 13px;
   color: $np-text;
 }
 
 .NpInfoValueCyan {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 12px;
+  font-size: 13px;
   color: $np-cyan;
 }
 
 .NpInfoValueMagenta {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 12px;
+  font-size: 13px;
   color: $np-magenta;
 }
 
 .NpInfoValueDim {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 12px;
+  font-size: 13px;
   color: $np-text-sec;
 }
 
 .NpInfoValueSmall {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 10px;
+  font-size: 13px;
   color: $np-text;
 }
 
 .NpGeoLabel {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 8px;
+  font-size: 10px;
   color: $np-text-dim;
 }
 
@@ -1880,7 +1880,7 @@ window.NpWindow {
 // DNS
 .NpDnsBadgeOn {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 600;
   color: $np-bg0;
   background: $np-green;
@@ -1890,7 +1890,7 @@ window.NpWindow {
 
 .NpDnsBadgeOff {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 600;
   color: $np-text-sec;
   background: $np-bg3;
@@ -1904,7 +1904,7 @@ window.NpWindow {
 
 .NpDnsChip {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 9px;
+  font-size: 11px;
   color: $np-cyan;
   background: $np-bg3;
   border-radius: 3px;
@@ -1920,34 +1920,34 @@ window.NpWindow {
 
 .NpLatencyLabel {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 9px;
+  font-size: 11px;
   color: $np-text-sec;
 }
 
 .NpLatencyGood {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
   color: $np-green;
 }
 
 .NpLatencyWarn {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
   color: $np-amber;
 }
 
 .NpLatencyBad {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
   color: $np-red;
 }
 
 .NpLatencyUnknown {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 9px;
+  font-size: 11px;
   color: $np-text-dim;
 }
 
@@ -1997,7 +1997,7 @@ window.NpWindow {
 
 .NpConnCardLabel {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 7.5px;
+  font-size: 10px;
   color: $np-text-sec;
 }
 
@@ -2052,7 +2052,7 @@ window.NpWindow {
 
 .NpFlowProto {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 9px;
+  font-size: 11px;
   color: $np-text-dim;
 }
 
@@ -2069,13 +2069,13 @@ window.NpWindow {
 
 .NpLogTime {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 9px;
+  font-size: 11px;
   color: $np-text-dim;
 }
 
 .NpLogEvent {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: bold;
   color: $np-text-sec;
 }
@@ -2094,13 +2094,13 @@ window.NpWindow {
 
 .NpLogState {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 9px;
+  font-size: 11px;
   color: $np-text-sec;
 }
 
 .NpLogDest {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 9px;
+  font-size: 11px;
   color: $np-text;
 }
 
@@ -2141,13 +2141,13 @@ window.NpWindow {
 
 .NpWifiSecurity {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 9px;
+  font-size: 11px;
   color: $np-text-dim;
 }
 
 .NpWifiSignalPct {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 9px;
+  font-size: 11px;
   color: $np-text-sec;
 }
 
@@ -2182,13 +2182,13 @@ window.NpWindow {
 
 .NpApMeta {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 8px;
+  font-size: 11px;
   color: $np-text-dim;
 }
 
 .NpApBssid {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 8px;
+  font-size: 11px;
   color: $np-text-dim;
   opacity: 0.6;
 }
@@ -2200,7 +2200,7 @@ window.NpWindow {
 
 .NpApSignalPct {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 9px;
+  font-size: 11px;
   color: $np-text-sec;
   min-width: 32px;
 }
@@ -2226,7 +2226,7 @@ window.NpWindow {
 
 .NpApConnectBtn {
   font-family: $network-panel-font-family, $font-family;
-  font-size: 9px;
+  font-size: 11px;
   color: $np-bg0;
   background: $np-cyan;
   border-radius: 3px;
