@@ -7,7 +7,7 @@ import type { NetworkSnapshot } from "../../modules/network/domain.ts"
 import { signalLevel, type WifiSnapshot } from "../../modules/wifi/domain.ts"
 import { closeNetworkPopup } from "../../app/network-controller.ts"
 
-const MAX_APS = 15
+const MAX_APS = 50
 
 export interface NetworkPopupProps {
   gdkmonitor: Gdk.Monitor
