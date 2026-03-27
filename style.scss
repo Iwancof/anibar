@@ -896,6 +896,24 @@ window.NetPopup {
   min-width: 32px;
 }
 
+.NetInfoLabel {
+  font-size: 11px;
+  color: rgba(224, 230, 240, 0.4);
+  letter-spacing: 0.5px;
+}
+
+.NetInfoValue {
+  font-size: 12px;
+  color: $colors-text;
+}
+
+.NetIpFixed {
+  font-family: $font-family;
+  font-size: 12px;
+  color: $colors-text;
+  min-width: 120px;
+}
+
 .NetApPassword {
   padding: 4px 12px 8px;
   background: rgba(17, 20, 32, 0.5);

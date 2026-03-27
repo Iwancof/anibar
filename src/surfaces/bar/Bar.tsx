@@ -113,18 +113,6 @@ export default function Bar(props: BarProps) {
           >
             <box spacing={6} valign={Gtk.Align.CENTER}>
               <label
-                class="NetBarGlobalIp"
-                label={props.wifiSnapshot((s) => s?.globalIp?.ip ?? "")}
-                visible={props.wifiSnapshot((s) => s?.globalIp?.ip != null)}
-                valign={Gtk.Align.CENTER}
-              />
-              <label
-                class="NetBarSsid"
-                label={props.wifiSnapshot((s) => s?.connected?.ssid ?? "")}
-                visible={props.wifiSnapshot((s) => s?.connected != null)}
-                valign={Gtk.Align.CENTER}
-              />
-              <label
                 class={createMemo(() => {
                   const net = props.networkSnapshot()
                   if (!net.online) return "NetBarIcon NetBarIconOff"

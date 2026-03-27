@@ -133,34 +133,28 @@ export default function NetworkPopup(props: NetworkPopupProps) {
             {/* Connected section */}
             <box class="NetConnectedSection" orientation={Gtk.Orientation.VERTICAL} spacing={4}>
               <box spacing={8}>
-                <label class="NetConnectedLabel" label="Connected" halign={Gtk.Align.START} />
+                <label class="NetInfoLabel" label="Connected" halign={Gtk.Align.START} widthRequest={80} />
                 <label
-                  class="NetConnectedSsid"
+                  class="NetInfoValue"
                   label={props.wifiSnapshot((s) => s.connected?.ssid ?? "—")}
-                  halign={Gtk.Align.END}
+                  halign={Gtk.Align.START}
                   hexpand
                 />
               </box>
               <box spacing={8}>
-                <label class="NetIpLabel" label="Local IP" halign={Gtk.Align.START} />
+                <label class="NetInfoLabel" label="Local IP" halign={Gtk.Align.START} widthRequest={80} />
                 <label
-                  class="NetIpValue"
+                  class="NetIpFixed"
                   label={props.wifiSnapshot((s) => s.localIp ?? "—")}
-                  halign={Gtk.Align.END}
-                  hexpand
+                  halign={Gtk.Align.START}
                 />
               </box>
-            </box>
-
-            {/* Global IP */}
-            <box class="NetIpRow" orientation={Gtk.Orientation.VERTICAL} spacing={2}>
               <box spacing={8}>
-                <label class="NetIpLabel" label="Global IP" halign={Gtk.Align.START} />
+                <label class="NetInfoLabel" label="Global IP" halign={Gtk.Align.START} widthRequest={80} />
                 <label
-                  class="NetIpValue"
+                  class="NetIpFixed"
                   label={props.wifiSnapshot((s) => s.globalIp?.ip ?? "—")}
-                  halign={Gtk.Align.END}
-                  hexpand
+                  halign={Gtk.Align.START}
                 />
               </box>
               <label
