@@ -88,6 +88,10 @@ network:
   bssid-size:      9px
   ap-scroll-height: 400px
 
+# ── ネットワークパネル ────────────────────────
+network-panel:
+  font-family: "Consolas"
+
 # ── プレビュー ──────────────────────────────
 preview:
   padding:       24px
