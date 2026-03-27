@@ -1,6 +1,6 @@
-import { createPoll } from "ags/time"
+import GLib from "gi://GLib?version=2.0"
 
-import type { Accessor } from "gnim"
+import { createState, type Accessor } from "gnim"
 
 import {
   parseWifiList,
@@ -61,27 +61,43 @@ const EMPTY: WifiSnapshot = {
   globalIp: null,
 }
 
+async function fetchSnapshot(): Promise<WifiSnapshot> {
+  const [wifiOutput, globalIp, activeIface] = await Promise.all([
+    safeExec(["nmcli", "-t", "-f", "SSID,SIGNAL,SECURITY,BSSID,IN-USE", "device", "wifi", "list", "--rescan", "no"]),
+    fetchGlobalIp(),
+    fetchActiveInterface(),
+  ])
+
+  const networks = parseWifiList(wifiOutput)
+  const connected = networks.find((n) => n.inUse) ?? null
+
+  let localIp: string | null = null
+  let gateway: string | null = null
+  if (activeIface) {
+    const ipInfo = await fetchIpInfo(activeIface)
+    localIp = ipInfo.localIp
+    gateway = ipInfo.gateway
+  }
+
+  return { connected, networks, localIp, gateway, globalIp }
+}
+
 export function createWifiSource(): WifiSource {
-  const snapshot = createPoll<WifiSnapshot>(EMPTY, WIFI_POLL_MS, async () => {
-    const [wifiOutput, globalIp, activeIface] = await Promise.all([
-      safeExec(["nmcli", "-t", "-f", "SSID,SIGNAL,SECURITY,BSSID,IN-USE", "device", "wifi", "list", "--rescan", "auto"]),
-      fetchGlobalIp(),
-      fetchActiveInterface(),
-    ])
+  const [snapshot, setSnapshot] = createState<WifiSnapshot>(EMPTY)
 
-    const networks = parseWifiList(wifiOutput)
-    const connected = networks.find((n) => n.inUse) ?? null
+  // 初回取得
+  fetchSnapshot().then(setSnapshot)
 
-    let localIp: string | null = null
-    let gateway: string | null = null
-    if (activeIface) {
-      const ipInfo = await fetchIpInfo(activeIface)
-      localIp = ipInfo.localIp
-      gateway = ipInfo.gateway
-    }
-
-    return { connected, networks, localIp, gateway, globalIp }
+  // 定期ポーリング
+  GLib.timeout_add(GLib.PRIORITY_DEFAULT, WIFI_POLL_MS, () => {
+    fetchSnapshot().then(setSnapshot)
+    return GLib.SOURCE_CONTINUE
   })
+
+  async function refresh() {
+    const snap = await fetchSnapshot()
+    setSnapshot(snap)
+  }
 
   async function connect(ssid: string, password?: string): Promise<boolean> {
     const args = ["nmcli", "device", "wifi", "connect", ssid]
@@ -89,11 +105,18 @@ export function createWifiSource(): WifiSource {
       args.push("password", password)
     }
     const result = await safeExec(args)
+    // 接続後に即更新
+    await refresh()
     return result.includes("successfully")
   }
 
   async function rescan(): Promise<void> {
     await safeExec(["nmcli", "device", "wifi", "rescan"])
+    // rescan 完了後少し待ってからリスト再取得
+    GLib.timeout_add(GLib.PRIORITY_DEFAULT, 2000, () => {
+      refresh()
+      return GLib.SOURCE_REMOVE
+    })
   }
 
   return { snapshot, connect, rescan }
