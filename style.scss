@@ -2244,3 +2244,16 @@ window.NpWindow {
   0%   { margin-top: -200px; }
   100% { margin-top: 800px; }
 }
+
+// ── Layout helpers ──
+.NpCompactRow {
+  padding: 4px 13px;
+  border-bottom: 1px solid $np-border;
+}
+
+.NpDnsLinkInfo {
+  font-family: $network-panel-font-family, $font-family;
+  font-size: $network-panel-info-label;
+  color: $np-text-dim;
+  margin-top: 2px;
+}

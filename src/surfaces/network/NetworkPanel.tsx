@@ -74,24 +74,23 @@ export default function NetworkPanel(props: NetworkPanelProps) {
           halign={Gtk.Align.END}
           valign={Gtk.Align.START}
         >
-          <box class="NpPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={560} heightRequest={720}>
+          <box class="NpPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={560} heightRequest={800}>
             <HeaderSection wifiSnapshot={props.wifiSnapshot} />
-            <Gtk.ScrolledWindow
-              class="NpScrollArea"
-              vscrollbarPolicy={Gtk.PolicyType.AUTOMATIC}
-              hscrollbarPolicy={Gtk.PolicyType.NEVER}
-              vexpand
-            >
-              <box class="NpContent" orientation={Gtk.Orientation.VERTICAL} spacing={0}>
-                <IdentitySection wifiSnapshot={props.wifiSnapshot} />
-                <DnsSection dnsSnapshot={props.dnsSnapshot} />
-                <BandwidthSection bandwidthSnapshot={props.bandwidthSnapshot} />
-                <QualitySection qualitySnapshot={props.qualitySnapshot} />
-                <LatencySection latencySnapshot={props.latencySnapshot} />
-                <SessionSection sessionSnapshot={props.sessionSnapshot} />
-                <ConnectionsSection connectionsSnapshot={props.connectionsSnapshot} />
+            <box class="NpContent" orientation={Gtk.Orientation.VERTICAL} spacing={0}>
+              <IdentitySection wifiSnapshot={props.wifiSnapshot} />
+              <DnsSection dnsSnapshot={props.dnsSnapshot} />
+              <BandwidthSection bandwidthSnapshot={props.bandwidthSnapshot} />
+              <box class="NpSection" spacing={8}>
+                <box hexpand><QualitySection qualitySnapshot={props.qualitySnapshot} /></box>
               </box>
-            </Gtk.ScrolledWindow>
+              <box class="NpSection" spacing={8}>
+                <box hexpand><LatencySection latencySnapshot={props.latencySnapshot} /></box>
+              </box>
+              <box class="NpCompactRow" spacing={12}>
+                <box hexpand><SessionSection sessionSnapshot={props.sessionSnapshot} /></box>
+                <box hexpand><ConnectionsSection connectionsSnapshot={props.connectionsSnapshot} /></box>
+              </box>
+            </box>
             <TabArea
               wifiSnapshot={props.wifiSnapshot}
               flows={props.flows}

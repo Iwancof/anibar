@@ -114,7 +114,7 @@ export default function BandwidthSection(props: BandwidthSectionProps) {
       <Gtk.DrawingArea
         class="NpSparkline"
         widthRequest={380}
-        heightRequest={52}
+        heightRequest={36}
         onRealize={(self: any) => {
           drawingArea = self
           self.set_draw_func((_area: any, cr: any, w: number, h: number) => {
