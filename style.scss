@@ -1890,6 +1890,282 @@ window.NpWindow {
   color: $np-red;
 }
 
+// ── Phase 3: DNS + Latency + Session + Connections ──
+
+// DNS
+.NpDnsBadgeOn {
+  font-family: "Consolas", $font-family;
+  font-size: 8px;
+  font-weight: 600;
+  color: $np-bg0;
+  background: $np-green;
+  border-radius: 3px;
+  padding: 1px 6px;
+}
+
+.NpDnsBadgeOff {
+  font-family: "Consolas", $font-family;
+  font-size: 8px;
+  font-weight: 600;
+  color: $np-text-sec;
+  background: $np-bg3;
+  border-radius: 3px;
+  padding: 1px 6px;
+}
+
+.NpDnsChips {
+  padding: 0;
+}
+
+.NpDnsChip {
+  font-family: "Consolas", $font-family;
+  font-size: 9px;
+  color: $np-cyan;
+  background: $np-bg3;
+  border-radius: 3px;
+  padding: 2px 8px;
+}
+
+// Latency
+.NpLatencyCard {
+  background: $np-bg2;
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+
+.NpLatencyLabel {
+  font-family: "Consolas", $font-family;
+  font-size: 9px;
+  color: $np-text-sec;
+}
+
+.NpLatencyGood {
+  font-family: "Consolas", $font-family;
+  font-size: 9px;
+  font-weight: 600;
+  color: $np-green;
+}
+
+.NpLatencyWarn {
+  font-family: "Consolas", $font-family;
+  font-size: 9px;
+  font-weight: 600;
+  color: $np-amber;
+}
+
+.NpLatencyBad {
+  font-family: "Consolas", $font-family;
+  font-size: 9px;
+  font-weight: 600;
+  color: $np-red;
+}
+
+.NpLatencyUnknown {
+  font-family: "Consolas", $font-family;
+  font-size: 9px;
+  color: $np-text-dim;
+}
+
+.NpLatencyBar {
+  background: $np-bg3;
+  border-radius: 2px;
+
+  trough {
+    background: $np-bg3;
+    border-radius: 2px;
+    min-height: 3px;
+  }
+
+  block.filled {
+    background: $np-cyan;
+    border-radius: 2px;
+    min-height: 3px;
+  }
+}
+
+// Session
+.NpSessionRow {
+  padding: 2px 0;
+}
+
+// Connections
+.NpConnCards {
+  padding: 0;
+}
+
+.NpConnCard {
+  background: $np-bg2;
+  border-radius: 4px;
+  padding: 6px 4px;
+}
+
+.NpConnCardValue {
+  font-family: "Consolas", $font-family;
+  font-size: 14px;
+  font-weight: 700;
+  color: $np-text;
+}
+
+.NpConnCardCyan {
+  color: $np-cyan;
+}
+
+.NpConnCardLabel {
+  font-family: "Consolas", $font-family;
+  font-size: 7.5px;
+  color: $np-text-sec;
+}
+
+// ── Phase 4: Tab Area ──
+
+.NpTabArea {
+  margin-top: 2px;
+  border-top: 1px solid $np-border;
+}
+
+.NpTabBar {
+  padding: 4px 8px 0;
+}
+
+.NpTabBtn {
+  font-family: "Consolas", $font-family;
+  font-size: 10px;
+  font-weight: 600;
+  color: $np-text-sec;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 4px 12px 3px;
+  margin: 0 2px;
+  border-radius: 0;
+}
+
+.NpTabBtnActive {
+  color: $np-cyan;
+  border-bottom: 2px solid $np-cyan;
+}
+
+.NpTabScroll {
+  margin: 0;
+}
+
+.NpTabContent {
+  padding: 2px 8px 4px;
+}
+
+// Flows Tab
+.NpFlowRow {
+  padding: 1px 0;
+}
+
+.NpFlowPort {
+  font-family: "Consolas", $font-family;
+  font-size: 10px;
+  font-weight: bold;
+  color: $np-cyan;
+}
+
+.NpFlowProto {
+  font-family: "Consolas", $font-family;
+  font-size: 9px;
+  color: $np-text-dim;
+}
+
+.NpFlowHost {
+  font-family: "Consolas", $font-family;
+  font-size: 10px;
+  color: $np-text;
+}
+
+// Log Tab
+.NpLogRow {
+  padding: 1px 0;
+}
+
+.NpLogTime {
+  font-family: "Consolas", $font-family;
+  font-size: 9px;
+  color: $np-text-dim;
+}
+
+.NpLogEvent {
+  font-family: "Consolas", $font-family;
+  font-size: 9px;
+  font-weight: bold;
+  color: $np-text-sec;
+}
+
+.NpLogEventNew {
+  color: $np-green;
+}
+
+.NpLogEventEstab {
+  color: $np-cyan;
+}
+
+.NpLogEventClose {
+  color: $np-red;
+}
+
+.NpLogState {
+  font-family: "Consolas", $font-family;
+  font-size: 9px;
+  color: $np-text-sec;
+}
+
+.NpLogDest {
+  font-family: "Consolas", $font-family;
+  font-size: 9px;
+  color: $np-text;
+}
+
+// WiFi Tab
+.NpWifiRow {
+  padding: 2px 0;
+}
+
+.NpWifiRowActive {
+  .NpWifiSsid {
+    color: $np-cyan;
+  }
+}
+
+.NpWifiSignal {
+  margin: 0 2px;
+}
+
+.NpWifiBar {
+  background: $np-text-dim;
+  border-radius: 1px;
+}
+
+.NpWifiBarActive {
+  background: $np-cyan;
+}
+
+.NpWifiSsid {
+  font-family: "Consolas", $font-family;
+  font-size: 10px;
+  color: $np-text;
+}
+
+.NpWifiCheck {
+  font-size: 10px;
+  color: $np-cyan;
+}
+
+.NpWifiSecurity {
+  font-family: "Consolas", $font-family;
+  font-size: 9px;
+  color: $np-text-dim;
+}
+
+.NpWifiSignalPct {
+  font-family: "Consolas", $font-family;
+  font-size: 9px;
+  color: $np-text-sec;
+}
+
 // ── Scanline ──
 @keyframes np-scanline {
   0%   { margin-top: -200px; }
