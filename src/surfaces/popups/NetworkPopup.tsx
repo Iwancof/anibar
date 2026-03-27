@@ -193,11 +193,12 @@ export default function NetworkPopup(props: NetworkPopupProps) {
               </button>
             </box>
 
-            <scrollable
+            <Gtk.ScrolledWindow
               class="NetApScroll"
-              vscrollbar-policy={Gtk.PolicyType.AUTOMATIC}
-              hscrollbar-policy={Gtk.PolicyType.NEVER}
+              vscrollbarPolicy={Gtk.PolicyType.AUTOMATIC}
+              hscrollbarPolicy={Gtk.PolicyType.NEVER}
               vexpand
+              minContentHeight={100}
             >
               <box class="NetApList" orientation={Gtk.Orientation.VERTICAL} spacing={2}>
                 {props.wifiSnapshot((s) => {
@@ -209,7 +210,7 @@ export default function NetworkPopup(props: NetworkPopupProps) {
                   ))
                 })}
               </box>
-            </scrollable>
+            </Gtk.ScrolledWindow>
           </box>
         </box>
       </overlay>
