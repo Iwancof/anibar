@@ -3,9 +3,9 @@ import GLib from "gi://GLib?version=2.0"
 import { Gtk } from "ags/gtk4"
 import type { Accessor } from "gnim"
 
-const BAR_WIDTH = 4
-const BAR_GAP = 2
-const BAR_MAX_HEIGHT = 28
+const BAR_WIDTH = 8
+const BAR_GAP = 3
+const BAR_MAX_HEIGHT = 48
 
 export interface WideSpectrumProps {
   bars: Accessor<number[]>
@@ -22,8 +22,9 @@ export default function WideSpectrum(props: WideSpectrumProps) {
   return (
     <Gtk.DrawingArea
       class="DmSpectrum"
-      widthRequest={500}
+      widthRequest={800}
       heightRequest={BAR_MAX_HEIGHT + 4}
+      hexpand
       halign={Gtk.Align.CENTER}
       onRealize={(self: Gtk.DrawingArea) => {
         drawingArea = self
