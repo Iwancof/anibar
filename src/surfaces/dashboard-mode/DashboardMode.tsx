@@ -17,7 +17,7 @@ import type { FlowEntry, LogEntry } from "../../runtime/netmon-source.ts"
 import type { PlayerSource } from "../../runtime/player-source.ts"
 
 import { closeDashboardMode } from "../../app/dashboard-mode-controller.ts"
-import SpectrumWidget from "../bar/SpectrumWidget.tsx"
+import WideSpectrum from "./WideSpectrum.tsx"
 
 // Network sections (reuse from network panel)
 import HeaderSection from "../network/HeaderSection.tsx"
@@ -95,7 +95,7 @@ export default function DashboardMode(props: DashboardModeProps) {
 
         {/* 音楽 + スペクトラム */}
         <box class="DmMusicArea" orientation={Gtk.Orientation.VERTICAL} spacing={8} halign={Gtk.Align.CENTER}>
-          <SpectrumWidget bars={props.spectrumBars} />
+          <WideSpectrum bars={props.spectrumBars} />
           <box spacing={12} halign={Gtk.Align.CENTER}>
             <label class="DmMusicTitle" label={props.player.label} />
             <box spacing={6} valign={Gtk.Align.CENTER}>

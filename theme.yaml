@@ -75,7 +75,7 @@ tone:
 
 # ── スペクトラム (CAVA) ──────────────────────
 spectrum:
-  bars:            10
+  bars:            48
   framerate:       60
   sensitivity:     150
   noise-reduction: 0
