@@ -15,9 +15,9 @@ const BODY_WIDTH = 26
 const BODY_HEIGHT = 14
 const FILL_MAX_WIDTH = BODY_WIDTH - 4
 
-// Animation: 1s hold → 1s grow (tan curve) → 0.5s fade → repeat
+// Animation: 1s hold → 2s grow (tan curve) → 0.5s fade → repeat
 const HOLD_MS = 1000
-const GROW_MS = 1000
+const GROW_MS = 2000
 const FADE_MS = 500
 const CYCLE_MS = HOLD_MS + GROW_MS + FADE_MS
 const TICK_MS = 30
@@ -98,25 +98,23 @@ export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
                   if (cycle < HOLD_MS) {
                     // Phase 1: hold — no extra fill
                   } else if (cycle < HOLD_MS + GROW_MS) {
-                    // Phase 2: tan curve growth
+                    // Phase 2: tan curve growth to full
                     const t = (cycle - HOLD_MS) / GROW_MS // 0→1
-                    // tan(t * π/2.5) normalized to 0→~1
                     const tanMax = Math.tan(Math.PI / 2.5)
                     const progress = Math.min(1, Math.tan(t * Math.PI / 2.5) / tanMax)
-                    const extraWidth = remainWidth * progress * 0.6
+                    const extraWidth = remainWidth * progress
 
-                    cr.setSourceRGBA(0.62, 0.81, 0.42, 0.5)
+                    // Lighter cyan-green for the growing part
+                    cr.setSourceRGBA(0.4, 0.9, 0.8, 0.6)
                     cr.rectangle(baseWidth, 0, extraWidth, h)
                     cr.fill()
                   } else {
-                    // Phase 3: fade out
+                    // Phase 3: fade out at full extent
                     const t = (cycle - HOLD_MS - GROW_MS) / FADE_MS // 0→1
-                    const opacity = 0.5 * (1 - t)
-                    const tanMax = Math.tan(Math.PI / 2.5)
-                    const extraWidth = remainWidth * 0.6 // max extent
+                    const opacity = 0.6 * (1 - t)
 
-                    cr.setSourceRGBA(0.62, 0.81, 0.42, opacity)
-                    cr.rectangle(baseWidth, 0, extraWidth, h)
+                    cr.setSourceRGBA(0.4, 0.9, 0.8, opacity)
+                    cr.rectangle(baseWidth, 0, remainWidth, h)
                     cr.fill()
                   }
                 }
