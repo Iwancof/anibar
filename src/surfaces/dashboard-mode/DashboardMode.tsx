@@ -17,6 +17,7 @@ import type { FlowEntry, LogEntry } from "../../runtime/netmon-source.ts"
 import type { PlayerSource } from "../../runtime/player-source.ts"
 
 import { closeDashboardMode } from "../../app/dashboard-mode-controller.ts"
+import SpectrumWidget from "../bar/SpectrumWidget.tsx"
 
 // Network sections (reuse from network panel)
 import HeaderSection from "../network/HeaderSection.tsx"
@@ -55,8 +56,9 @@ export interface DashboardModeProps {
   onToggleMeasure: (name: MeasureName, enable: boolean) => void
   onToggleAll: (enable: boolean) => void
   onSetLidAction: (action: LidAction) => void
-  // Player
+  // Player + Spectrum
   player: PlayerSource
+  spectrumBars: Accessor<number[]>
 }
 
 export default function DashboardMode(props: DashboardModeProps) {
@@ -91,10 +93,12 @@ export default function DashboardMode(props: DashboardModeProps) {
           <label class="DmClock" label={props.clock} />
         </box>
 
-        {/* 音楽 */}
-        <box class="DmMusicArea" halign={Gtk.Align.CENTER} spacing={12}>
-          <label class="DmMusicTitle" label={props.player.label} />
-          <box spacing={6} valign={Gtk.Align.CENTER}>
+        {/* 音楽 + スペクトラム */}
+        <box class="DmMusicArea" orientation={Gtk.Orientation.VERTICAL} spacing={8} halign={Gtk.Align.CENTER}>
+          <SpectrumWidget bars={props.spectrumBars} />
+          <box spacing={12} halign={Gtk.Align.CENTER}>
+            <label class="DmMusicTitle" label={props.player.label} />
+            <box spacing={6} valign={Gtk.Align.CENTER}>
             <button class="DmMusicBtn" onClicked={() => props.player.previous()}>
               <label label={"\u23EE"} />
             </button>
@@ -104,6 +108,7 @@ export default function DashboardMode(props: DashboardModeProps) {
             <button class="DmMusicBtn" onClicked={() => props.player.next()}>
               <label label={"\u23ED"} />
             </button>
+            </box>
           </box>
         </box>
 

@@ -167,6 +167,7 @@ export function startMainApp() {
           onToggleAll: pwsaveSource.toggleAll,
           onSetLidAction: lidActionSource.setAction,
           player: playerSource,
+          spectrumBars: spectrumSource.bars,
         })
 
         WorkspaceWindow({
