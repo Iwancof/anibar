@@ -4,6 +4,7 @@ import { anySwipeDashboardVisible, setSwipeDashboardVisibility, toggleSwipeDashb
 import { toggleBatteryPopup, openBatteryPopup, closeBatteryPopup, anyBatteryPopupVisible } from "./popup-controller.ts"
 import { toggleNetworkPopup, openNetworkPopup, closeNetworkPopup } from "./network-controller.ts"
 import { toggleNotifCenter, openNotifCenter, closeNotifCenter } from "./notification-controller.ts"
+import { toggleDashboardMode, openDashboardMode, closeDashboardMode } from "./dashboard-mode-controller.ts"
 
 function normalizeArgs(args: string[]): string[] {
   return args.filter(Boolean).filter((arg, index) => {
@@ -35,6 +36,15 @@ export function handleAppRequest(args: string[]): string {
         return "launcher hidden"
       default:
         return `unknown launcher action "${action}"`
+    }
+  }
+
+  if (scope === "dashboard-mode") {
+    switch (action) {
+      case "toggle": toggleDashboardMode(); return "ok"
+      case "open": openDashboardMode(); return "ok"
+      case "close": closeDashboardMode(); return "ok"
+      default: return `unknown dashboard-mode action "${action}"`
     }
   }
 

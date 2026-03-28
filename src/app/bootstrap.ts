@@ -29,6 +29,7 @@ import LauncherWindow from "../surfaces/launcher/LauncherWindow.tsx"
 import NotificationPopup from "../surfaces/notifications/NotificationPopup.tsx"
 import NotificationCenter from "../surfaces/notifications/NotificationCenter.tsx"
 import SwipeDashboard from "../surfaces/dashboard/SwipeDashboard.tsx"
+import DashboardMode from "../surfaces/dashboard-mode/DashboardMode.tsx"
 import { toggleNotifCenter } from "./notification-controller.ts"
 import { toggleDashboardVisibility } from "./dashboard-controller.ts"
 import { toggleSwipeDashboard } from "./swipe-dashboard-controller.ts"
@@ -142,6 +143,30 @@ export function startMainApp() {
           onClose: () => {
             toggleSwipeDashboard()
           },
+        })
+
+        DashboardMode({
+          gdkmonitor,
+          monitorIndex,
+          clock,
+          networkSnapshot: modules.network.snapshot,
+          wifiSnapshot: wifiSource.snapshot,
+          bandwidthSnapshot: bandwidthSource.snapshot,
+          qualitySnapshot: qualitySource.snapshot,
+          dnsSnapshot: dnsSource.snapshot,
+          latencySnapshot: latencySource.snapshot,
+          sessionSnapshot: sessionSource.snapshot,
+          connectionsSnapshot: connectionsSource.snapshot,
+          flows: flowsSource.flows,
+          logs: logSource.logs,
+          batterySnapshot: modules.battery.snapshot,
+          systemStats: systemStats.snapshot,
+          pwsaveStatus: pwsaveSource.status,
+          lidAction: lidActionSource.action,
+          onToggleMeasure: pwsaveSource.toggleMeasure,
+          onToggleAll: pwsaveSource.toggleAll,
+          onSetLidAction: lidActionSource.setAction,
+          player: playerSource,
         })
 
         WorkspaceWindow({

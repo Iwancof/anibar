@@ -2258,3 +2258,72 @@ window.NpWindow {
 .NpApPanelScroll {
   background: transparent;
 }
+
+// ══════════════════════════════════════════
+// ── Dashboard Mode (全画面) ──────────────
+// ══════════════════════════════════════════
+
+window.DmWindow {
+  background: transparent;
+}
+
+.DmBackdrop {
+  background: rgba(8, 10, 16, 0.88);
+  padding: 20px 32px;
+}
+
+.DmClockArea {
+  padding: 16px 0 8px;
+}
+
+.DmClock {
+  font-family: $network-panel-font-family, $font-family;
+  font-size: 48px;
+  font-weight: 300;
+  color: $np-cyan;
+  letter-spacing: 4px;
+}
+
+.DmMusicArea {
+  padding: 8px 0 16px;
+}
+
+.DmMusicTitle {
+  font-family: "Noto Sans Mono CJK JP", $network-panel-font-family, $font-family;
+  font-size: 16px;
+  color: $np-text;
+}
+
+.DmMusicBtn {
+  background: transparent;
+  border: none;
+  padding: 0 6px;
+  margin: 0;
+}
+
+.DmMusicBtn label {
+  font-size: 18px;
+  color: $np-text-sec;
+}
+
+.DmMusicBtn:hover label {
+  color: $np-text;
+}
+
+.DmMainArea {
+  padding: 0;
+}
+
+.DmNetPanel {
+  background: rgba($np-bg1, 0.7);
+  border: 1px solid $np-border;
+  border-radius: 8px;
+  padding: 0;
+}
+
+.DmBatPanel {
+  background: rgba($np-bg1, 0.7);
+  border: 1px solid $np-border;
+  border-radius: 8px;
+  padding: 0;
+}
