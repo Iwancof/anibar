@@ -61,6 +61,7 @@ async function readHyprMonitorSignature(): Promise<string | null> {
 
   try {
     const monitors = JSON.parse(output) as Array<Record<string, unknown>>
+    // Only compare physical layout fields. Focus changes as the pointer moves.
     return JSON.stringify(monitors.map((monitor) => ({
       name: monitor.name ?? "",
       x: monitor.x ?? 0,
@@ -68,7 +69,6 @@ async function readHyprMonitorSignature(): Promise<string | null> {
       width: monitor.width ?? 0,
       height: monitor.height ?? 0,
       scale: monitor.scale ?? 1,
-      focused: monitor.focused ?? false,
     })))
   } catch {
     return null
