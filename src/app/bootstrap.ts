@@ -22,6 +22,7 @@ import { createLatencySource } from "../runtime/latency-source.ts"
 import { createSessionSource } from "../runtime/session-source.ts"
 import { createConnectionsSource } from "../runtime/connections-source.ts"
 import { createFlowsSource, createLogSource } from "../runtime/netmon-source.ts"
+import { safeExec } from "../runtime/command.ts"
 import Bar from "../surfaces/bar/Bar.tsx"
 import WorkspaceWindow from "../surfaces/workspace/WorkspaceWindow.tsx"
 import BatteryPopup from "../surfaces/popups/BatteryPopup.tsx"
@@ -37,6 +38,42 @@ import { toggleSwipeDashboard } from "./swipe-dashboard-controller.ts"
 import { toggleBatteryPopup } from "./popup-controller.ts"
 import { toggleNetworkPopup } from "./network-controller.ts"
 import { handleAppRequest } from "./request-handler.ts"
+
+const MONITOR_POLL_MS = 1000
+
+function disposeWindow(window: Gtk.Window) {
+  try {
+    window.close()
+  } catch {}
+
+  try {
+    app.remove_window(window)
+  } catch {}
+
+  try {
+    window.destroy()
+  } catch {}
+}
+
+async function readHyprMonitorSignature(): Promise<string | null> {
+  const output = await safeExec(["hyprctl", "monitors", "-j"])
+  if (!output) return null
+
+  try {
+    const monitors = JSON.parse(output) as Array<Record<string, unknown>>
+    return JSON.stringify(monitors.map((monitor) => ({
+      name: monitor.name ?? "",
+      x: monitor.x ?? 0,
+      y: monitor.y ?? 0,
+      width: monitor.width ?? 0,
+      height: monitor.height ?? 0,
+      scale: monitor.scale ?? 1,
+      focused: monitor.focused ?? false,
+    })))
+  } catch {
+    return null
+  }
+}
 
 export function startMainApp() {
   const modules = createRuntimeAppModules()
@@ -188,14 +225,37 @@ export function startMainApp() {
     main() {
       let monitorWindows: Gtk.Window[] = []
       let pendingSyncSource = 0
+      let hyprMonitorPollSource = 0
+      let hyprMonitorPollInFlight = false
+      let lastHyprMonitorSignature: string | null = null
 
       const syncMonitorWindows = () => {
-        monitorWindows.forEach((window) => window.destroy())
+        monitorWindows.forEach(disposeWindow)
         monitorWindows = []
 
         app.get_monitors().forEach((gdkmonitor, monitorIndex) => {
           monitorWindows.push(...createMonitorWindows(gdkmonitor, monitorIndex))
         })
+      }
+
+      const pollHyprMonitorTopology = async () => {
+        if (hyprMonitorPollInFlight) return
+        hyprMonitorPollInFlight = true
+
+        const signature = await readHyprMonitorSignature()
+        hyprMonitorPollInFlight = false
+
+        if (!signature) return
+
+        if (lastHyprMonitorSignature == null) {
+          lastHyprMonitorSignature = signature
+          return
+        }
+
+        if (signature !== lastHyprMonitorSignature) {
+          lastHyprMonitorSignature = signature
+          scheduleMonitorSync()
+        }
       }
 
       const scheduleMonitorSync = () => {
@@ -204,22 +264,33 @@ export function startMainApp() {
         pendingSyncSource = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 150, () => {
           pendingSyncSource = 0
           syncMonitorWindows()
+          void pollHyprMonitorTopology()
           return false
         })
       }
 
       const monitorSignalId = app.connect("notify::monitors", scheduleMonitorSync)
+      hyprMonitorPollSource = GLib.timeout_add(GLib.PRIORITY_DEFAULT, MONITOR_POLL_MS, () => {
+        void pollHyprMonitorTopology()
+        return true
+      })
+
       app.connect("shutdown", () => {
         if (pendingSyncSource !== 0) {
           GLib.source_remove(pendingSyncSource)
           pendingSyncSource = 0
         }
+        if (hyprMonitorPollSource !== 0) {
+          GLib.source_remove(hyprMonitorPollSource)
+          hyprMonitorPollSource = 0
+        }
         app.disconnect(monitorSignalId)
-        monitorWindows.forEach((window) => window.destroy())
+        monitorWindows.forEach(disposeWindow)
         monitorWindows = []
       })
 
       syncMonitorWindows()
+      void pollHyprMonitorTopology()
     },
   })
 }
