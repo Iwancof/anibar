@@ -11,10 +11,11 @@ export interface LauncherWindowProps {
 
 export default function LauncherWindow(props: LauncherWindowProps) {
   const { TOP, LEFT, RIGHT, BOTTOM } = Astal.WindowAnchor
+  const monitorName = props.gdkmonitor.connector || `${props.monitorIndex}`
 
   return (
     <window
-      name={`launcher:${props.monitorIndex}`}
+      name={`launcher:${monitorName}`}
       class="Launcher"
       visible={false}
       application={app}
