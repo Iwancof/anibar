@@ -1,6 +1,7 @@
 import GLib from "gi://GLib?version=2.0"
 
 import app from "ags/gtk4/app"
+import { Gdk, Gtk } from "ags/gtk4"
 
 import style from "../../style.scss"
 import { createRuntimeAppModules, barIndicators } from "../modules/index.ts"
@@ -59,126 +60,166 @@ export function startMainApp() {
   const logSource = createLogSource()
   const indicators = barIndicators(modules)
 
+  function createMonitorWindows(
+    gdkmonitor: Gdk.Monitor,
+    monitorIndex: number,
+  ): Gtk.Window[] {
+    return [
+      Bar({
+        gdkmonitor,
+        monitorIndex,
+        clock,
+        indicators,
+        spectrumBars: spectrumSource.bars,
+        player: playerSource,
+        networkSnapshot: modules.network.snapshot,
+        wifiSnapshot: wifiSource.snapshot,
+        notifUnreadCount: notificationSource.unreadCount,
+        batterySnapshot: modules.battery.snapshot,
+        imeSnapshot: imeSource.snapshot,
+        workspaceSnapshot: workspaceSource.snapshot,
+        onToggleDashboard: toggleDashboardVisibility,
+        onToggleBatteryPopup: toggleBatteryPopup,
+        onToggleNotifCenter: () => {
+          notificationSource.markAllRead()
+          toggleNotifCenter()
+        },
+        onToggleNetworkPopup: toggleNetworkPopup,
+      }),
+
+      NetworkPanel({
+        gdkmonitor,
+        monitorIndex,
+        networkSnapshot: modules.network.snapshot,
+        wifiSnapshot: wifiSource.snapshot,
+        bandwidthSnapshot: bandwidthSource.snapshot,
+        qualitySnapshot: qualitySource.snapshot,
+        dnsSnapshot: dnsSource.snapshot,
+        latencySnapshot: latencySource.snapshot,
+        sessionSnapshot: sessionSource.snapshot,
+        connectionsSnapshot: connectionsSource.snapshot,
+        flows: flowsSource.flows,
+        logs: logSource.logs,
+        onConnect: (ssid, password) => { wifiSource.connect(ssid, password) },
+        onRescan: () => { wifiSource.rescan() },
+      }),
+
+      BatteryPopup({
+        gdkmonitor,
+        monitorIndex,
+        snapshot: modules.battery.snapshot,
+        systemStats: systemStats.snapshot,
+        pwsaveStatus: pwsaveSource.status,
+        lidAction: lidActionSource.action,
+        onToggleMeasure: pwsaveSource.toggleMeasure,
+        onToggleAll: pwsaveSource.toggleAll,
+        onSetLidAction: lidActionSource.setAction,
+      }),
+
+      LauncherWindow({
+        gdkmonitor,
+        monitorIndex,
+      }),
+
+      NotificationPopup({
+        gdkmonitor,
+        monitorIndex,
+        notifications: notificationSource,
+      }),
+
+      NotificationCenter({
+        gdkmonitor,
+        monitorIndex,
+        notifications: notificationSource,
+      }),
+
+      SwipeDashboard({
+        gdkmonitor,
+        monitorIndex,
+        batterySnapshot: modules.battery.snapshot,
+        notifications: notificationSource,
+        player: playerSource,
+        onClose: () => {
+          toggleSwipeDashboard()
+        },
+      }),
+
+      DashboardMode({
+        gdkmonitor,
+        monitorIndex,
+        clock,
+        networkSnapshot: modules.network.snapshot,
+        wifiSnapshot: wifiSource.snapshot,
+        bandwidthSnapshot: bandwidthSource.snapshot,
+        qualitySnapshot: qualitySource.snapshot,
+        dnsSnapshot: dnsSource.snapshot,
+        latencySnapshot: latencySource.snapshot,
+        sessionSnapshot: sessionSource.snapshot,
+        connectionsSnapshot: connectionsSource.snapshot,
+        flows: flowsSource.flows,
+        logs: logSource.logs,
+        batterySnapshot: modules.battery.snapshot,
+        systemStats: systemStats.snapshot,
+        pwsaveStatus: pwsaveSource.status,
+        lidAction: lidActionSource.action,
+        onToggleMeasure: pwsaveSource.toggleMeasure,
+        onToggleAll: pwsaveSource.toggleAll,
+        onSetLidAction: lidActionSource.setAction,
+        player: playerSource,
+        spectrumBars: spectrumSource.bars,
+      }),
+
+      WorkspaceWindow({
+        gdkmonitor,
+        monitorIndex,
+        snapshot: workspaceSource.snapshot,
+        onClose: () => {
+          void toggleDashboardVisibility()
+        },
+      }),
+    ]
+  }
+
   app.start({
     css: style,
     requestHandler(args, respond) {
       respond(handleAppRequest(args))
     },
     main() {
-      app.get_monitors().forEach((gdkmonitor, monitorIndex) => {
-        Bar({
-          gdkmonitor,
-          monitorIndex,
-          clock,
-          indicators,
-          spectrumBars: spectrumSource.bars,
-          player: playerSource,
-          networkSnapshot: modules.network.snapshot,
-          wifiSnapshot: wifiSource.snapshot,
-          notifUnreadCount: notificationSource.unreadCount,
-          batterySnapshot: modules.battery.snapshot,
-          imeSnapshot: imeSource.snapshot,
-          workspaceSnapshot: workspaceSource.snapshot,
-          onToggleDashboard: toggleDashboardVisibility,
-          onToggleBatteryPopup: toggleBatteryPopup,
-          onToggleNotifCenter: () => {
-            notificationSource.markAllRead()
-            toggleNotifCenter()
-          },
-          onToggleNetworkPopup: toggleNetworkPopup,
-        })
+      let monitorWindows: Gtk.Window[] = []
+      let pendingSyncSource = 0
 
-        NetworkPanel({
-          gdkmonitor,
-          monitorIndex,
-          networkSnapshot: modules.network.snapshot,
-          wifiSnapshot: wifiSource.snapshot,
-          bandwidthSnapshot: bandwidthSource.snapshot,
-          qualitySnapshot: qualitySource.snapshot,
-          dnsSnapshot: dnsSource.snapshot,
-          latencySnapshot: latencySource.snapshot,
-          sessionSnapshot: sessionSource.snapshot,
-          connectionsSnapshot: connectionsSource.snapshot,
-          flows: flowsSource.flows,
-          logs: logSource.logs,
-          onConnect: (ssid, password) => { wifiSource.connect(ssid, password) },
-          onRescan: () => { wifiSource.rescan() },
-        })
+      const syncMonitorWindows = () => {
+        monitorWindows.forEach((window) => window.destroy())
+        monitorWindows = []
 
-        BatteryPopup({
-          gdkmonitor,
-          monitorIndex,
-          snapshot: modules.battery.snapshot,
-          systemStats: systemStats.snapshot,
-          pwsaveStatus: pwsaveSource.status,
-          lidAction: lidActionSource.action,
-          onToggleMeasure: pwsaveSource.toggleMeasure,
-          onToggleAll: pwsaveSource.toggleAll,
-          onSetLidAction: lidActionSource.setAction,
+        app.get_monitors().forEach((gdkmonitor, monitorIndex) => {
+          monitorWindows.push(...createMonitorWindows(gdkmonitor, monitorIndex))
         })
+      }
 
-        LauncherWindow({
-          gdkmonitor,
-          monitorIndex,
-        })
+      const scheduleMonitorSync = () => {
+        if (pendingSyncSource !== 0) return
 
-        NotificationPopup({
-          gdkmonitor,
-          monitorIndex,
-          notifications: notificationSource,
+        pendingSyncSource = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 150, () => {
+          pendingSyncSource = 0
+          syncMonitorWindows()
+          return false
         })
+      }
 
-        NotificationCenter({
-          gdkmonitor,
-          monitorIndex,
-          notifications: notificationSource,
-        })
-
-        SwipeDashboard({
-          gdkmonitor,
-          monitorIndex,
-          batterySnapshot: modules.battery.snapshot,
-          notifications: notificationSource,
-          player: playerSource,
-          onClose: () => {
-            toggleSwipeDashboard()
-          },
-        })
-
-        DashboardMode({
-          gdkmonitor,
-          monitorIndex,
-          clock,
-          networkSnapshot: modules.network.snapshot,
-          wifiSnapshot: wifiSource.snapshot,
-          bandwidthSnapshot: bandwidthSource.snapshot,
-          qualitySnapshot: qualitySource.snapshot,
-          dnsSnapshot: dnsSource.snapshot,
-          latencySnapshot: latencySource.snapshot,
-          sessionSnapshot: sessionSource.snapshot,
-          connectionsSnapshot: connectionsSource.snapshot,
-          flows: flowsSource.flows,
-          logs: logSource.logs,
-          batterySnapshot: modules.battery.snapshot,
-          systemStats: systemStats.snapshot,
-          pwsaveStatus: pwsaveSource.status,
-          lidAction: lidActionSource.action,
-          onToggleMeasure: pwsaveSource.toggleMeasure,
-          onToggleAll: pwsaveSource.toggleAll,
-          onSetLidAction: lidActionSource.setAction,
-          player: playerSource,
-          spectrumBars: spectrumSource.bars,
-        })
-
-        WorkspaceWindow({
-          gdkmonitor,
-          monitorIndex,
-          snapshot: workspaceSource.snapshot,
-          onClose: () => {
-            void toggleDashboardVisibility()
-          },
-        })
+      const monitorSignalId = app.connect("notify::monitors", scheduleMonitorSync)
+      app.connect("shutdown", () => {
+        if (pendingSyncSource !== 0) {
+          GLib.source_remove(pendingSyncSource)
+          pendingSyncSource = 0
+        }
+        app.disconnect(monitorSignalId)
+        monitorWindows.forEach((window) => window.destroy())
+        monitorWindows = []
       })
+
+      syncMonitorWindows()
     },
   })
 }
