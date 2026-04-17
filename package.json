@@ -8,6 +8,7 @@
     "check": "npm run typecheck && npm run test",
     "typecheck": "tsc --noEmit --project tsconfig.pure.json",
     "test": "node --experimental-strip-types --test tests/shared/*.test.ts tests/modules/*.test.ts",
+    "layout": "node --experimental-strip-types scripts/layoutctl.ts",
     "preview:dashboard": "ags run src/preview/dashboard.tsx --gtk 4",
     "preview:battery": "ags run src/preview/battery.tsx --gtk 4",
     "preview:network": "ags run src/preview/network.tsx --gtk 4",
