@@ -9,21 +9,6 @@ export function createClock(format = "%a %H:%M:%S") {
   })
 }
 
-const MONTH_NAMES = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-]
-
 const WEEKDAY_NAMES = [
   "Mon",
   "Tue",
@@ -40,7 +25,7 @@ function pad2(value: number): string {
 
 function formatBarClock(now: GLib.DateTime): string {
   const year = now.get_year()
-  const month = MONTH_NAMES[now.get_month() - 1] ?? pad2(now.get_month())
+  const month = pad2(now.get_month())
   const day = pad2(now.get_day_of_month())
   const weekday = WEEKDAY_NAMES[now.get_day_of_week() - 1] ?? ""
   const time = now.format("%H:%M:%S") ?? ""
