@@ -8,7 +8,7 @@ import { createRuntimeAppModules, barIndicators } from "../modules/index.ts"
 import { createSystemStatsSource } from "../runtime/system-stats-source.ts"
 import { createWorkspaceSource } from "../runtime/workspace-source.ts"
 import { createImeSource } from "../runtime/ime-source.ts"
-import { createClock } from "../shared/runtime/clock.ts"
+import { createBarClock, createClock } from "../shared/runtime/clock.ts"
 import { createPwsaveSource } from "../runtime/pwsave-source.ts"
 import { createLidActionSource } from "../runtime/lid-action-source.ts"
 import { createSpectrumSource } from "../runtime/spectrum-source.ts"
@@ -81,6 +81,7 @@ export function startMainApp() {
   const workspaceSource = createWorkspaceSource()
   const imeSource = createImeSource()
   const clock = createClock()
+  const barClock = createBarClock()
   const pwsaveSource = createPwsaveSource()
   const lidActionSource = createLidActionSource()
   const notificationSource = createNotificationSource()
@@ -105,7 +106,7 @@ export function startMainApp() {
       Bar({
         gdkmonitor,
         monitorIndex,
-        clock,
+        clock: barClock,
         indicators,
         spectrumBars: spectrumSource.bars,
         player: playerSource,
