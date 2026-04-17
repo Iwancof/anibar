@@ -106,6 +106,8 @@ function getDetachedLaunchPrefix(description: string): string[] {
     "--quiet",
     "--same-dir",
     "--service-type=exec",
+    "-p",
+    "ExitType=cgroup",
     `--description=${description}`,
   ]
 
