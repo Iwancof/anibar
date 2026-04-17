@@ -1,5 +1,5 @@
 import { Gtk } from "ags/gtk4"
-import { For, createEffect, createMemo, createState } from "gnim"
+import { For, createEffect, createMemo, createState, onCleanup } from "gnim"
 import type { Accessor } from "gnim"
 
 import type { DisplayProfile, DisplayOutput } from "../../modules/display-layout/domain.ts"
@@ -28,20 +28,6 @@ interface DisplayLayoutViewProps {
   onApply: (profile: DisplayProfile) => Promise<{ ok: boolean; error?: string }>
   onSave: (name: string, profile: DisplayProfile) => Promise<{ ok: boolean; error?: string }>
   onRefresh: () => Promise<void>
-}
-
-const EMPTY_OUTPUT: DisplayOutput = {
-  connector: "",
-  description: "",
-  enabled: false,
-  mode: "",
-  availableModes: [],
-  scale: 1,
-  x: 0,
-  y: 0,
-  logicalWidth: 1,
-  logicalHeight: 1,
-  focused: false,
 }
 
 function selectConnector(profile: DisplayProfile, preferred: string): string {
@@ -126,13 +112,16 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
     }
   })
 
-  const outputIds = createMemo(() => draft()?.outputs.map((output) => output.connector) ?? [])
   const canApply = createMemo(() => {
     const profile = draft()
     return !busy() && profile != null && hasEnabledOutputs(profile)
   })
   const canSave = createMemo(() => !busy() && draft() != null && saveName().trim().length > 0)
   const dirtyLabel = dirty((value) => value ? "Draft has unapplied changes." : "Draft matches current outputs.")
+  const outputCountLabel = createMemo(() => {
+    const count = draft()?.outputs.length ?? 0
+    return count === 1 ? "1 output" : `${count} outputs`
+  })
 
   function updateDraft(updater: (profile: DisplayProfile) => DisplayProfile, message?: string): void {
     const currentDraft = draft()
@@ -274,31 +263,21 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
       <box class="DisplayCenter" orientation={Gtk.Orientation.VERTICAL} spacing={12} hexpand>
         <box class="DisplayCanvasHeader" spacing={10}>
           <label class="DisplayCanvasTitle" label="LAYOUT" halign={Gtk.Align.START} hexpand />
+          <label class="DisplayCanvasHint" label={outputCountLabel} halign={Gtk.Align.END} />
           <label class="DisplayCanvasHint" label={dirtyLabel} halign={Gtk.Align.END} />
         </box>
 
         <overlay class="DisplayCanvas">
           <box class="DisplayCanvasBase" widthRequest={CANVAS_WIDTH} heightRequest={CANVAS_HEIGHT} />
-          <For each={outputIds} id={(connector) => connector}>
-            {(connector) => {
-              const output = createMemo(() =>
-                draft()?.outputs.find((item) => item.connector === connector) ?? EMPTY_OUTPUT,
-              )
-
-              return (
-                <DisplayCanvasCard
-                  output={output}
-                  layout={canvasLayout}
-                  profile={draft}
-                  selected={createMemo(() => selectedConnector() === connector)}
-                  onSelect={() => setSelectedConnector(connector)}
-                  onMove={(x, y) => {
-                    updateDraft((profile) => setOutputPosition(profile, connector, x, y))
-                  }}
-                />
-              )
+          <DisplayCanvasFixed
+            profile={draft}
+            layout={canvasLayout}
+            selectedConnector={selectedConnector}
+            onSelect={(connector) => setSelectedConnector(connector)}
+            onMove={(connector, x, y) => {
+              updateDraft((profile) => setOutputPosition(profile, connector, x, y))
             }}
-          </For>
+          />
         </overlay>
 
         <box class="DisplayActions" spacing={8}>
@@ -463,95 +442,137 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
   )
 }
 
-interface DisplayCanvasCardProps {
-  output: Accessor<DisplayOutput>
-  layout: Accessor<{ minX: number; minY: number; scale: number; offsetX: number; offsetY: number }>
+interface DisplayCanvasFixedProps {
   profile: Accessor<DisplayProfile | null>
-  selected: Accessor<boolean>
-  onSelect: () => void
-  onMove: (x: number, y: number) => void
+  layout: Accessor<{ minX: number; minY: number; scale: number; offsetX: number; offsetY: number }>
+  selectedConnector: Accessor<string>
+  onSelect: (connector: string) => void
+  onMove: (connector: string, x: number, y: number) => void
 }
 
-function DisplayCanvasCard(props: DisplayCanvasCardProps) {
-  const className = createMemo(() => {
-    const output = props.output()
-    let cls = "DisplayCanvasCard"
-    if (props.selected()) cls += " DisplayCanvasCardSelected"
-    if (!output.enabled) cls += " DisplayCanvasCardDisabled"
-    if (output.focused) cls += " DisplayCanvasCardFocused"
-    return cls
+function DisplayCanvasFixed(props: DisplayCanvasFixedProps) {
+  const fixed = new Gtk.Fixed({
+    widthRequest: CANVAS_WIDTH,
+    heightRequest: CANVAS_HEIGHT,
+    halign: Gtk.Align.START,
+    valign: Gtk.Align.START,
   })
+  fixed.cssClasses = ["DisplayCanvasFixed"]
 
-  const marginStart = createMemo(() => {
-    const output = props.output()
+  const cards = new Map<string, {
+    button: Gtk.Button
+    connectorLabel: Gtk.Label
+    metaLabel: Gtk.Label
+  }>()
+
+  function ensureCard(connector: string) {
+    const existing = cards.get(connector)
+    if (existing) return existing
+
+    const connectorLabel = new Gtk.Label({
+      halign: Gtk.Align.START,
+      xalign: 0,
+      maxWidthChars: 16,
+      ellipsize: 3,
+    })
+    connectorLabel.cssClasses = ["DisplayCanvasConnector"]
+
+    const metaLabel = new Gtk.Label({
+      halign: Gtk.Align.START,
+      xalign: 0,
+      maxWidthChars: 18,
+      ellipsize: 3,
+    })
+    metaLabel.cssClasses = ["DisplayCanvasMeta"]
+
+    const content = new Gtk.Box({
+      orientation: Gtk.Orientation.VERTICAL,
+      spacing: 2,
+    })
+    content.append(connectorLabel)
+    content.append(metaLabel)
+
+    const button = new Gtk.Button({
+      halign: Gtk.Align.START,
+      valign: Gtk.Align.START,
+      child: content,
+    })
+    button.cssClasses = ["DisplayCanvasCard"]
+    button.connect("clicked", () => props.onSelect(connector))
+
+    const drag = new Gtk.GestureDrag()
+    let startX = 0
+    let startY = 0
+
+    drag.connect("drag-begin", () => {
+      const output = props.profile()?.outputs.find((item) => item.connector === connector)
+      if (!output) return
+      startX = output.x
+      startY = output.y
+      props.onSelect(connector)
+    })
+
+    drag.connect("drag-update", (_gesture: unknown, offsetX: number, offsetY: number) => {
+      const profile = props.profile()
+      if (!profile) return
+
+      const scale = Math.max(props.layout().scale, 0.001)
+      const desiredX = startX + offsetX / scale
+      const desiredY = startY + offsetY / scale
+      const snapped = snapOutputPosition(profile, connector, desiredX, desiredY)
+      props.onMove(connector, snapped.x, snapped.y)
+    })
+
+    button.add_controller(drag)
+    fixed.put(button, 0, 0)
+
+    const refs = { button, connectorLabel, metaLabel }
+    cards.set(connector, refs)
+    return refs
+  }
+
+  createEffect(() => {
+    const profile = props.profile()
     const layout = props.layout()
-    return Math.round(layout.offsetX + (output.x - layout.minX) * layout.scale)
+    const selected = props.selectedConnector()
+    const outputs = profile?.outputs ?? []
+    const seen = new Set<string>()
+
+    for (const output of outputs) {
+      seen.add(output.connector)
+      const refs = ensureCard(output.connector)
+
+      refs.connectorLabel.label = output.connector
+      refs.metaLabel.label = output.enabled ? output.mode : "disabled"
+      refs.button.widthRequest = Math.max(84, Math.round(output.logicalWidth * layout.scale))
+      refs.button.heightRequest = Math.max(54, Math.round(output.logicalHeight * layout.scale))
+      refs.button.cssClasses = [
+        "DisplayCanvasCard",
+        ...(selected === output.connector ? ["DisplayCanvasCardSelected"] : []),
+        ...(!output.enabled ? ["DisplayCanvasCardDisabled"] : []),
+        ...(output.focused ? ["DisplayCanvasCardFocused"] : []),
+      ]
+
+      fixed.move(
+        refs.button,
+        Math.round(layout.offsetX + (output.x - layout.minX) * layout.scale),
+        Math.round(layout.offsetY + (output.y - layout.minY) * layout.scale),
+      )
+    }
+
+    for (const [connector, refs] of cards.entries()) {
+      if (seen.has(connector)) continue
+      fixed.remove(refs.button)
+      cards.delete(connector)
+    }
+  }, { immediate: true })
+
+  onCleanup(() => {
+    for (const refs of cards.values()) {
+      fixed.remove(refs.button)
+    }
+    cards.clear()
   })
 
-  const marginTop = createMemo(() => {
-    const output = props.output()
-    const layout = props.layout()
-    return Math.round(layout.offsetY + (output.y - layout.minY) * layout.scale)
-  })
-
-  const widthRequest = createMemo(() => {
-    const output = props.output()
-    const layout = props.layout()
-    return Math.max(84, Math.round(output.logicalWidth * layout.scale))
-  })
-
-  const heightRequest = createMemo(() => {
-    const output = props.output()
-    const layout = props.layout()
-    return Math.max(54, Math.round(output.logicalHeight * layout.scale))
-  })
-
-  return (
-    <button
-      class={className}
-      halign={Gtk.Align.START}
-      valign={Gtk.Align.START}
-      marginStart={marginStart}
-      marginTop={marginTop}
-      widthRequest={widthRequest}
-      heightRequest={heightRequest}
-      onClicked={props.onSelect}
-      onRealize={(self: any) => {
-        const drag = new Gtk.GestureDrag()
-        let startX = 0
-        let startY = 0
-
-        drag.connect("drag-begin", () => {
-          const output = props.output()
-          startX = output.x
-          startY = output.y
-          props.onSelect()
-        })
-
-        drag.connect("drag-update", (_gesture: unknown, offsetX: number, offsetY: number) => {
-          const profile = props.profile()
-          const output = props.output()
-          if (!profile) return
-
-          const scale = Math.max(props.layout().scale, 0.001)
-          const desiredX = startX + offsetX / scale
-          const desiredY = startY + offsetY / scale
-          const snapped = snapOutputPosition(profile, output.connector, desiredX, desiredY)
-          props.onMove(snapped.x, snapped.y)
-        })
-
-        self.add_controller(drag)
-      }}
-    >
-      <box orientation={Gtk.Orientation.VERTICAL} spacing={2}>
-        <label class="DisplayCanvasConnector" label={props.output((output) => output.connector)} />
-        <label
-          class="DisplayCanvasMeta"
-          label={props.output((output) => output.enabled ? output.mode : "disabled")}
-          maxWidthChars={18}
-          ellipsize={3}
-        />
-      </box>
-    </button>
-  )
+  return fixed
 }
