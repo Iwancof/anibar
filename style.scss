@@ -1465,6 +1465,7 @@ window.WsOverview {
 .DisplayActionButton,
 .DisplayCycleButton,
 .DisplayScaleButton,
+.DisplayRotationButton,
 .DisplayEnabledToggle {
   background: #111420;
   border: 1px solid #1a1e2e;
@@ -1554,6 +1555,7 @@ window.WsOverview {
 
 .DisplayModePicker,
 .DisplayScalePicker,
+.DisplayRotationPicker,
 .DisplayPositionInfo {
   background: rgba(17, 20, 32, 0.72);
   border: 1px solid #1a1e2e;
@@ -1562,6 +1564,11 @@ window.WsOverview {
 }
 
 .DisplayScaleButtonActive {
+  background: rgba(0, 255, 204, 0.12);
+  border-color: rgba(0, 255, 204, 0.45);
+}
+
+.DisplayRotationButtonActive {
   background: rgba(0, 255, 204, 0.12);
   border-color: rgba(0, 255, 204, 0.45);
 }

@@ -2,7 +2,7 @@ import { Gtk } from "ags/gtk4"
 import { For, createEffect, createMemo, createState, onCleanup } from "gnim"
 import type { Accessor } from "gnim"
 
-import type { DisplayProfile, DisplayOutput } from "../../modules/display-layout/domain.ts"
+import type { DisplayProfile, DisplayOutput, DisplayTransform } from "../../modules/display-layout/domain.ts"
 import {
   applyHorizontalPreset,
   applySingleOutputPreset,
@@ -14,10 +14,12 @@ import {
   setOutputMode,
   setOutputPosition,
   setOutputScale,
+  setOutputTransform,
   snapOutputPosition,
 } from "../../modules/display-layout/domain.ts"
 
 const SCALE_OPTIONS = [0.75, 1, 1.25, 1.5, 2]
+const ROTATION_OPTIONS: DisplayTransform[] = [0, 1, 2, 3]
 const CANVAS_WIDTH = 560
 const CANVAS_HEIGHT = 340
 const CANVAS_PADDING = 18
@@ -43,6 +45,17 @@ function selectConnector(profile: DisplayProfile, preferred: string): string {
 
 function formatScale(scale: number): string {
   return `${scale.toFixed(2).replace(/\.?0+$/, "")}x`
+}
+
+function formatRotation(transform: DisplayTransform): string {
+  if (transform === 0) return "0 deg"
+  if (transform === 1) return "90 deg"
+  if (transform === 2) return "180 deg"
+  if (transform === 3) return "270 deg"
+  if (transform === 4) return "flipped"
+  if (transform === 5) return "flip 90"
+  if (transform === 6) return "flip 180"
+  return "flip 270"
 }
 
 function cycleMode(output: DisplayOutput, delta: number): string {
@@ -117,6 +130,7 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
     return !busy() && profile != null && hasEnabledOutputs(profile)
   })
   const canSave = createMemo(() => !busy() && draft() != null && saveName().trim().length > 0)
+  const rotationOptions = createMemo(() => ROTATION_OPTIONS)
   const dirtyLabel = dirty((value) => value ? "Draft has unapplied changes." : "Draft matches current outputs.")
   const outputCountLabel = createMemo(() => {
     const count = draft()?.outputs.length ?? 0
@@ -394,10 +408,12 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
           <label class="DisplayFieldLabel" label="SCALE" halign={Gtk.Align.START} />
           <box spacing={6}>
             <For each={createMemo(() => nextScaleOptions(selectedOutput()?.scale ?? 1))}>
-              {(scale) => (
+              {(scale) => {
+                const scaleValue = scale as number
+                return (
                 <button
                   class={createMemo(() =>
-                    selectedOutput()?.scale === scale
+                    selectedOutput()?.scale === scaleValue
                       ? "DisplayScaleButton DisplayScaleButtonActive"
                       : "DisplayScaleButton",
                   )}
@@ -406,14 +422,46 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
                     const output = selectedOutput()
                     if (!output) return
                     updateDraft(
-                      (profile) => setOutputScale(profile, output.connector, scale),
+                      (profile) => setOutputScale(profile, output.connector, scaleValue),
                       `Changed ${output.connector} scale.`,
                     )
                   }}
                 >
-                  <label label={formatScale(scale)} />
+                  <label label={formatScale(scaleValue)} />
                 </button>
-              )}
+                )
+              }}
+            </For>
+          </box>
+        </box>
+
+        <box class="DisplayRotationPicker" orientation={Gtk.Orientation.VERTICAL} spacing={6}>
+          <label class="DisplayFieldLabel" label="ROTATION" halign={Gtk.Align.START} />
+          <box spacing={6}>
+            <For each={rotationOptions}>
+              {(transform) => {
+                const transformValue = transform as DisplayTransform
+                return (
+                <button
+                  class={createMemo(() =>
+                    selectedOutput()?.transform === transformValue
+                      ? "DisplayRotationButton DisplayRotationButtonActive"
+                      : "DisplayRotationButton",
+                  )}
+                  sensitive={selectedOutput((output) => output != null)}
+                  onClicked={() => {
+                    const output = selectedOutput()
+                    if (!output) return
+                    updateDraft(
+                      (profile) => setOutputTransform(profile, output.connector, transformValue),
+                      `Changed ${output.connector} rotation.`,
+                    )
+                  }}
+                >
+                  <label label={formatRotation(transformValue)} />
+                </button>
+                )
+              }}
             </For>
           </box>
         </box>
@@ -543,7 +591,7 @@ function DisplayCanvasFixed(props: DisplayCanvasFixedProps) {
       const refs = ensureCard(output.connector)
 
       refs.connectorLabel.label = output.connector
-      refs.metaLabel.label = output.enabled ? output.mode : "disabled"
+      refs.metaLabel.label = output.enabled ? `${output.mode} / ${formatRotation(output.transform)}` : "disabled"
       refs.button.widthRequest = Math.max(84, Math.round(output.logicalWidth * layout.scale))
       refs.button.heightRequest = Math.max(54, Math.round(output.logicalHeight * layout.scale))
       refs.button.cssClasses = [

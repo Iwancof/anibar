@@ -5,12 +5,15 @@ export interface DisplayOutput {
   mode: string
   availableModes: string[]
   scale: number
+  transform: DisplayTransform
   x: number
   y: number
   logicalWidth: number
   logicalHeight: number
   focused: boolean
 }
+
+export type DisplayTransform = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
 
 export interface DisplayProfile {
   name: string
@@ -30,6 +33,7 @@ interface HyprMonitor {
   x?: unknown
   y?: unknown
   scale?: unknown
+  transform?: unknown
   focused?: unknown
   disabled?: unknown
   availableModes?: unknown
@@ -49,6 +53,16 @@ function asNumber(value: unknown, fallback: number): number {
 
 function roundScale(scale: number): number {
   return Number(scale.toFixed(2))
+}
+
+function toDisplayTransform(value: unknown): DisplayTransform {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 7
+    ? value as DisplayTransform
+    : 0
+}
+
+function isSidewaysTransform(transform: DisplayTransform): boolean {
+  return transform % 2 === 1
 }
 
 function trimNumber(value: number): string {
@@ -75,8 +89,10 @@ function modeToCommand(mode: string): string {
 
 function withLogicalSize(output: Omit<DisplayOutput, "logicalWidth" | "logicalHeight">): DisplayOutput {
   const mode = parseMode(output.mode)
-  const width = mode?.width ?? 1
-  const height = mode?.height ?? 1
+  const modeWidth = mode?.width ?? 1
+  const modeHeight = mode?.height ?? 1
+  const width = isSidewaysTransform(output.transform) ? modeHeight : modeWidth
+  const height = isSidewaysTransform(output.transform) ? modeWidth : modeHeight
   const scale = output.scale > 0 ? output.scale : 1
 
   return {
@@ -140,6 +156,7 @@ export function parseHyprMonitorsJson(json: string): DisplayOutput[] {
         mode,
         availableModes: availableModes.length > 0 ? availableModes : [mode],
         scale: roundScale(Math.max(0.25, asNumber(monitor.scale, 1))),
+        transform: toDisplayTransform(monitor.transform),
         x: Math.round(asNumber(monitor.x, 0)),
         y: Math.round(asNumber(monitor.y, 0)),
         focused: monitor.focused === true,
@@ -189,6 +206,7 @@ export function parseDisplayProfilesFile(text: string): DisplayProfile[] {
           ? output.availableModes.filter((value): value is string => typeof value === "string" && value.trim().length > 0)
           : [mode],
         scale: roundScale(Math.max(0.25, typeof output.scale === "number" ? output.scale : 1)),
+        transform: toDisplayTransform(output.transform),
         x: Math.round(typeof output.x === "number" ? output.x : 0),
         y: Math.round(typeof output.y === "number" ? output.y : 0),
         focused: output.focused === true,
@@ -213,6 +231,7 @@ export function serializeDisplayProfiles(profiles: DisplayProfile[]): string {
           mode: output.mode,
           availableModes: output.availableModes,
           scale: output.scale,
+          transform: output.transform,
           x: output.x,
           y: output.y,
           focused: output.focused,
@@ -330,6 +349,20 @@ export function setOutputScale(profile: DisplayProfile, connector: string, scale
         ? withLogicalSize({
             ...cloneOutput(output),
             scale: nextScale,
+          })
+        : cloneOutput(output),
+    ),
+  }
+}
+
+export function setOutputTransform(profile: DisplayProfile, connector: string, transform: DisplayTransform): DisplayProfile {
+  return {
+    ...cloneProfile(profile),
+    outputs: profile.outputs.map((output) =>
+      output.connector === connector
+        ? withLogicalSize({
+            ...cloneOutput(output),
+            transform,
           })
         : cloneOutput(output),
     ),
@@ -475,7 +508,7 @@ export function buildApplyCommands(profile: DisplayProfile): string[][] {
       "hyprctl",
       "keyword",
       "monitor",
-      `${output.connector},${mode},${Math.round(output.x)}x${Math.round(output.y)},${trimNumber(output.scale)}`,
+      `${output.connector},${mode},${Math.round(output.x)}x${Math.round(output.y)},${trimNumber(output.scale)},transform,${output.transform}`,
     ]
   })
 }

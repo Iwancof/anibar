@@ -12,6 +12,7 @@ import {
   serializeDisplayProfiles,
   setOutputMode,
   setOutputScale,
+  setOutputTransform,
   snapOutputPosition,
   upsertDisplayProfile,
 } from "../../src/modules/display-layout/domain.ts"
@@ -68,6 +69,7 @@ test("parseHyprMonitorsJson parses enabled and disabled outputs", () => {
   assert.equal(outputs[1].connector, "HDMI-A-1")
   assert.equal(outputs[1].enabled, true)
   assert.equal(outputs[1].logicalWidth, 2560)
+  assert.equal(outputs[1].transform, 0)
   assert.equal(outputs[2].x, 2560)
 })
 
@@ -91,6 +93,21 @@ test("setOutputMode updates mode while keeping availableModes", () => {
   assert.equal(output.mode, "1920x1080@60.00Hz")
   assert.equal(output.logicalWidth, 1920)
   assert.ok(output.availableModes.includes("2560x1080@59.98Hz"))
+})
+
+test("setOutputTransform stores rotation and recalculates logical size", () => {
+  const profile = createDisplayProfile("current", parseHyprMonitorsJson(HYPR_MONITORS_ALL))
+  const next = setOutputTransform(profile, "DP-2", 1)
+  const output = next.outputs.find((item) => item.connector === "DP-2")
+
+  assert.ok(output)
+  assert.equal(output.transform, 1)
+  assert.equal(output.logicalWidth, 1080)
+  assert.equal(output.logicalHeight, 2560)
+  assert.equal(
+    buildApplyCommands(next).find((command) => command[3].startsWith("DP-2,"))?.[3],
+    "DP-2,2560x1080@59.98,2560x0,1,transform,1",
+  )
 })
 
 test("applyHorizontalPreset reflows enabled outputs side by side", () => {
@@ -148,8 +165,8 @@ test("buildApplyCommands normalizes origins and emits enable/disable commands", 
   const commands = buildApplyCommands(adjusted)
 
   assert.deepEqual(commands, [
-    ["hyprctl", "keyword", "monitor", "HDMI-A-1,2560x1080@59.98,0x0,1"],
-    ["hyprctl", "keyword", "monitor", "DP-2,2560x1080@59.98,2560x0,1.25"],
+    ["hyprctl", "keyword", "monitor", "HDMI-A-1,2560x1080@59.98,0x0,1,transform,0"],
+    ["hyprctl", "keyword", "monitor", "DP-2,2560x1080@59.98,2560x0,1.25,transform,0"],
     ["hyprctl", "keyword", "monitor", "eDP-1,disable"],
   ])
 })
