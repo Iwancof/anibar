@@ -1,0 +1,59 @@
+@use "../theme" as *;
+
+%icon-btn-reset {
+  background: transparent;
+  border: none;
+}
+
+@mixin popup-panel($border-color, $radius, $min-width) {
+  background: $popup-panel-bg;
+  border: 1px solid $border-color;
+  border-radius: $radius;
+  padding: 0;
+  min-width: $min-width;
+}
+
+@mixin popup-anim($root) {
+  #{$root}.open #{$root}Backdrop {
+    animation: backdrop-fade-in 200ms ease-out forwards;
+  }
+
+  #{$root}.open #{$root}Panel {
+    @content;
+  }
+
+  #{$root}.closing #{$root}Backdrop {
+    animation: backdrop-fade-out 200ms ease-in forwards;
+  }
+
+  #{$root}.closing #{$root}Panel {
+    animation: popup-slide-out 200ms ease-in forwards;
+  }
+}
+
+%eyebrow-label {
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+%dark-card {
+  background: #111420;
+  border: 1px solid $hud-border;
+}
+
+@mixin signal-colors($high, $mid, $low, $weak) {
+  .NpApSignalHigh { color: $high; }
+  .NpApSignalMid  { color: $mid; }
+  .NpApSignalLow  { color: $low; }
+  .NpApSignalWeak { color: $weak; }
+}
+
+@mixin value-tint($color) {
+  font-family: $network-panel-font-family, $font-family;
+  font-size: $network-panel-info-value;
+  color: $color;
+}
+
+%section-divider {
+  border-bottom: 1px solid $hud-border;
+}

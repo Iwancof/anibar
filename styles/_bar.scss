@@ -1,4 +1,5 @@
 @use "../theme" as *;
+@use "mixins" as *;
 
 // ── バー ──────────────────────────────────
 window.Bar {
@@ -56,8 +57,7 @@ window.Bar {
 }
 
 .PlayerBtn {
-  background: transparent;
-  border: none;
+  @extend %icon-btn-reset;
   padding: 0 3px;
   margin: 0;
   min-width: 20px;
@@ -177,8 +177,7 @@ window.Bar {
 
 // ── ネットワークアイコン (バー) ────────────
 .NetBarBtn {
-  background: transparent;
-  border: none;
+  @extend %icon-btn-reset;
   padding: 0 4px;
   margin: 0;
 }
@@ -211,8 +210,7 @@ window.Bar {
 
 // ── 通知ベルアイコン (バー) ────────────────
 .NotifBellBtn {
-  background: transparent;
-  border: none;
+  @extend %icon-btn-reset;
   padding: 0 4px;
   margin: 0;
 }

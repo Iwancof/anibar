@@ -1,5 +1,6 @@
 @use "../theme" as *;
 @use "animations";
+@use "mixins" as *;
 
 // ── 通知ポップアップ ──────────────────────
 window.NotifPopupWindow {
@@ -42,6 +43,7 @@ window.NotifPopupWindow {
 }
 
 .NotifAppName {
+  @extend %eyebrow-label;
   font-size: 10px;
   letter-spacing: 1px;
   color: rgba($hud-text, 0.4);
@@ -74,42 +76,25 @@ window.NotifCenter {
   border: none;
 }
 
-.NotifCenter.open .NotifCenterBackdrop {
-  animation: backdrop-fade-in 200ms ease-out forwards;
-}
-
-.NotifCenter.open .NotifCenterPanel {
+@include popup-anim(".NotifCenter") {
   animation: popup-slide-in 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.NotifCenter.closing .NotifCenterBackdrop {
-  animation: backdrop-fade-out 200ms ease-in forwards;
-}
-
-.NotifCenter.closing .NotifCenterPanel {
-  animation: popup-slide-out 200ms ease-in forwards;
-}
-
 .NotifCenterPanel {
-  background: $popup-panel-bg;
-  border: 1px solid rgba($colors-accent, 0.2);
-  border-radius: 12px;
-  padding: 0;
+  @include popup-panel(rgba($colors-accent, 0.2), 12px, 380px);
   margin-top: 6px;
   margin-right: 8px;
-  min-width: 380px;
   box-shadow: $popup-shadow;
   opacity: 0;
 }
 
 .NotifCenterHeader {
+  @extend %section-divider;
   padding: 12px 16px;
-  border-bottom: 1px solid $hud-border;
 }
 
 .NotifCenterTitle {
-  font-size: 11px;
-  letter-spacing: 2px;
+  @extend %eyebrow-label;
   font-weight: 700;
   color: rgba($hud-text, 0.4);
 }
@@ -167,6 +152,7 @@ window.NotifCenter {
 }
 
 .NotifHistoryCard {
+  @extend %dark-card;
   background: rgba(17, 20, 32, 0.5);
   border: 1px solid rgba($hud-border, 0.7);
   border-radius: 10px;
@@ -186,6 +172,7 @@ window.NotifCenter {
 }
 
 .NotifHistoryApp {
+  @extend %eyebrow-label;
   font-size: 10px;
   letter-spacing: 1px;
   color: rgba($hud-text, 0.35);
