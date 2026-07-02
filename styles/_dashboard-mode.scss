@@ -23,7 +23,7 @@ window.DmWindow {
   font-size: 48px;
   font-weight: 300;
   color: $np-cyan;
-  letter-spacing: 4px;
+  letter-spacing: 0.04em;
 }
 
 .DmMusicArea {
@@ -45,5 +45,6 @@ window.DmWindow {
   background: rgba($np-bg1, 0.7);
   border: 1px solid $np-border;
   border-radius: 8px;
+  box-shadow: $popup-shadow;
   padding: 0;
 }

@@ -108,12 +108,8 @@ export default function DashboardMode(props: DashboardModeProps) {
             <IdentitySection wifiSnapshot={props.wifiSnapshot} />
             <DnsSection dnsSnapshot={props.dnsSnapshot} />
             <BandwidthSection bandwidthSnapshot={props.bandwidthSnapshot} />
-            <box spacing={8}>
-              <box hexpand><QualitySection qualitySnapshot={props.qualitySnapshot} /></box>
-            </box>
-            <box spacing={8}>
-              <box hexpand><LatencySection latencySnapshot={props.latencySnapshot} /></box>
-            </box>
+            <QualitySection qualitySnapshot={props.qualitySnapshot} />
+            <LatencySection latencySnapshot={props.latencySnapshot} />
             <box spacing={12}>
               <box hexpand><SessionSection sessionSnapshot={props.sessionSnapshot} /></box>
               <box hexpand><ConnectionsSection connectionsSnapshot={props.connectionsSnapshot} /></box>
