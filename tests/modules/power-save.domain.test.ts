@@ -1,4 +1,5 @@
-import { describe, it, expect } from "bun:test"
+import assert from "node:assert/strict"
+import { describe, it } from "node:test"
 import {
   parsePwsaveStatus,
   isAllEnabled,
@@ -20,9 +21,9 @@ describe("parsePwsaveStatus", () => {
       ],
     })
     const result = parsePwsaveStatus(json)!
-    expect(result.summary).toBe("all_disabled")
-    expect(result.measures).toHaveLength(6)
-    expect(result.measures.every((m) => !m.enabled)).toBe(true)
+    assert.equal(result.summary, "all_disabled")
+    assert.equal(result.measures.length, 6)
+    assert.ok(result.measures.every((m) => !m.enabled))
   })
 
   it("parses all_enabled status", () => {
@@ -38,8 +39,8 @@ describe("parsePwsaveStatus", () => {
       ],
     })
     const result = parsePwsaveStatus(json)!
-    expect(result.summary).toBe("all_enabled")
-    expect(isAllEnabled(result)).toBe(true)
+    assert.equal(result.summary, "all_enabled")
+    assert.ok(isAllEnabled(result))
   })
 
   it("parses partial status", () => {
@@ -55,16 +56,16 @@ describe("parsePwsaveStatus", () => {
       ],
     })
     const result = parsePwsaveStatus(json)!
-    expect(result.summary).toBe("partial")
-    expect(isAllEnabled(result)).toBe(false)
-    expect(isMeasureEnabled(result, "ppd")).toBe(true)
-    expect(isMeasureEnabled(result, "brightness")).toBe(false)
+    assert.equal(result.summary, "partial")
+    assert.equal(isAllEnabled(result), false)
+    assert.ok(isMeasureEnabled(result, "ppd"))
+    assert.equal(isMeasureEnabled(result, "brightness"), false)
   })
 
   it("returns null for invalid JSON", () => {
-    expect(parsePwsaveStatus("not json")).toBeNull()
-    expect(parsePwsaveStatus("{}")).toBeNull()
-    expect(parsePwsaveStatus("")).toBeNull()
+    assert.equal(parsePwsaveStatus("not json"), null)
+    assert.equal(parsePwsaveStatus("{}"), null)
+    assert.equal(parsePwsaveStatus(""), null)
   })
 
   it("ignores unknown measures", () => {
@@ -76,26 +77,26 @@ describe("parsePwsaveStatus", () => {
       ],
     })
     const result = parsePwsaveStatus(json)!
-    expect(result.measures).toHaveLength(1)
-    expect(result.measures[0].measure).toBe("ppd")
+    assert.equal(result.measures.length, 1)
+    assert.equal(result.measures[0].measure, "ppd")
   })
 })
 
 describe("parseLidAction", () => {
   it("parses suspend", () => {
-    expect(parseLidAction("suspend")).toBe("suspend")
+    assert.equal(parseLidAction("suspend"), "suspend")
   })
 
   it("parses hibernate", () => {
-    expect(parseLidAction("Hibernate")).toBe("hibernate")
+    assert.equal(parseLidAction("Hibernate"), "hibernate")
   })
 
   it("parses ignore", () => {
-    expect(parseLidAction("ignore")).toBe("ignore")
+    assert.equal(parseLidAction("ignore"), "ignore")
   })
 
   it("defaults to suspend for unknown values", () => {
-    expect(parseLidAction("")).toBe("suspend")
-    expect(parseLidAction("poweroff")).toBe("suspend")
+    assert.equal(parseLidAction(""), "suspend")
+    assert.equal(parseLidAction("poweroff"), "suspend")
   })
 })
