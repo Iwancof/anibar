@@ -11,6 +11,14 @@ worktree を切ってそこで行い、レビュー後に master へマージす
 更に、この開発体制に問題がある場合、既存のAGENTS.mdを編集することも許可します。
 このプロジェクトはClaude Codeで開発を行っており、途中で性能が足りずあなたに依頼されたプロジェクトになります。
 
+## デザイン規約 (2026-07-02〜)
+
+- **UI を触る前に必ず `informations/design-system.md` を読む**（Terminal HUD 言語。トークン・スケール・文言・コンポーネント anatomy・negative examples）。
+- 色・サイズは theme.yaml → 生成物 (`_theme.scss` / `src/shared/theme-tokens.ts`) 経由。SCSS/Cairo への直書き禁止。
+- 共通コンポーネントは `src/shared/ui/`（PopupShell/PanelHeader/SectionHeader/StatTile/InfoRow/ToggleRow/Icon 等）。window controller は `src/app/controllers.ts`。
+- `npm run check` に design guard（`scripts/check-design.sh`）が含まれる。hex 直書き・Unicode アイコン・Escape ハンドラのコピペが増えると fail する。
+- 実機検証: `ags request <scope> open`（クォートせず引数を分ける）+ `grim`。手順は `~/.claude/skills/wayland-ui-verify` 参照。
+
 ## AGS デバッグメモ
 
 - `npm run dev | tee /tmp/ags_log` の `/tmp/ags_log` には、現状 `scripts/dev.sh` の wrapper 出力しか残っていない。`ags run --gtk 4 &` の子プロセス側 `console.log` は取れていない前提で調査すること。

@@ -1,32 +1,21 @@
 # Status
 
-## 2026-04-17 20:40 JST
+## 2026-07-02 全体リファクタ（デザイン統一 + Bluetooth）
 
-- 再現確認済み。`lid` 開閉直後の最新 coredump は `20:40:29 JST`, PID `161609`, `gtk_window_destroy` 経由の `SIGSEGV`。
-- 現状の `src/app/monitor-registry.ts` では monitor cleanup 中に `window.destroy()` を呼んでいたが、これが crash point と一致している。
-- `npm run dev | tee /tmp/ags_log` の `/tmp/ags_log` には wrapper (`scripts/dev.sh`) の出力しか残っておらず、AGS 本体の `console.log` は取得できていない。デバッグの一次情報としては `coredumpctl` / `journalctl` を優先する。
+Fable 5 主導・Codex 委譲（隔離 worktree 方式）で全面リファクタを実施。
 
-## いま進めている修正
+- **設計**: `informations/design-system.md`（Terminal HUD v2、oracle レビュー反映済み）が唯一のデザイン規約。
+- **W0**: dead code 削除（NetworkPopup/DashboardWindow ほか -918 行）、power-save テストの node 移行（テスト全 green 化）。
+- **W1**: theme.yaml 単一ソース化（`_theme.scss` + `src/shared/theme-tokens.ts` を生成）、SCSS partial 分割（styles/）、パレットの np 基準収束（accent #00e5ff、意味色 ok/warn/crit/info）。
+- **W2**: 共通 UI 層 `src/shared/ui/`（Icon/PanelHeader/SectionHeader/StatTile/InfoRow/ToggleRow/PlayerControls/NotificationCard/TabBar/PopupShell）+ `makeWindowController` factory（7 controller → controllers.ts、monitor 可用性フィルタ付き）。
+- **W3**: 全 surface を HUD 言語へ統一。Battery（虹色ゲージ・glow・iOS トグル廃止）、DashboardMode、NotificationCenter、Launcher、Workspace/Display 編集、Bar（右側を icon+値のモジュール文法に）、SwipeDashboard → **GLANCE パネル**に再設計。
+- **W4**: Bluetooth モジュール新設（BlueZ D-Bus 直、AstalBluetooth 不使用）: `src/modules/bluetooth/`（純粋層+テスト）、`src/runtime/bluetooth-source.ts`（ObjectManager + discovery 所有権 + NameOwnerChanged）、bar モジュール + BluetoothPopup + `ags request bluetooth`。
+- **バグ修正**: 通知ポップアップが一度も表示されない既存バグ（onRealize が未表示 window で発火しない）を修正。dev.sh / ui-test.sh の孤児 gjs 対策。
+- **検証**: `npm run check`（typecheck + tests + design guard）green 維持。各 Wave で実機スクリーンショット確認済み。
 
-- monitor detach / shutdown cleanup で `destroy()` をやめ、`visible = false` + `app.remove_window()` でアプリ管理外へ退避する方針に切り替えた。
-- retired window は強参照で保持し、GJS/GTK finalization があとで `gtk_window_destroy` に再突入しないようにしている。
+### 運用メモ
+- エージェント作業は worktree 必須（AGENTS.md 冒頭参照）。`~/.claude/skills/worktree-delegate` に手順。
+- window name prefix は `src/app/window-controller.ts` の WINDOW_PREFIXES が一覧。WorkspaceWindow は `workspace:`（CLI の `ags request dashboard` は互換 alias）。
 
-## 次の確認
-
-- `npm run check`
-- AGS 再起動後に `lid close/open` を再試験
-- crash が止まったら、退避方式の副作用（window leak, controller からの誤参照, app shutdown 挙動）を確認
-
-## 2026-04-17 20:51 JST
-
-- `lid open` 単独では bar 消失なし、`lid close` で再度 SEGV。
-- 最新 coredump は `20:51:05 JST`, PID `176284`。
-- stack から `gtk_window_destroy` は消えた。つまり `destroy()` 経路は外れたが、monitor detach cleanup 中の別の GTK 操作でまだ落ちている。
-- 次の修正は `remove_window` / `visible=false` をやめ、monitor disappearance 時は window を触らず stale entry として保持し、connector 再登場時に `gdkmonitor` を差し替える方針。
-
-## 2026-04-18 13:35 JST
-
-- 画面配置エディタの実装に着手。`Dashboard` 内に `Displays` タブを追加し、`hyprctl monitors all -j` を current state の source に使う方針。
-- pure module `src/modules/display-layout/domain.ts` を新設し、JSON parse / preset / snap / `hyprctl keyword monitor ...` コマンド生成 / profile 保存形式を共通化。
-- `scripts/layoutctl.ts` を追加し、UI とは別に `current`, `list`, `save`, `apply` の最小 CLI を用意する。
-- 現在の既知事項: `npm test` 全体は既存の `tests/modules/power-save.domain.test.ts` が `bun:` import 依存で Node 実行に失敗するため赤い。今回追加の display-layout テスト単体は通過。
+## 過去の課題（未解決のまま保留）
+- lid close/open での SEGV（HANDOFF.md 参照、2026-04 の調査記録）。monitor-registry は mark-unavailable 方式で回避運用中。今回のリファクタでは registry のライフサイクルには手を入れていない。
