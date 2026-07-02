@@ -59,25 +59,25 @@ window.Bar {
 // ── ワークスペースドット ──────────────────
 .WsDot {
   font-family: $font-family;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: $fontsize-dense;
+  font-weight: 600;
   min-width: 18px;
   min-height: 18px;
-  border-radius: 5px;
+  border-radius: $radius-sm;
   padding: 0 2px;
-  border: none;
+  border: 1px solid transparent;
   background: transparent;
 }
 
 .WsDot label {
   font-family: $font-family;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: $fontsize-dense;
+  font-weight: 600;
 }
 
 .WsDotActive {
-  background: rgba($colors-accent, 0.3);
-  border: 1px solid rgba($colors-accent, 0.5);
+  background: rgba($colors-accent, 0.18);
+  border-color: $colors-accent;
 }
 
 .WsDotActive label {
@@ -85,15 +85,15 @@ window.Bar {
 }
 
 .WsDotOccupied {
-  background: rgba($colors-muted, 0.1);
+  background: transparent;
 }
 
 .WsDotOccupied label {
-  color: $colors-muted;
+  color: $np-text;
 }
 
 .WsDotEmpty label {
-  color: rgba($colors-muted, 0.25);
+  color: $np-text-dim;
 }
 
 // ── バーインジケータ ──────────────────────
@@ -111,30 +111,94 @@ window.Bar {
   font-size: $bar-indicator-label-size;
 }
 
+// ── バーモジュール ────────────────────────
+.BarRightModules {
+  min-height: 22px;
+}
+
+.BarGroup {
+  min-height: 22px;
+}
+
+.BarSeparator {
+  min-width: 1px;
+  min-height: 14px;
+  background: $np-border;
+  margin: 0 8px;
+}
+
+.BarModule {
+  color: $np-text;
+  min-height: 20px;
+  padding: 0 2px;
+}
+
+.BarModuleIcon {
+  font-size: 14px;
+  color: $np-text-sec;
+}
+
+.BarModuleValue {
+  color: $np-text;
+  font-size: $fontsize-dense;
+  font-weight: 600;
+}
+
+.BarModuleToneAccent .BarModuleIcon,
+.BarModuleToneAccent .BarModuleValue {
+  color: $np-cyan;
+}
+
+.BarModuleToneMuted .BarModuleIcon,
+.BarModuleToneMuted .BarModuleValue {
+  color: $np-text-sec;
+}
+
+.BarModuleToneWarn .BarModuleIcon,
+.BarModuleToneWarn .BarModuleValue {
+  color: $np-amber;
+}
+
+.BarModuleToneCrit .BarModuleIcon,
+.BarModuleToneCrit .BarModuleValue {
+  color: $np-red;
+}
+
+.BarModuleToneGood .BarModuleIcon,
+.BarModuleToneGood .BarModuleValue {
+  color: $np-green;
+}
+
 // ── IME インジケータ ──────────────────────
 .ImeIndicator {
   font-family: "Noto Sans Mono CJK JP", $font-family;
-  font-size: 13px;
-  font-weight: 700;
-  color: $colors-muted;
-  background: rgba($colors-muted, 0.1);
-  border-radius: 4px;
-  padding: 0 5px;
+  font-size: $fontsize-caption;
+  font-weight: 600;
+  color: $np-text-sec;
+  background: transparent;
+  border: 1px solid $np-border;
+  border-radius: $radius-sm;
+  padding: 1px 5px;
   min-width: 20px;
 }
 
 .ImeActive {
-  color: $hud-cyan;
+  border-color: $np-cyan;
+  color: $np-cyan;
   background: rgba($hud-cyan, 0.1);
 }
 
 // ── バッテリー視覚インジケータ ────────────
 .BatIndicator {
+  padding: 0 2px;
+}
+
+.BatGlyph {
   padding: 0;
 }
 
 .BatBody {
-  border: 2px solid $colors-muted;
+  border: 2px solid $np-text-sec;
   border-radius: 3px;
   padding: 2px;
 }
@@ -144,11 +208,11 @@ window.Bar {
 }
 
 .BatBodyEmpty {
-  border-color: rgba($colors-muted, 0.4);
+  border-color: rgba($np-text-sec, 0.4);
 }
 
 .BatNub {
-  background: $colors-muted;
+  background: $np-text-sec;
   border-radius: 0 2px 2px 0;
 }
 
@@ -158,54 +222,20 @@ window.Bar {
   color: $colors-bg;
 }
 
+.BatValue {
+  min-width: 17px;
+}
+
 // ── ネットワークアイコン (バー) ────────────
 .NetBarBtn {
   @extend %icon-btn-reset;
-  padding: 0 4px;
+  padding: 0;
   margin: 0;
-}
-
-.NetBarGlobalIp {
-  font-family: $font-family;
-  font-size: 10px;
-  color: rgba($hud-text, 0.35);
-}
-
-.NetBarSsid {
-  font-family: $font-family;
-  font-size: 11px;
-  color: $colors-muted;
-}
-
-.NetBarIcon {
-  font-family: "HackGen Console NF";
-  font-size: 14px;
-  color: $colors-muted;
-}
-
-.NetBarIconWired {
-  color: rgba($colors-muted, 0.4);
-}
-
-.NetBarIconOff {
-  color: rgba($colors-critical, 0.5);
 }
 
 // ── 通知ベルアイコン (バー) ────────────────
 .NotifBellBtn {
   @extend %icon-btn-reset;
-  padding: 0 4px;
+  padding: 0;
   margin: 0;
-}
-
-.NotifBellIcon {
-  font-family: "HackGen Console NF";
-  font-size: 14px;
-  color: $colors-muted;
-}
-
-.NotifBellBadge {
-  font-size: 10px;
-  font-weight: 700;
-  color: $hud-pink;
 }

@@ -4,8 +4,8 @@ import { createMemo } from "gnim"
 
 import type { Accessor } from "gnim"
 
-import type { BarIndicatorViewModel } from "../../shared/bar-indicator.ts"
 import type { BatterySnapshot } from "../../modules/battery/domain.ts"
+import type { VolumeSnapshot } from "../../modules/volume/domain.ts"
 import type { WorkspaceSnapshot } from "../../modules/workspace/domain.ts"
 import type { ImeSnapshot } from "../../runtime/ime-source.ts"
 import { switchToWorkspace } from "../../runtime/workspace-source.ts"
@@ -14,7 +14,7 @@ import { signalIcon, signalLevel, type WifiSnapshot } from "../../modules/wifi/d
 import Icon from "../../shared/ui/Icon.tsx"
 import { ICONS } from "../../shared/ui/icons.ts"
 import type { PlayerSource } from "../../runtime/player-source.ts"
-import BarIndicatorStrip from "./BarIndicatorStrip.tsx"
+import BarModule, { type BarModuleTone } from "./BarModule.tsx"
 import BatteryBarWidget from "./BatteryBarWidget.tsx"
 import SpectrumWidget from "./SpectrumWidget.tsx"
 import PlayerWidget from "./PlayerWidget.tsx"
@@ -23,7 +23,7 @@ export interface BarProps {
   gdkmonitor: Gdk.Monitor
   monitor: string
   clock: Accessor<string>
-  indicators: Accessor<BarIndicatorViewModel>[]
+  volumeSnapshot: Accessor<VolumeSnapshot | null>
   batterySnapshot: Accessor<BatterySnapshot | null>
   imeSnapshot: Accessor<ImeSnapshot | null>
   workspaceSnapshot: Accessor<WorkspaceSnapshot | null>
@@ -40,11 +40,34 @@ export interface BarProps {
 
 const MAX_WS_DOTS = 9
 
+function volumeIcon(snapshot: VolumeSnapshot | null): string {
+  if (!snapshot || snapshot.sinkMuted) return ICONS.volumeMuted
+  const pct = Math.round(snapshot.sinkVolume * 100)
+  if (pct <= 0) return ICONS.volumeLow
+  if (pct <= 50) return ICONS.volumeMedium
+  return ICONS.volumeHigh
+}
+
+function volumeValue(snapshot: VolumeSnapshot | null): string {
+  if (!snapshot || snapshot.sinkMuted) return ""
+  return `${Math.max(0, Math.round(snapshot.sinkVolume * 100))}`
+}
+
+function volumeTone(snapshot: VolumeSnapshot | null): BarModuleTone {
+  if (!snapshot || snapshot.sinkMuted) return "muted"
+  if (snapshot.sinkVolume > 1.0) return "warn"
+  return "normal"
+}
+
+function wifiTone(snapshot: NetworkSnapshot): BarModuleTone {
+  return snapshot.online ? "normal" : "muted"
+}
+
 export default function Bar(props: BarProps) {
   const { TOP, LEFT, RIGHT } = Astal.WindowAnchor
 
   const imeLabel = props.imeSnapshot((s) => {
-    if (!s) return "?"
+    if (!s) return "A"
     return s.active ? "あ" : "A"
   })
 
@@ -99,27 +122,19 @@ export default function Bar(props: BarProps) {
           })}
         </box>
         <label $type="center" class="BarClock" label={props.clock} />
-        <box $type="end" spacing={10} halign={Gtk.Align.END} valign={Gtk.Align.CENTER}>
-          <BarIndicatorStrip indicators={props.indicators} />
-          <button
-            class="NetBarBtn"
-            valign={Gtk.Align.CENTER}
-            onClicked={props.onToggleNetworkPopup}
-          >
-            <box spacing={6} valign={Gtk.Align.CENTER}>
-              <label
-                class="NetBarSsid"
-                label={props.wifiSnapshot((s) => s?.connected?.ssid ?? "")}
-                visible={props.wifiSnapshot((s) => s?.connected != null)}
-                valign={Gtk.Align.CENTER}
-              />
-              <Icon
-                class={createMemo(() => {
-                  const net = props.networkSnapshot()
-                  if (!net.online) return "NetBarIcon NetBarIconOff"
-                  if (net.linkKind !== "wifi") return "NetBarIcon NetBarIconWired"
-                  return "NetBarIcon"
-                })}
+        <box $type="end" class="BarRightModules" spacing={0} halign={Gtk.Align.END} valign={Gtk.Align.CENTER}>
+          <box class="BarGroup" spacing={4} valign={Gtk.Align.CENTER}>
+            <BarModule
+              icon={props.volumeSnapshot(volumeIcon)}
+              value={props.volumeSnapshot(volumeValue)}
+              tone={props.volumeSnapshot(volumeTone)}
+            />
+            <button
+              class="NetBarBtn"
+              valign={Gtk.Align.CENTER}
+              onClicked={props.onToggleNetworkPopup}
+            >
+              <BarModule
                 icon={createMemo(() => {
                   const net = props.networkSnapshot()
                   if (!net.online) return ICONS.wifiDisconnected
@@ -129,30 +144,36 @@ export default function Bar(props: BarProps) {
                   const level = signalLevel(sig)
                   return signalIcon(level)
                 })}
-                valign={Gtk.Align.CENTER}
+                tone={props.networkSnapshot(wifiTone)}
               />
-            </box>
-          </button>
-          <button
-            class="NotifBellBtn"
-            valign={Gtk.Align.CENTER}
-            onClicked={props.onToggleNotifCenter}
-          >
-            <box spacing={4} valign={Gtk.Align.CENTER}>
-              <Icon class="NotifBellIcon" icon={ICONS.bell} valign={Gtk.Align.CENTER} />
-              <label
-                class="NotifBellBadge"
-                label={props.notifUnreadCount((c) => c > 0 ? `${c}` : "")}
-                visible={props.notifUnreadCount((c) => c > 0)}
-                valign={Gtk.Align.CENTER}
+            </button>
+          </box>
+
+          <box class="BarSeparator" valign={Gtk.Align.CENTER} />
+
+          <box class="BarGroup" spacing={4} valign={Gtk.Align.CENTER}>
+            <button
+              class="NotifBellBtn"
+              valign={Gtk.Align.CENTER}
+              onClicked={props.onToggleNotifCenter}
+            >
+              <BarModule
+                icon={ICONS.bell}
+                value={props.notifUnreadCount((c) => c > 0 ? `${c}` : "")}
+                tone={props.notifUnreadCount((c) => c > 0 ? "accent" : "muted")}
               />
-            </box>
-          </button>
-          <label class={imeClass} label={imeLabel} valign={Gtk.Align.CENTER} />
-          <BatteryBarWidget
-            snapshot={props.batterySnapshot}
-            onClicked={props.onToggleBatteryPopup}
-          />
+            </button>
+            <label class={imeClass} label={imeLabel} valign={Gtk.Align.CENTER} />
+          </box>
+
+          <box class="BarSeparator" valign={Gtk.Align.CENTER} />
+
+          <box class="BarGroup" spacing={4} valign={Gtk.Align.CENTER}>
+            <BatteryBarWidget
+              snapshot={props.batterySnapshot}
+              onClicked={props.onToggleBatteryPopup}
+            />
+          </box>
         </box>
       </centerbox>
     </window>

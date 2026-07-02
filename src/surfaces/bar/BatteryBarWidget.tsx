@@ -30,6 +30,14 @@ const BATTERY_CHARGE = COLORS.rgb["bar-battery-charge"]
 
 export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
   const isCharging = props.snapshot((s) => isOnAC(s))
+  const percentLabel = props.snapshot((s) =>
+    s && s.present ? `${Math.round(Math.max(0, Math.min(100, s.percent)))}` : "",
+  )
+  const moduleClass = props.snapshot((s) => {
+    if (!s || !s.present) return "BatIndicator BarModule BarModuleToneMuted"
+    if (s.percent <= 20 && !isOnAC(s)) return "BatIndicator BarModule BarModuleToneWarn"
+    return "BatIndicator BarModule BarModuleToneNormal"
+  })
 
   const bodyClass = props.snapshot((s) => {
     if (!s || !s.present) return "BatBody BatBodyEmpty"
@@ -54,84 +62,87 @@ export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
   }
 
   return (
-    <box class="BatIndicator" onRealize={setupClick} valign={Gtk.Align.CENTER} spacing={0}>
-      <overlay>
-        <box
-          class={bodyClass}
-          widthRequest={BODY_WIDTH}
-          heightRequest={BODY_HEIGHT}
-          valign={Gtk.Align.CENTER}
-        >
-          {/* Fill bar drawn with Cairo for charging animation */}
-          <Gtk.DrawingArea
-            widthRequest={FILL_MAX_WIDTH}
-            heightRequest={BODY_HEIGHT - 4}
-            halign={Gtk.Align.START}
+    <box class={moduleClass} onRealize={setupClick} valign={Gtk.Align.CENTER} spacing={4}>
+      <box class="BatGlyph" valign={Gtk.Align.CENTER} spacing={0}>
+        <overlay>
+          <box
+            class={bodyClass}
+            widthRequest={BODY_WIDTH}
+            heightRequest={BODY_HEIGHT}
             valign={Gtk.Align.CENTER}
-            onRealize={(self: Gtk.DrawingArea) => {
-              drawingArea = self
-              self.set_draw_func((_area: any, cr: any, w: number, h: number) => {
-                const s = props.snapshot()
-                if (!s || !s.present) return
+          >
+            {/* Fill bar drawn with Cairo for charging animation */}
+            <Gtk.DrawingArea
+              widthRequest={FILL_MAX_WIDTH}
+              heightRequest={BODY_HEIGHT - 4}
+              halign={Gtk.Align.START}
+              valign={Gtk.Align.CENTER}
+              onRealize={(self: Gtk.DrawingArea) => {
+                drawingArea = self
+                self.set_draw_func((_area: any, cr: any, w: number, h: number) => {
+                  const s = props.snapshot()
+                  if (!s || !s.present) return
 
-                const pct = Math.max(0, Math.min(100, s.percent))
-                const baseWidth = (pct / 100) * w
-                const charging = isOnAC(s)
-                const low = pct <= 20 && !charging
+                  const pct = Math.max(0, Math.min(100, s.percent))
+                  const baseWidth = (pct / 100) * w
+                  const charging = isOnAC(s)
+                  const low = pct <= 20 && !charging
 
-                // Base fill color
-                if (low) {
-                  cr.setSourceRGBA(BATTERY_AMBER[0], BATTERY_AMBER[1], BATTERY_AMBER[2], 1)
-                } else {
-                  cr.setSourceRGBA(BATTERY_GREEN[0], BATTERY_GREEN[1], BATTERY_GREEN[2], 1)
-                }
-
-                // Draw base fill
-                cr.rectangle(0, 0, baseWidth, h)
-                cr.fill()
-
-                // Charging animation: grow beyond current level
-                if (charging && pct < 100) {
-                  const cycle = animTime % CYCLE_MS
-                  const remainWidth = w - baseWidth
-
-                  if (cycle < HOLD_MS) {
-                    // Phase 1: hold — no extra fill
-                  } else if (cycle < HOLD_MS + GROW_MS) {
-                    // Phase 2: tan curve growth to full
-                    const t = (cycle - HOLD_MS) / GROW_MS // 0→1
-                    const tanMax = Math.tan(Math.PI / 2.5)
-                    const progress = Math.min(1, Math.tan(t * Math.PI / 2.5) / tanMax)
-                    const extraWidth = remainWidth * progress
-
-                    // Lighter cyan-green for the growing part
-                    cr.setSourceRGBA(BATTERY_CHARGE[0], BATTERY_CHARGE[1], BATTERY_CHARGE[2], 0.6)
-                    cr.rectangle(baseWidth, 0, extraWidth, h)
-                    cr.fill()
+                  // Base fill color
+                  if (low) {
+                    cr.setSourceRGBA(BATTERY_AMBER[0], BATTERY_AMBER[1], BATTERY_AMBER[2], 1)
                   } else {
-                    // Phase 3: fade out at full extent
-                    const t = (cycle - HOLD_MS - GROW_MS) / FADE_MS // 0→1
-                    const opacity = 0.6 * (1 - t)
-
-                    cr.setSourceRGBA(BATTERY_CHARGE[0], BATTERY_CHARGE[1], BATTERY_CHARGE[2], opacity)
-                    cr.rectangle(baseWidth, 0, remainWidth, h)
-                    cr.fill()
+                    cr.setSourceRGBA(BATTERY_GREEN[0], BATTERY_GREEN[1], BATTERY_GREEN[2], 1)
                   }
-                }
-              })
-            }}
+
+                  // Draw base fill
+                  cr.rectangle(0, 0, baseWidth, h)
+                  cr.fill()
+
+                  // Charging animation: grow beyond current level
+                  if (charging && pct < 100) {
+                    const cycle = animTime % CYCLE_MS
+                    const remainWidth = w - baseWidth
+
+                    if (cycle < HOLD_MS) {
+                      // Phase 1: hold — no extra fill
+                    } else if (cycle < HOLD_MS + GROW_MS) {
+                      // Phase 2: tan curve growth to full
+                      const t = (cycle - HOLD_MS) / GROW_MS // 0→1
+                      const tanMax = Math.tan(Math.PI / 2.5)
+                      const progress = Math.min(1, Math.tan(t * Math.PI / 2.5) / tanMax)
+                      const extraWidth = remainWidth * progress
+
+                      // Lighter cyan-green for the growing part
+                      cr.setSourceRGBA(BATTERY_CHARGE[0], BATTERY_CHARGE[1], BATTERY_CHARGE[2], 0.6)
+                      cr.rectangle(baseWidth, 0, extraWidth, h)
+                      cr.fill()
+                    } else {
+                      // Phase 3: fade out at full extent
+                      const t = (cycle - HOLD_MS - GROW_MS) / FADE_MS // 0→1
+                      const opacity = 0.6 * (1 - t)
+
+                      cr.setSourceRGBA(BATTERY_CHARGE[0], BATTERY_CHARGE[1], BATTERY_CHARGE[2], opacity)
+                      cr.rectangle(baseWidth, 0, remainWidth, h)
+                      cr.fill()
+                    }
+                  }
+                })
+              }}
+            />
+          </box>
+          <label
+            $type="overlay"
+            class="BatChargingIcon"
+            label={ICONS.batteryCharging}
+            visible={isCharging}
+            halign={Gtk.Align.CENTER}
+            valign={Gtk.Align.CENTER}
           />
-        </box>
-        <label
-          $type="overlay"
-          class="BatChargingIcon"
-          label={ICONS.batteryCharging}
-          visible={isCharging}
-          halign={Gtk.Align.CENTER}
-          valign={Gtk.Align.CENTER}
-        />
-      </overlay>
-      <box class="BatNub" widthRequest={3} heightRequest={7} valign={Gtk.Align.CENTER} />
+        </overlay>
+        <box class="BatNub" widthRequest={3} heightRequest={7} valign={Gtk.Align.CENTER} />
+      </box>
+      <label class="BarModuleValue BatValue" label={percentLabel} valign={Gtk.Align.CENTER} />
     </box>
   )
 }
