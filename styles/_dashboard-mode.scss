@@ -36,21 +36,6 @@ window.DmWindow {
   color: $np-text;
 }
 
-.DmMusicBtn {
-  @extend %icon-btn-reset;
-  padding: 0 6px;
-  margin: 0;
-}
-
-.DmMusicBtn label {
-  font-size: 18px;
-  color: $np-text-sec;
-}
-
-.DmMusicBtn:hover label {
-  color: $np-text;
-}
-
 .DmMainArea {
   padding: 0;
 }

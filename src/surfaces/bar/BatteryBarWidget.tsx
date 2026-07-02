@@ -4,9 +4,10 @@ import { Gtk } from "ags/gtk4"
 
 import type { Accessor } from "gnim"
 
-import type { BatterySnapshot } from "../../modules/battery/domain.ts"
+import { isOnAC, type BatterySnapshot } from "../../modules/battery/domain.ts"
 import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
 import { COLORS } from "../../shared/theme-tokens.ts"
+import { ICONS } from "../../shared/ui/icons.ts"
 
 export interface BatteryBarWidgetProps {
   snapshot: Accessor<BatterySnapshot | null>
@@ -28,10 +29,6 @@ const BATTERY_AMBER = COLORS.rgb["bar-battery-amber"]
 const BATTERY_CHARGE = COLORS.rgb["bar-battery-charge"]
 
 export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
-  const isOnAC = (s: BatterySnapshot | null) =>
-    s?.present === true &&
-    (s.state === "charging" || s.state === "full" || s.state === "not-charging")
-
   const isCharging = props.snapshot((s) => isOnAC(s))
 
   const bodyClass = props.snapshot((s) => {
@@ -128,7 +125,7 @@ export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
         <label
           $type="overlay"
           class="BatChargingIcon"
-          label="󰚥"
+          label={ICONS.batteryCharging}
           visible={isCharging}
           halign={Gtk.Align.CENTER}
           valign={Gtk.Align.CENTER}

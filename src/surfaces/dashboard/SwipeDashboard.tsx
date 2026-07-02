@@ -2,9 +2,15 @@ import app from "ags/gtk4/app"
 import { Astal, Gdk, Gtk } from "ags/gtk4"
 import { createMemo, type Accessor } from "gnim"
 
-import type { BatterySnapshot } from "../../modules/battery/domain.ts"
+import { estimateBatteryMinutes, type BatterySnapshot } from "../../modules/battery/domain.ts"
 import type { NotificationSource, NotificationItem } from "../../runtime/notification-source.ts"
 import type { PlayerSource } from "../../runtime/player-source.ts"
+import { formatDurationMinutes, timeAgo } from "../../shared/format.ts"
+import Icon from "../../shared/ui/Icon.tsx"
+import NotificationCard from "../../shared/ui/NotificationCard.tsx"
+import PlayerControls from "../../shared/ui/PlayerControls.tsx"
+import SectionHeader from "../../shared/ui/SectionHeader.tsx"
+import { ICONS } from "../../shared/ui/icons.ts"
 
 // ── Props ──────────────────────────────────
 
@@ -36,16 +42,8 @@ function BatterySection(props: { snapshot: Accessor<BatterySnapshot | null> }) {
   const eta = createMemo(() => {
     const s = props.snapshot()
     if (!s || !s.present) return ""
-    if (s.powerNowW <= 0) return ""
-    const hours = (s.state === "charging" && s.energyFullWh != null && s.energyNowWh != null)
-      ? (s.energyFullWh - s.energyNowWh) / s.powerNowW
-      : (s.state === "discharging" && s.energyNowWh != null)
-        ? s.energyNowWh / s.powerNowW
-        : 0
-    if (hours <= 0) return ""
-    const mins = Math.round(hours * 60)
-    if (mins < 60) return `${mins}m remaining`
-    return `${Math.floor(mins / 60)}h ${mins % 60}m remaining`
+    const mins = estimateBatteryMinutes(s)
+    return mins == null ? "" : `${formatDurationMinutes(mins)} remaining`
   })
 
   const toneClass = createMemo(() => {
@@ -58,7 +56,7 @@ function BatterySection(props: { snapshot: Accessor<BatterySnapshot | null> }) {
 
   return (
     <box class={toneClass} orientation={Gtk.Orientation.VERTICAL} spacing={4}>
-      <label class="SwipeDashSectionTitle" label="BATTERY" halign={Gtk.Align.START} />
+      <SectionHeader label="BATTERY" />
       <label class="SwipeDashSectionBody" label={label} halign={Gtk.Align.START} />
       <label class="SwipeDashSectionMeta" label={eta} halign={Gtk.Align.START} />
     </box>
@@ -69,14 +67,6 @@ function BatterySection(props: { snapshot: Accessor<BatterySnapshot | null> }) {
 
 const MAX_NOTIF = 3
 
-function timeAgo(epoch: number): string {
-  const diff = Math.floor(Date.now() / 1000 - epoch)
-  if (diff < 60) return "now"
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
-  return `${Math.floor(diff / 86400)}d ago`
-}
-
 function NotificationSection(props: { notifications: NotificationSource }) {
   const { notifications } = props
   const countLabel = createMemo(() => {
@@ -86,13 +76,11 @@ function NotificationSection(props: { notifications: NotificationSource }) {
 
   return (
     <box class="SwipeDashSection" orientation={Gtk.Orientation.VERTICAL} spacing={6}>
-      <box spacing={4}>
-        <label class="SwipeDashSectionTitle" label="NOTIFICATIONS" hexpand halign={Gtk.Align.START} />
-        <label class="SwipeDashSectionMeta" label={countLabel} halign={Gtk.Align.END} />
-      </box>
+      <SectionHeader label="NOTIFICATIONS" meta={countLabel} />
       {Array.from({ length: MAX_NOTIF }).map((_, i) => {
         const item = createMemo((): NotificationItem | null => notifications.all()[i] ?? null)
         const visible = createMemo(() => item() != null)
+        const urgency = createMemo(() => item()?.urgency ?? 1)
         const appName = createMemo(() => item()?.appName ?? "")
         const summary = createMemo(() => item()?.summary ?? "")
         const time = createMemo(() => {
@@ -101,19 +89,14 @@ function NotificationSection(props: { notifications: NotificationSource }) {
         })
 
         return (
-          <box class="SwipeDashNotif" visible={visible} orientation={Gtk.Orientation.VERTICAL} spacing={2}>
-            <box spacing={4}>
-              <label class="SwipeDashNotifApp" label={appName} hexpand halign={Gtk.Align.START} />
-              <label class="SwipeDashNotifTime" label={time} halign={Gtk.Align.END} />
-            </box>
-            <label
-              class="SwipeDashNotifSummary"
-              label={summary}
-              halign={Gtk.Align.START}
-              maxWidthChars={40}
-              ellipsize={3}
-            />
-          </box>
+          <NotificationCard
+            variant="mini"
+            visible={visible}
+            urgency={urgency}
+            appName={appName}
+            time={time}
+            summary={summary}
+          />
         )
       })}
     </box>
@@ -125,7 +108,6 @@ function NotificationSection(props: { notifications: NotificationSource }) {
 function PlayerSection(props: { player: PlayerSource }) {
   const { player } = props
   const visible = createMemo(() => player.snapshot() != null)
-  const statusIcon = player.isPlaying((p) => (p ? "\u23F8" : "\u25B6"))
   const statusText = createMemo(() => {
     const s = player.snapshot()
     return s ? s.status : ""
@@ -133,7 +115,7 @@ function PlayerSection(props: { player: PlayerSource }) {
 
   return (
     <box class="SwipeDashSection" orientation={Gtk.Orientation.VERTICAL} spacing={6} visible={visible}>
-      <label class="SwipeDashSectionTitle" label="NOW PLAYING" halign={Gtk.Align.START} />
+      <SectionHeader label="NOW PLAYING" />
       <label
         class="SwipeDashPlayerTrack"
         label={player.label}
@@ -143,15 +125,12 @@ function PlayerSection(props: { player: PlayerSource }) {
       />
       <box spacing={6}>
         <label class="SwipeDashSectionMeta" label={statusText} hexpand halign={Gtk.Align.START} />
-        <button class="SwipeDashPlayerBtn" onClicked={() => player.previous()}>
-          <label label={"\u23EE"} />
-        </button>
-        <button class="SwipeDashPlayerBtn" onClicked={() => player.playPause()}>
-          <label label={statusIcon} />
-        </button>
-        <button class="SwipeDashPlayerBtn" onClicked={() => player.next()}>
-          <label label={"\u23ED"} />
-        </button>
+        <PlayerControls
+          isPlaying={player.isPlaying}
+          onPrevious={() => player.previous()}
+          onPlayPause={() => player.playPause()}
+          onNext={() => player.next()}
+        />
       </box>
     </box>
   )
@@ -196,7 +175,7 @@ export default function SwipeDashboard(props: SwipeDashboardProps) {
             <box class="SwipeDashHeader" spacing={8}>
               <label class="SwipeDashTitle" label="Dashboard" hexpand halign={Gtk.Align.START} />
               <button class="SwipeDashCloseBtn" onClicked={props.onClose}>
-                <label label="\u2715" />
+                <Icon icon={ICONS.close} />
               </button>
             </box>
 

@@ -17,6 +17,7 @@ import type { FlowEntry, LogEntry } from "../../runtime/netmon-source.ts"
 import type { PlayerSource } from "../../runtime/player-source.ts"
 
 import { closeDashboardMode } from "../../app/dashboard-mode-controller.ts"
+import PlayerControls from "../../shared/ui/PlayerControls.tsx"
 import WideSpectrum from "./WideSpectrum.tsx"
 
 // Network sections (reuse from network panel)
@@ -98,17 +99,13 @@ export default function DashboardMode(props: DashboardModeProps) {
           <WideSpectrum bars={props.spectrumBars} />
           <box spacing={12} halign={Gtk.Align.CENTER}>
             <label class="DmMusicTitle" label={props.player.label} />
-            <box spacing={6} valign={Gtk.Align.CENTER}>
-            <button class="DmMusicBtn" onClicked={() => props.player.previous()}>
-              <label label={"\u23EE"} />
-            </button>
-            <button class="DmMusicBtn" onClicked={() => props.player.playPause()}>
-              <label label={props.player.isPlaying((p) => p ? "\u23F8" : "\u25B6")} />
-            </button>
-            <button class="DmMusicBtn" onClicked={() => props.player.next()}>
-              <label label={"\u23ED"} />
-            </button>
-            </box>
+            <PlayerControls
+              class="DmMusicControls"
+              isPlaying={props.player.isPlaying}
+              onPrevious={() => props.player.previous()}
+              onPlayPause={() => props.player.playPause()}
+              onNext={() => props.player.next()}
+            />
           </box>
         </box>
 

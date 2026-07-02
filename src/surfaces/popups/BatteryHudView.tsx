@@ -4,6 +4,7 @@ import type { Accessor } from "gnim"
 import {
   estimateBatteryMinutes,
   batteryHealthPercent,
+  isOnAC,
   type BatterySnapshot,
 } from "../../modules/battery/domain.ts"
 import type { SystemStatsSnapshot } from "../../modules/system-stats/domain.ts"
@@ -18,6 +19,10 @@ import {
   type LidAction,
 } from "../../modules/power-save/domain.ts"
 import { formatDurationMinutes, formatWatts } from "../../shared/format.ts"
+import SectionHeader from "../../shared/ui/SectionHeader.tsx"
+import StatTile, { type StatTileTone } from "../../shared/ui/StatTile.tsx"
+import ToggleRow from "../../shared/ui/ToggleRow.tsx"
+import { ICONS } from "../../shared/ui/icons.ts"
 
 export interface BatteryHudViewProps {
   snapshot: Accessor<BatterySnapshot | null>
@@ -53,12 +58,8 @@ const MEASURE_META: Record<MeasureName, { label: string; sub: string }> = {
 }
 
 export default function BatteryHudView(props: BatteryHudViewProps) {
-  const isOnAC = (s: BatterySnapshot | null) =>
-    s?.present === true &&
-    (s.state === "charging" || s.state === "full" || s.state === "not-charging")
-
   const headerRight = props.snapshot((s) =>
-    !s || !s.present ? "N/A" : isOnAC(s) ? "AC_IN" : "BATTERY",
+    !s || !s.present ? "—" : isOnAC(s) ? "AC::IN" : "BATTERY",
   )
 
   const dotClass = props.snapshot((s) => {
@@ -69,7 +70,7 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
   })
 
   const percentText = props.snapshot((s) =>
-    !s || !s.present ? "--" : `${Math.round(s.percent)}`,
+    !s || !s.present ? "—" : `${Math.round(s.percent)}`,
   )
 
   const percentClass = props.snapshot((s) => {
@@ -85,41 +86,41 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
   }))
 
   const timeLeft = props.snapshot((s) => {
-    if (!s || !s.present) return "--"
+    if (!s || !s.present) return "—"
     const mins = estimateBatteryMinutes(s)
-    if (mins == null) return "---"
+    if (mins == null) return "—"
     return (s.state === "charging" ? "~" : "") + formatDurationMinutes(mins)
   })
 
   const draw = props.snapshot((s) => {
-    if (!s || !s.present || s.powerNowW == null) return "--"
+    if (!s || !s.present || s.powerNowW == null) return "—"
     const prefix = isOnAC(s) ? "+" : ""
     return prefix + formatWatts(s.powerNowW)
   })
 
-  const drawClass = props.snapshot((s) =>
-    isOnAC(s) ? "HudStatValue HudStatCharge" : "HudStatValue HudStatWarn",
+  const drawTone = props.snapshot((s): StatTileTone =>
+    isOnAC(s) ? "charge" : "warn",
   )
 
   const health = props.snapshot((s) => {
-    if (!s || !s.present) return "--"
+    if (!s || !s.present) return "—"
     const h = batteryHealthPercent(s)
-    return h != null ? `${h}%` : "--"
+    return h != null ? `${h}%` : "—"
   })
 
   const cpuText = props.systemStats((s) =>
-    s != null ? `${s.cpuPercent}%` : "--",
+    s != null ? `${s.cpuPercent}%` : "—",
   )
 
-  const cpuClass = props.systemStats((s) => {
-    if (!s) return "HudStatValue HudStatNormal"
-    if (s.cpuPercent > 80) return "HudStatValue HudStatCrit"
-    if (s.cpuPercent > 50) return "HudStatValue HudStatWarn"
-    return "HudStatValue HudStatNormal"
+  const cpuTone = props.systemStats((s): StatTileTone => {
+    if (!s) return "info"
+    if (s.cpuPercent > 80) return "crit"
+    if (s.cpuPercent > 50) return "warn"
+    return "info"
   })
 
   const energyLabel = props.snapshot((s) => {
-    if (!s || !s.present || s.energyNowWh == null || s.energyFullWh == null) return "--"
+    if (!s || !s.present || s.energyNowWh == null || s.energyFullWh == null) return "—"
     return `${s.energyNowWh.toFixed(1)} / ${s.energyFullWh.toFixed(1)} Wh`
   })
 
@@ -144,15 +145,7 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
     setMenuOpen(false)
   }
 
-  // ── All toggle ──
-  const allTrackClass = props.pwsaveStatus((s) => {
-    const on = s != null ? isAllEnabled(s) : false
-    return on ? "HudToggleTrack HudToggleTrackOn" : "HudToggleTrack"
-  })
-  const allKnobClass = props.pwsaveStatus((s) => {
-    const on = s != null ? isAllEnabled(s) : false
-    return on ? "HudToggleKnob HudToggleKnobOn" : "HudToggleKnob"
-  })
+  const allEnabled = props.pwsaveStatus((s) => s != null ? isAllEnabled(s) : false)
 
   return (
     <box class="Hud" orientation={Gtk.Orientation.VERTICAL} spacing={0}>
@@ -194,22 +187,10 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
 
         {/* Stats grid */}
         <box spacing={8} homogeneous>
-          <box class="HudStat" orientation={Gtk.Orientation.VERTICAL} spacing={4}>
-            <label class="HudStatLabel" label="TIME LEFT" halign={Gtk.Align.START} />
-            <label class="HudStatValue HudStatNormal" label={timeLeft} halign={Gtk.Align.START} />
-          </box>
-          <box class="HudStat" orientation={Gtk.Orientation.VERTICAL} spacing={4}>
-            <label class="HudStatLabel" label="DRAW" halign={Gtk.Align.START} />
-            <label class={drawClass} label={draw} halign={Gtk.Align.START} />
-          </box>
-          <box class="HudStat" orientation={Gtk.Orientation.VERTICAL} spacing={4}>
-            <label class="HudStatLabel" label="HEALTH" halign={Gtk.Align.START} />
-            <label class="HudStatValue HudStatCharge" label={health} halign={Gtk.Align.START} />
-          </box>
-          <box class="HudStat" orientation={Gtk.Orientation.VERTICAL} spacing={4}>
-            <label class="HudStatLabel" label="CPU" halign={Gtk.Align.START} />
-            <label class={cpuClass} label={cpuText} halign={Gtk.Align.START} />
-          </box>
+          <StatTile label="TIME LEFT" value={timeLeft} tone="info" />
+          <StatTile label="DRAW" value={draw} tone={drawTone} />
+          <StatTile label="HEALTH" value={health} tone="charge" />
+          <StatTile label="CPU" value={cpuText} tone={cpuTone} />
         </box>
 
         {/* Energy + cycles */}
@@ -220,7 +201,7 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
 
         {/* Top consumers */}
         <box class="HudProcessSection" orientation={Gtk.Orientation.VERTICAL} spacing={0}>
-          <label class="HudProcessHeader" label="TOP CONSUMERS" halign={Gtk.Align.START} />
+          <SectionHeader label="TOP CONSUMERS" />
           <ProcessRow info={proc0} />
           <ProcessRow info={proc1} />
           <ProcessRow info={proc2} />
@@ -228,7 +209,7 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
 
         {/* ── Power Controls ── */}
         <box class="HudPowerSection" orientation={Gtk.Orientation.VERTICAL} spacing={0}>
-          <label class="HudPowerHeader" label="POWER CONTROLS" halign={Gtk.Align.START} />
+          <SectionHeader label="POWER CONTROLS" />
 
           {/* Lid close action — pull-down with overlay menu */}
           <overlay>
@@ -250,7 +231,7 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
             <box $type="overlay"
                  class="HudPdMenu" orientation={Gtk.Orientation.VERTICAL} spacing={0}
                  visible={menuOpen} halign={Gtk.Align.END} valign={Gtk.Align.END}>
-              <label class="HudPdSection" label="LID_ACTION" halign={Gtk.Align.START} />
+              <label class="HudPdSection" label="LID::ACTION" halign={Gtk.Align.START} />
               {LID_ACTIONS.map((action) => (
                 <LidMenuItem
                   action={action}
@@ -264,25 +245,13 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
           <box class="HudSepLine" />
 
           {/* All toggle */}
-          <box class="HudToggleRowAll" spacing={0}>
-            <box orientation={Gtk.Orientation.VERTICAL} hexpand halign={Gtk.Align.START} valign={Gtk.Align.CENTER}>
-              <label class="HudToggleLabel" label="All Power Save" halign={Gtk.Align.START} />
-              <label class="HudToggleSub" label="SAVE::ALL" halign={Gtk.Align.START} />
-            </box>
-            <button
-              class="HudToggleSwitchBtn"
-              onClicked={() => {
-                const s = props.pwsaveStatus()
-                const on = s != null ? isAllEnabled(s) : false
-                props.onToggleAll(!on)
-              }}
-              valign={Gtk.Align.CENTER}
-            >
-              <box class={allTrackClass}>
-                <box class={allKnobClass} />
-              </box>
-            </button>
-          </box>
+          <ToggleRow
+            label="All Power Save"
+            subLabel="SAVE::ALL"
+            active={allEnabled}
+            onToggle={props.onToggleAll}
+            emphasis
+          />
 
           {/* Individual measure toggles */}
           {MEASURE_NAMES.map((name) => (
@@ -299,8 +268,6 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
 }
 
 // ── Pull-down menu item ──
-const CHECK_MARK = String.fromCharCode(0x2713)
-
 function LidMenuItem(props: {
   action: LidAction
   currentAction: Accessor<LidAction>
@@ -310,7 +277,7 @@ function LidMenuItem(props: {
     current === props.action ? "HudPdItem HudPdItemSelected" : "HudPdItem",
   )
   const checkLabel = props.currentAction((current) =>
-    current === props.action ? CHECK_MARK : "",
+    current === props.action ? ICONS.check : "",
   )
 
   return (
@@ -331,41 +298,21 @@ function MeasureToggleRow(props: {
 }) {
   const meta = MEASURE_META[props.name]
 
-  const trackClass = props.pwsaveStatus((s) => {
-    const on = s != null ? isMeasureEnabled(s, props.name) : false
-    return on ? "HudToggleTrack HudToggleTrackOn" : "HudToggleTrack"
-  })
-  const knobClass = props.pwsaveStatus((s) => {
-    const on = s != null ? isMeasureEnabled(s, props.name) : false
-    return on ? "HudToggleKnob HudToggleKnobOn" : "HudToggleKnob"
-  })
+  const enabled = props.pwsaveStatus((s) => s != null ? isMeasureEnabled(s, props.name) : false)
 
   return (
-    <box class="HudToggleRow" spacing={0}>
-      <box orientation={Gtk.Orientation.VERTICAL} hexpand halign={Gtk.Align.START} valign={Gtk.Align.CENTER}>
-        <label class="HudToggleLabel" label={meta.label} halign={Gtk.Align.START} />
-        <label class="HudToggleSub" label={meta.sub} halign={Gtk.Align.START} />
-      </box>
-      <button
-        class="HudToggleSwitchBtn"
-        onClicked={() => {
-          const s = props.pwsaveStatus()
-          const current = s != null ? isMeasureEnabled(s, props.name) : false
-          props.onToggle(!current)
-        }}
-        valign={Gtk.Align.CENTER}
-      >
-        <box class={trackClass}>
-          <box class={knobClass} />
-        </box>
-      </button>
-    </box>
+    <ToggleRow
+      label={meta.label}
+      subLabel={meta.sub}
+      active={enabled}
+      onToggle={props.onToggle}
+    />
   )
 }
 
 // ── Process row ──
 function ProcessRow(props: { info: any }) {
-  const name = props.info((p: any) => p?.name ?? "---")
+  const name = props.info((p: any) => p?.name ?? "—")
   const cpu = props.info((p: any) => p != null ? `${p.cpu.toFixed(1)}%` : "")
   const barWidth = props.info((p: any) => {
     if (p == null) return 0

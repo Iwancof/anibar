@@ -56,23 +56,6 @@ window.Bar {
   padding: 0 4px;
 }
 
-.PlayerBtn {
-  @extend %icon-btn-reset;
-  padding: 0 3px;
-  margin: 0;
-  min-width: 20px;
-  min-height: 20px;
-}
-
-.PlayerBtn label, .PlayerBtnIcon {
-  font-size: 15px;
-  color: $colors-muted;
-}
-
-.PlayerBtn:hover label {
-  color: $colors-text;
-}
-
 // ── ワークスペースドット ──────────────────
 .WsDot {
   font-family: $font-family;

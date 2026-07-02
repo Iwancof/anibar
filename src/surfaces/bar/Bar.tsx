@@ -10,7 +10,9 @@ import type { WorkspaceSnapshot } from "../../modules/workspace/domain.ts"
 import type { ImeSnapshot } from "../../runtime/ime-source.ts"
 import { switchToWorkspace } from "../../runtime/workspace-source.ts"
 import type { NetworkSnapshot } from "../../modules/network/domain.ts"
-import { signalLevel, type WifiSnapshot } from "../../modules/wifi/domain.ts"
+import { signalIcon, signalLevel, type WifiSnapshot } from "../../modules/wifi/domain.ts"
+import Icon from "../../shared/ui/Icon.tsx"
+import { ICONS } from "../../shared/ui/icons.ts"
 import type { PlayerSource } from "../../runtime/player-source.ts"
 import BarIndicatorStrip from "./BarIndicatorStrip.tsx"
 import BatteryBarWidget from "./BatteryBarWidget.tsx"
@@ -111,27 +113,21 @@ export default function Bar(props: BarProps) {
                 visible={props.wifiSnapshot((s) => s?.connected != null)}
                 valign={Gtk.Align.CENTER}
               />
-              <label
+              <Icon
                 class={createMemo(() => {
                   const net = props.networkSnapshot()
                   if (!net.online) return "NetBarIcon NetBarIconOff"
                   if (net.linkKind !== "wifi") return "NetBarIcon NetBarIconWired"
                   return "NetBarIcon"
                 })}
-                label={createMemo(() => {
+                icon={createMemo(() => {
                   const net = props.networkSnapshot()
-                  if (!net.online) return "󰤭"
-                  if (net.linkKind !== "wifi") return "󰈁"
+                  if (!net.online) return ICONS.wifiDisconnected
+                  if (net.linkKind !== "wifi") return ICONS.wired
                   const ws = props.wifiSnapshot()
                   const sig = ws?.connected?.signal ?? 0
                   const level = signalLevel(sig)
-                  switch (level) {
-                    case 4: return "󰤨"
-                    case 3: return "󰤥"
-                    case 2: return "󰤢"
-                    case 1: return "󰤟"
-                    default: return "󰤯"
-                  }
+                  return signalIcon(level)
                 })}
                 valign={Gtk.Align.CENTER}
               />
@@ -143,7 +139,7 @@ export default function Bar(props: BarProps) {
             onClicked={props.onToggleNotifCenter}
           >
             <box spacing={4} valign={Gtk.Align.CENTER}>
-              <label class="NotifBellIcon" label={"󰂚"} valign={Gtk.Align.CENTER} />
+              <Icon class="NotifBellIcon" icon={ICONS.bell} valign={Gtk.Align.CENTER} />
               <label
                 class="NotifBellBadge"
                 label={props.notifUnreadCount((c) => c > 0 ? `${c}` : "")}

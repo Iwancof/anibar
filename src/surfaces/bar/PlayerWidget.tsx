@@ -8,6 +8,7 @@ import { createMemo } from "gnim"
 import type { PlayerSource } from "../../runtime/player-source.ts"
 import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
 import { COLORS } from "../../shared/theme-tokens.ts"
+import PlayerControls from "../../shared/ui/PlayerControls.tsx"
 
 const VISIBLE_WIDTH = 200
 const VISIBLE_HEIGHT = 20
@@ -25,7 +26,6 @@ export default function PlayerWidget(props: PlayerWidgetProps) {
   const { player } = props
 
   const visible = createMemo(() => player.snapshot() != null)
-  const playIcon = player.isPlaying((p) => (p ? "\u23F8" : "\u25B6"))
 
   let textWidth = 0
   let lastText = ""
@@ -96,15 +96,12 @@ export default function PlayerWidget(props: PlayerWidgetProps) {
           })
         }}
       />
-      <button class="PlayerBtn" valign={Gtk.Align.CENTER} onClicked={() => player.previous()}>
-        <label label={"\u23EE"} class="PlayerBtnIcon" />
-      </button>
-      <button class="PlayerBtn" valign={Gtk.Align.CENTER} onClicked={() => player.playPause()}>
-        <label label={playIcon} class="PlayerBtnIcon" />
-      </button>
-      <button class="PlayerBtn" valign={Gtk.Align.CENTER} onClicked={() => player.next()}>
-        <label label={"\u23ED"} class="PlayerBtnIcon" />
-      </button>
+      <PlayerControls
+        isPlaying={player.isPlaying}
+        onPrevious={() => player.previous()}
+        onPlayPause={() => player.playPause()}
+        onNext={() => player.next()}
+      />
     </box>
   )
 }
