@@ -52,7 +52,7 @@
 }
 .HudDotNormal { background: $hud-blue; }
 .HudDotCharge { background: $hud-cyan; }
-.HudDotCrit   { background: $hud-pink; }
+.HudDotCrit   { background: $colors-critical; }
 
 .HudBody {
   padding: 20px 16px 16px;
@@ -67,7 +67,7 @@
 }
 .HudPercentNormal { color: $hud-blue; }
 .HudPercentCharge { color: $hud-cyan; }
-.HudPercentCrit   { color: $hud-pink; }
+.HudPercentCrit   { color: $colors-critical; }
 
 .HudPercentUnit {
   font-size: 20px;
@@ -97,7 +97,7 @@
   border: 1px solid transparent;
 }
 .HudSegCrit {
-  background: $hud-pink;
+  background: $colors-critical;
   border: 1px solid transparent;
 }
 
@@ -142,7 +142,7 @@
   color: rgba($hud-text, 0.5);
 }
 
-.HudStatCrit { color: $hud-pink; }
+.HudStatCrit { color: $colors-critical; }
 
 .HudFooterDim {
   font-size: 11px;
@@ -182,14 +182,14 @@
 }
 .HudProcBarLow  { background: $hud-cyan; }
 .HudProcBarMed  { background: $hud-amber; }
-.HudProcBarHigh { background: $hud-pink; }
+.HudProcBarHigh { background: $colors-critical; }
 
 .HudProcCpu {
   font-size: 11px;
 }
 .HudProcCpuLow  { color: $hud-cyan; }
 .HudProcCpuMed  { color: $hud-amber; }
-.HudProcCpuHigh { color: $hud-pink; }
+.HudProcCpuHigh { color: $colors-critical; }
 
 // ── Power Controls (HUD内) ───────────────
 .HudPowerSection {

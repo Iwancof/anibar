@@ -11,7 +11,7 @@ import { COLORS } from "../../shared/theme-tokens.ts"
 const MAX_POPUPS = 3
 const TIMER_BAR_HEIGHT = 3
 const TICK_MS = 30
-const URGENCY_CRITICAL = COLORS.rgb["hud-pink"]
+const URGENCY_CRITICAL = COLORS.rgb["colors-critical"]
 const URGENCY_LOW = COLORS.rgb["colors-muted"]
 const URGENCY_NORMAL = COLORS.rgb["colors-accent"]
 
