@@ -2,7 +2,7 @@ import app from "ags/gtk4/app"
 import { Astal, Gdk, Gtk } from "ags/gtk4"
 import { createMemo } from "gnim"
 
-import type { NotificationSource, NotificationItem } from "../../runtime/notification-source.ts"
+import type { NotificationSource } from "../../runtime/notification-source.ts"
 import { closeNotifCenter } from "../../app/notification-controller.ts"
 
 const MAX_HISTORY = 20
@@ -12,7 +12,6 @@ const MAX_HISTORY = 20
 export interface NotificationCenterProps {
   gdkmonitor: Gdk.Monitor
   monitor: string
-  monitorIndex: number
   notifications: NotificationSource
 }
 

@@ -81,10 +81,8 @@ export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
                 // Base fill color
                 if (low) {
                   cr.setSourceRGBA(0.89, 0.65, 0.41, 1) // warning orange
-                } else if (charging) {
-                  cr.setSourceRGBA(0.62, 0.81, 0.42, 1) // charging green
                 } else {
-                  cr.setSourceRGBA(0.62, 0.81, 0.42, 1) // healthy green
+                  cr.setSourceRGBA(0.62, 0.81, 0.42, 1) // charging/healthy green
                 }
 
                 // Draw base fill

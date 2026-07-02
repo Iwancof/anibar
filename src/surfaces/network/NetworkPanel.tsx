@@ -28,7 +28,6 @@ import WifiTab from "./WifiTab.tsx"
 export interface NetworkPanelProps {
   gdkmonitor: Gdk.Monitor
   monitor: string
-  monitorIndex: number
   networkSnapshot: Accessor<NetworkSnapshot>
   wifiSnapshot: Accessor<WifiSnapshot>
   bandwidthSnapshot: Accessor<BandwidthSnapshot>
@@ -40,7 +39,6 @@ export interface NetworkPanelProps {
   flows: Accessor<FlowEntry[]>
   logs: Accessor<LogEntry[]>
   onConnect: (ssid: string, password?: string) => void
-  onRescan: () => void
 }
 
 export default function NetworkPanel(props: NetworkPanelProps) {
@@ -79,7 +77,7 @@ export default function NetworkPanel(props: NetworkPanelProps) {
         >
           {/* 左パネル: メイン情報 + Flows/Log */}
           <box class="NpPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={520} vexpand>
-            <HeaderSection wifiSnapshot={props.wifiSnapshot} />
+            <HeaderSection />
             <box class="NpContent" orientation={Gtk.Orientation.VERTICAL} spacing={0}>
               <IdentitySection wifiSnapshot={props.wifiSnapshot} />
               <DnsSection dnsSnapshot={props.dnsSnapshot} />

@@ -30,7 +30,6 @@ bar:
     border-radius: 8px
 
   indicator:
-    spacing:    12px
     icon-size:  13px
     label-size: 13px
 
@@ -83,8 +82,6 @@ spectrum:
 # ── ネットワークパネル ────────────────────────
 network-panel:
   font-family:      "Consolas"
-  panel-width:      560px
-  panel-height:     720px
   # セクション
   section-label:    14px
   section-padding:  "9px 13px"
@@ -92,24 +89,8 @@ network-panel:
   info-label:       13px
   info-value:       15px
   geo-label:        12px
-  # Bandwidth
-  bandwidth-speed:  12px
-  sparkline-height: 52px
-  # Quality / Latency / Connections カード
-  card-value:       13px
-  card-label:       11px
-  # タブ
-  tab-label:        11px
-  tab-content:      12px
   # APs
   ap-ssid:          14px
-  ap-meta:          11px
-  ap-bssid:         11px
-  # Flows / Log
-  flow-host:        12px
-  flow-port:        11px
-  log-time:         11px
-  log-addr:         11px
 
 # ── プレビュー ──────────────────────────────
 preview:

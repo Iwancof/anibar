@@ -3,7 +3,7 @@ import GLib from "gi://GLib?version=2.0"
 import { onCleanup } from "gnim"
 
 const LOG_TAG = "[scoped-timeout]"
-const DEBUG = true  // verbose 追跡を有効化（クラッシュ切り分け用）
+const DEBUG = false
 let counter = 0
 const active = new Map<number, string>()
 
@@ -46,8 +46,4 @@ export function scopedTimeoutAdd(
   })
 
   return sourceId
-}
-
-export function debugActiveTimeouts(): string {
-  return [...active.entries()].map(([id, tag]) => `${id}:${tag}`).join(", ")
 }

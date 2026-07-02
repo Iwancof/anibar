@@ -6,7 +6,7 @@ import {
   openSwipeDashboard,
   toggleSwipeDashboard,
 } from "./swipe-dashboard-controller.ts"
-import { toggleBatteryPopup, openBatteryPopup, closeBatteryPopup, anyBatteryPopupVisible } from "./popup-controller.ts"
+import { toggleBatteryPopup, openBatteryPopup, closeBatteryPopup } from "./popup-controller.ts"
 import { toggleNetworkPopup, openNetworkPopup, closeNetworkPopup } from "./network-controller.ts"
 import { toggleNotifCenter, openNotifCenter, closeNotifCenter } from "./notification-controller.ts"
 import { toggleDashboardMode, openDashboardMode, closeDashboardMode } from "./dashboard-mode-controller.ts"

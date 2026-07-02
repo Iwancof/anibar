@@ -73,7 +73,6 @@ export function startMainApp() {
       Bar({
         gdkmonitor,
         monitor,
-        monitorIndex,
         clock: barClock,
         indicators,
         spectrumBars: spectrumSource.bars,
@@ -96,7 +95,6 @@ export function startMainApp() {
       NetworkPanel({
         gdkmonitor,
         monitor,
-        monitorIndex,
         networkSnapshot: modules.network.snapshot,
         wifiSnapshot: wifiSource.snapshot,
         bandwidthSnapshot: bandwidthSource.snapshot,
@@ -108,13 +106,11 @@ export function startMainApp() {
         flows: flowsSource.flows,
         logs: logSource.logs,
         onConnect: (ssid, password) => { wifiSource.connect(ssid, password) },
-        onRescan: () => { wifiSource.rescan() },
       }),
 
       BatteryPopup({
         gdkmonitor,
         monitor,
-        monitorIndex,
         snapshot: modules.battery.snapshot,
         systemStats: systemStats.snapshot,
         pwsaveStatus: pwsaveSource.status,
@@ -126,27 +122,24 @@ export function startMainApp() {
 
       LauncherWindow({
         gdkmonitor,
-        monitorIndex,
+        monitor,
       }),
 
       NotificationPopup({
         gdkmonitor,
         monitor,
-        monitorIndex,
         notifications: notificationSource,
       }),
 
       NotificationCenter({
         gdkmonitor,
         monitor,
-        monitorIndex,
         notifications: notificationSource,
       }),
 
       SwipeDashboard({
         gdkmonitor,
         monitor,
-        monitorIndex,
         batterySnapshot: modules.battery.snapshot,
         notifications: notificationSource,
         player: playerSource,
@@ -158,7 +151,6 @@ export function startMainApp() {
       DashboardMode({
         gdkmonitor,
         monitor,
-        monitorIndex,
         clock,
         networkSnapshot: modules.network.snapshot,
         wifiSnapshot: wifiSource.snapshot,
@@ -184,7 +176,6 @@ export function startMainApp() {
       WorkspaceWindow({
         gdkmonitor,
         monitor,
-        monitorIndex,
         snapshot: workspaceSource.snapshot,
         onClose: () => {
           void toggleDashboardVisibility()

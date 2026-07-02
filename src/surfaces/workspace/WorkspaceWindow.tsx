@@ -9,7 +9,6 @@ import WorkspaceView from "./WorkspaceView.tsx"
 export interface WorkspaceWindowProps {
   gdkmonitor: Gdk.Monitor
   monitor: string
-  monitorIndex: number
   snapshot: Accessor<WorkspaceSnapshot | null>
   onClose: () => void
 }

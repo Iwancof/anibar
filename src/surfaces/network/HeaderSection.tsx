@@ -1,12 +1,6 @@
 import { Gtk } from "ags/gtk4"
-import type { Accessor } from "gnim"
-import type { WifiSnapshot } from "../../modules/wifi/domain.ts"
 
-export interface HeaderSectionProps {
-  wifiSnapshot: Accessor<WifiSnapshot>
-}
-
-export default function HeaderSection(_props: HeaderSectionProps) {
+export default function HeaderSection() {
   return (
     <box class="NpHeader" spacing={6} halign={Gtk.Align.START} valign={Gtk.Align.CENTER}>
       <label class="NpHeaderTitle" label="NETWORK" />

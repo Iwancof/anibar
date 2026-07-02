@@ -11,7 +11,6 @@ import type { PlayerSource } from "../../runtime/player-source.ts"
 export interface SwipeDashboardProps {
   gdkmonitor: Gdk.Monitor
   monitor: string
-  monitorIndex: number
   batterySnapshot: Accessor<BatterySnapshot | null>
   notifications: NotificationSource
   player: PlayerSource

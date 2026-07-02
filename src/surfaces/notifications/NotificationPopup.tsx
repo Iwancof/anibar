@@ -14,7 +14,6 @@ const TICK_MS = 30
 export interface NotificationPopupProps {
   gdkmonitor: Gdk.Monitor
   monitor: string
-  monitorIndex: number
   notifications: NotificationSource
 }
 

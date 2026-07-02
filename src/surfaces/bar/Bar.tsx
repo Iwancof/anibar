@@ -20,7 +20,6 @@ import PlayerWidget from "./PlayerWidget.tsx"
 export interface BarProps {
   gdkmonitor: Gdk.Monitor
   monitor: string
-  monitorIndex: number
   clock: Accessor<string>
   indicators: Accessor<BarIndicatorViewModel>[]
   batterySnapshot: Accessor<BatterySnapshot | null>
@@ -76,14 +75,7 @@ export default function Bar(props: BarProps) {
               if (exists) return "WsDot WsDotOccupied"
               return "WsDot WsDotEmpty"
             })
-            const dotLabel = createMemo(() => {
-              const s = props.workspaceSnapshot()
-              if (!s) return `${wsId}`
-              const active = s.activeId === wsId
-              const exists = s.workspaces.some((w) => w.id === wsId)
-              if (active || exists) return `${wsId}`
-              return `${wsId}`
-            })
+            const dotLabel = `${wsId}`
             const visible = createMemo(() => {
               const s = props.workspaceSnapshot()
               if (!s) return wsId <= 5

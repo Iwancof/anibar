@@ -12,7 +12,6 @@ import BatteryHudView from "./BatteryHudView.tsx"
 export interface BatteryPopupProps {
   gdkmonitor: Gdk.Monitor
   monitor: string
-  monitorIndex: number
   snapshot: Accessor<BatterySnapshot | null>
   systemStats: Accessor<SystemStatsSnapshot | null>
   pwsaveStatus: Accessor<PwsaveStatus | null>

@@ -36,7 +36,6 @@ import BatteryHudView from "../popups/BatteryHudView.tsx"
 export interface DashboardModeProps {
   gdkmonitor: Gdk.Monitor
   monitor: string
-  monitorIndex: number
   clock: Accessor<string>
   // Network
   networkSnapshot: Accessor<NetworkSnapshot>
@@ -117,7 +116,7 @@ export default function DashboardMode(props: DashboardModeProps) {
         <box class="DmMainArea" spacing={16} hexpand vexpand>
           {/* 左: ネットワーク */}
           <box class="DmNetPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={520} vexpand>
-            <HeaderSection wifiSnapshot={props.wifiSnapshot} />
+            <HeaderSection />
             <box orientation={Gtk.Orientation.VERTICAL} spacing={0}>
               <IdentitySection wifiSnapshot={props.wifiSnapshot} />
               <DnsSection dnsSnapshot={props.dnsSnapshot} />

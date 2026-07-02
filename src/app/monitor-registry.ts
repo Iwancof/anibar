@@ -8,8 +8,6 @@ import { createRoot, onCleanup } from "gnim"
 
 import { computeMonitorDiff } from "../shared/monitor-diff.ts"
 
-export { computeMonitorDiff as computeDiff } from "../shared/monitor-diff.ts"
-
 const LOG_TAG = "[monitor-registry]"
 function log(msg: string): void {
   const t = GLib.get_monotonic_time() / 1000

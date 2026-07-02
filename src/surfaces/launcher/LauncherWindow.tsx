@@ -6,16 +6,15 @@ import LauncherView from "./LauncherView.tsx"
 
 export interface LauncherWindowProps {
   gdkmonitor: Gdk.Monitor
-  monitorIndex: number
+  monitor: string
 }
 
 export default function LauncherWindow(props: LauncherWindowProps) {
   const { TOP, LEFT, RIGHT, BOTTOM } = Astal.WindowAnchor
-  const monitorName = props.gdkmonitor.connector || `${props.monitorIndex}`
 
   return (
     <window
-      name={`launcher:${monitorName}`}
+      name={`launcher:${props.monitor}`}
       class="Launcher"
       visible={false}
       application={app}

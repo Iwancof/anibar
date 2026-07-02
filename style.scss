@@ -21,17 +21,6 @@ window.Bar {
   }
 }
 
-.BarButton {
-  background: $colors-surface;
-  border: 1px solid rgba(122, 162, 247, 0.26);
-  color: $colors-text;
-  padding: $bar-button-padding;
-}
-
-.BarLabel {
-  color: $colors-muted;
-}
-
 .BarClock {
   color: $colors-text;
   font-size: $font-clock-size;
@@ -64,16 +53,6 @@ window.Bar {
 // ── プレイヤー ────────────────────────────
 .Player {
   padding: 0 4px;
-}
-
-.PlayerScroll {
-  min-width: 200px;
-}
-
-.PlayerLabel {
-  font-family: "Noto Sans Mono CJK JP", $font-family;
-  font-size: 12px;
-  color: $colors-muted;
 }
 
 .PlayerBtn {
@@ -185,21 +164,6 @@ window.Bar {
   border-color: rgba(138, 149, 179, 0.4);
 }
 
-.BatFill {
-  background: $colors-healthy;
-  border-radius: 1px;
-  min-height: 1px;
-  min-width: 0px;
-}
-
-.BatFillCharging {
-  background: $colors-healthy;
-}
-
-.BatFillLow {
-  background: $colors-warning;
-}
-
 .BatNub {
   background: $colors-muted;
   border-radius: 0 2px 2px 0;
@@ -209,13 +173,6 @@ window.Bar {
   font-family: "HackGen Console NF";
   font-size: 12px;
   color: $colors-bg;
-}
-
-.BatButton {
-  background: transparent;
-  border: none;
-  padding: 0;
-  margin: 0;
 }
 
 // ── バッテリーポップアップ ────────────────
@@ -416,11 +373,6 @@ window.Bar {
 .HudStatCharge { color: #00ffcc; }
 .HudStatWarn   { color: #ffaa00; }
 
-.HudFooterSection {
-  padding-top: 8px;
-  border-top: 1px solid #1a1e2e;
-}
-
 .HudFooterLine {
   font-size: 11px;
   color: rgba(224, 230, 240, 0.5);
@@ -566,44 +518,9 @@ window.Bar {
   min-width: 18px;
 }
 
-.HudPdCheckHidden {
-  color: transparent;
-}
-
 // ── Toggle row ──
 .HudToggleRow {
   padding: 6px 0;
-}
-
-.HudToggleIcon {
-  min-width: 28px;
-  min-height: 28px;
-  border-radius: 7px;
-  font-size: 13px;
-}
-
-.HudToggleIconCyan {
-  background: rgba(0, 255, 204, 0.08);
-  border: 1px solid rgba(0, 255, 204, 0.18);
-  color: #00ffcc;
-}
-
-.HudToggleIconBlue {
-  background: rgba(0, 170, 255, 0.08);
-  border: 1px solid rgba(0, 170, 255, 0.18);
-  color: #00aaff;
-}
-
-.HudToggleIconAmber {
-  background: rgba(255, 170, 0, 0.08);
-  border: 1px solid rgba(255, 170, 0, 0.18);
-  color: #ffaa00;
-}
-
-.HudToggleIconPink {
-  background: rgba(255, 34, 102, 0.08);
-  border: 1px solid rgba(255, 34, 102, 0.18);
-  color: #ff2266;
 }
 
 .HudToggleLabel {
@@ -1584,10 +1501,6 @@ window.NpWindow {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
 }
 
-.NpScrollArea {
-  background: transparent;
-}
-
 .NpContent {
   padding: 0;
 }
@@ -1763,16 +1676,6 @@ window.NpWindow {
   padding: 1px 6px;
 }
 
-.NpDnsBadgeOff {
-  font-family: $network-panel-font-family, $font-family;
-  font-size: 11px;
-  font-weight: 600;
-  color: $np-text-sec;
-  background: $np-bg3;
-  border-radius: 3px;
-  padding: 1px 6px;
-}
-
 .NpDnsChips {
   padding: 0;
 }
@@ -1809,28 +1712,6 @@ window.NpWindow {
 .NpLatencyGood { color: $np-green; }
 .NpLatencyWarn { color: $np-amber; }
 .NpLatencyBad  { color: $np-red; }
-
-.NpLatencyBar {
-  background: $np-bg3;
-  border-radius: 2px;
-
-  trough {
-    background: $np-bg3;
-    border-radius: 2px;
-    min-height: 3px;
-  }
-
-  block.filled {
-    background: $np-cyan;
-    border-radius: 2px;
-    min-height: 3px;
-  }
-}
-
-// Session
-.NpSessionRow {
-  padding: 2px 0;
-}
 
 // Connections
 .NpConnCards {
@@ -1963,53 +1844,6 @@ window.NpWindow {
   color: $np-text;
 }
 
-// WiFi Tab
-.NpWifiRow {
-  padding: 2px 0;
-}
-
-.NpWifiRowActive {
-  .NpWifiSsid {
-    color: $np-cyan;
-  }
-}
-
-.NpWifiSignal {
-  margin: 0 2px;
-}
-
-.NpWifiBar {
-  background: $np-text-dim;
-  border-radius: 1px;
-}
-
-.NpWifiBarActive {
-  background: $np-cyan;
-}
-
-.NpWifiSsid {
-  font-family: $network-panel-font-family, $font-family;
-  font-size: 10px;
-  color: $np-text;
-}
-
-.NpWifiCheck {
-  font-size: 10px;
-  color: $np-cyan;
-}
-
-.NpWifiSecurity {
-  font-family: $network-panel-font-family, $font-family;
-  font-size: 11px;
-  color: $np-text-dim;
-}
-
-.NpWifiSignalPct {
-  font-family: $network-panel-font-family, $font-family;
-  font-size: 11px;
-  color: $np-text-sec;
-}
-
 // ── APs tab ──
 .NpApRow {
   padding: 4px 8px;
@@ -2096,12 +1930,6 @@ window.NpWindow {
   &:hover {
     background: rgba($np-cyan, 0.85);
   }
-}
-
-// ── Scanline ──
-@keyframes np-scanline {
-  0%   { margin-top: -200px; }
-  100% { margin-top: 800px; }
 }
 
 // ── Layout helpers ──
