@@ -17,18 +17,24 @@ style.scss / Cairo コードへの hex/rgba 直書きは禁止。
 
 **基底色**と**役割トークン**を分離する（α 付きトークンをさらに α 化しない）:
 
-| 基底 | 値 |
-|---|---|
-| `base-deep` | `#0a0e14` |
-| `base-panel` | `#0c1018` |
-| `base-card` | `#111826` |
-| `border` | `#1a2436` |
-| `text` | `#e0e6f0` |
-| `text-muted` | `#8a95b3` |
-| `text-faint` | `#5a6a7e` |
-| `accent` | `#00e5ff` (cyan) — 旧 `#00ffcc`/`#7aa2f7` は全て置換 |
-| `accent-alt` | `#ff2d78` (magenta) — TX/RX 等データ視覚化ペアのみ |
-| `ok` `#00ff9d` / `warn` `#ffb627` / `crit` `#ff3d3d` / `info` `#00aaff` | 意味色 |
+基底値は **NetworkPanel (np.*) の実測値を正**とする（HUD/Tokyo Night 側を np に収束させる）:
+
+| 基底 | 値 | 備考 |
+|---|---|---|
+| `bg0` | `#080c12` | 最深背景 (np.bg0) |
+| `bg1` | `#0d1219` | パネル背景 (np.bg1) |
+| `bg2` | `#121a24` | カード背景 (np.bg2) |
+| `bg3` | `#182030` | 強調背景 (np.bg3) |
+| `border` | `#1a2436` | 全ボーダー・区切り (np.border)。旧 `#1a1e2e` は置換 |
+| `text` | `#c8d3e0` | 主要テキスト (np.text)。旧 `#d5def4`/`#e0e6f0` は置換 |
+| `text-muted` | `#8a95b3` | 補助テキスト |
+| `text-faint` | `#5a6a7e` | 最弱テキスト (np.text-sec) |
+| `accent` | `#00e5ff` | 主アクセント (np.cyan)。旧 `#00ffcc`/`#7aa2f7` は置換 |
+| `accent-alt` | `#ff2d78` | 対アクセント (np.magenta)。データ視覚化ペア・強調のみ |
+| `ok` | `#00ff9d` | 正常 (np.green)。旧 `#9ece6a`/`#9ecf6b`/`#00ff9e` は置換 |
+| `warn` | `#ffb627` | 警告 (np.amber)。旧 `#e0af68`/`#ffaa00`/`#e3a669`/`#ffb526` は置換 |
+| `crit` | `#ff3d3d` | 危険 (np.red)。旧 `#f7768e`/`#ff2266` は置換 |
+| `info` | `#00aaff` | 情報 (hud.blue) |
 
 役割トークン例: `surface.panel.bg = rgba(base-panel, .92)`、backdrop = `rgba(base-deep, .5)`。
 α は 0.08 / 0.18 / 0.35 / 0.6 / 0.92 の 5 段。
