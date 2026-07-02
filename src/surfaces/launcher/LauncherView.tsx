@@ -5,6 +5,8 @@ import type { Accessor } from "gnim"
 import { searchApps, type AppEntry } from "../../modules/launcher/domain.ts"
 import { loadAllApps, launchApp, loadRecentIds } from "../../runtime/app-source.ts"
 import { closeLauncher } from "../../app/launcher-controller.ts"
+import Icon from "../../shared/ui/Icon.tsx"
+import { ICONS } from "../../shared/ui/icons.ts"
 
 const MAX_RESULTS = 8
 
@@ -143,9 +145,9 @@ function ResultRow(props: ResultRowProps) {
           pixelSize={24}
           visible={hasIcon}
         />
-        <label
+        <Icon
           class="LauncherItemIconFallback"
-          label="●"
+          icon={ICONS.appFallback}
           widthRequest={24}
           visible={hasIcon((v) => !v)}
         />

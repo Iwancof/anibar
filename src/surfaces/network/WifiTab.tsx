@@ -1,7 +1,8 @@
 import { Gdk, Gtk } from "ags/gtk4"
 import { createMemo, createState } from "gnim"
 import type { Accessor } from "gnim"
-import { signalLevel, type WifiSnapshot } from "../../modules/wifi/domain.ts"
+import { signalColorClass, signalIcon, signalLevel, type WifiSnapshot } from "../../modules/wifi/domain.ts"
+import { ICONS } from "../../shared/ui/icons.ts"
 
 const MAX_APS = 50
 
@@ -9,23 +10,6 @@ export interface WifiTabProps {
   wifiSnapshot: Accessor<WifiSnapshot>
   visible?: Accessor<boolean>
   onConnect: (ssid: string, password?: string) => void
-}
-
-function signalIcon(level: number): string {
-  switch (level) {
-    case 4: return "󰤨"
-    case 3: return "󰤥"
-    case 2: return "󰤢"
-    case 1: return "󰤟"
-    default: return "󰤯"
-  }
-}
-
-function signalColorClass(level: number): string {
-  if (level >= 3) return "NpApSignalHigh"
-  if (level >= 2) return "NpApSignalMid"
-  if (level >= 1) return "NpApSignalLow"
-  return "NpApSignalWeak"
 }
 
 export default function WifiTab(props: WifiTabProps) {
@@ -124,7 +108,7 @@ export default function WifiTab(props: WifiTabProps) {
                 </box>
                 <label
                   class="NpApCheck"
-                  label="󰄬"
+                  label={ICONS.check}
                   visible={inUse}
                   valign={Gtk.Align.CENTER}
                 />
@@ -151,7 +135,7 @@ export default function WifiTab(props: WifiTabProps) {
                 class="NpApConnectBtn"
                 onClicked={() => handleConnect(i)}
               >
-                <label label="Connect" />
+                <label label="CONNECT" />
               </button>
             </box>
           </box>

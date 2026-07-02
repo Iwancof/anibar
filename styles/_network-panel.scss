@@ -58,58 +58,14 @@ window.NpWindow {
   border-bottom: 1px solid $np-border;
 }
 
-.NpSectionHeader {
-  margin-bottom: 4px;
-}
-
-.NpSectionLabel {
-  font-family: $network-panel-font-family, $font-family;
-  font-size: $network-panel-section-label;
-  font-weight: 500;
-  letter-spacing: 1.5px;
-  color: $np-cyan-dim;
-}
-
-.NpSectionLine {
-  min-height: 1px;
-  background: rgba($np-border, 0.3);
-}
-
-// ── Info Row ──
-.NpInfoRow {
-  padding: 1px 0;
-}
-
-.NpInfoLabel {
-  font-family: $network-panel-font-family, $font-family;
-  font-size: $network-panel-info-label;
-  color: $np-text-dim;
-}
-
-.NpInfoValue {
-  @include value-tint($np-text);
-}
-
-.NpInfoValueCyan {
-  @include value-tint($np-cyan);
-}
-
-.NpInfoValueMagenta {
-  @include value-tint($np-magenta);
-}
-
-.NpInfoValueDim {
-  @include value-tint($np-text-sec);
-}
-
-.NpInfoValueSmall {
-  @include value-tint($np-text);
-}
-
 .NpGeoLabel {
   font-family: $network-panel-font-family, $font-family;
   font-size: $network-panel-geo-label;
   color: $np-text-dim;
+}
+
+.NpGeoLine {
+  margin-left: $dim-label-sm * 1px;
 }
 
 .NpGeoTor {
@@ -142,36 +98,6 @@ window.NpWindow {
 
 .NpQualRow {
   margin: 4px 8px;
-}
-
-.NpMiniCard {
-  padding: 6px 4px;
-  border-radius: 4px;
-  background: rgba($np-bg3, 0.5);
-  border: 1px solid $np-border;
-}
-
-.NpMiniValue {
-  font-size: 13px;
-  font-weight: bold;
-  color: $np-text;
-}
-
-.NpMiniLabel {
-  font-size: 10px;
-  color: $np-text-dim;
-}
-
-.NpQualGood .NpMiniValue {
-  color: $np-green;
-}
-
-.NpQualWarn .NpMiniValue {
-  color: $np-amber;
-}
-
-.NpQualBad .NpMiniValue {
-  color: $np-red;
 }
 
 // ── Phase 3: DNS + Latency + Session + Connections ──
@@ -229,55 +155,11 @@ window.NpWindow {
   padding: 0;
 }
 
-.NpConnCard {
-  background: $np-bg2;
-  border-radius: 4px;
-  padding: 6px 4px;
-}
-
-.NpConnCardValue {
-  font-family: $network-panel-font-family, $font-family;
-  font-size: 14px;
-  font-weight: 700;
-  color: $np-text;
-}
-
-.NpConnCardCyan {
-  color: $np-cyan;
-}
-
-.NpConnCardLabel {
-  font-family: $network-panel-font-family, $font-family;
-  font-size: 11px;
-  color: $np-text-sec;
-}
-
 // ── Phase 4: Tab Area ──
 
 .NpTabArea {
   margin-top: 2px;
   border-top: 1px solid $np-border;
-}
-
-.NpTabBar {
-  padding: 4px 8px 0;
-}
-
-.NpTabBtn {
-  @extend %icon-btn-reset;
-  font-family: $network-panel-font-family, $font-family;
-  font-size: 13px;
-  font-weight: 600;
-  color: $np-text-sec;
-  border-bottom: 2px solid transparent;
-  padding: 4px 12px 3px;
-  margin: 0 2px;
-  border-radius: 0;
-}
-
-.NpTabBtnActive {
-  color: $np-cyan;
-  border-bottom: 2px solid $np-cyan;
 }
 
 .NpTabScroll {

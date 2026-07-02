@@ -2,6 +2,7 @@ import { Gtk } from "ags/gtk4"
 import { createMemo } from "gnim"
 import type { Accessor } from "gnim"
 import type { LogEntry } from "../../runtime/netmon-source.ts"
+import { fixedSlots } from "../../shared/fixed-slots.ts"
 
 const MAX_LOGS = 30
 
@@ -68,7 +69,7 @@ export default function LogTab(props: LogTabProps) {
       spacing={0}
       visible={props.visible}
     >
-      {Array.from({ length: MAX_LOGS }).map((_, i) => {
+      {fixedSlots(MAX_LOGS).map((i) => {
         const entry = createMemo(() => props.logs()[i] ?? null)
         return <LogRow entry={entry} />
       })}

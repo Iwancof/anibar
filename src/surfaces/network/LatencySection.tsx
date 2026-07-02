@@ -6,6 +6,7 @@ import type { Accessor } from "gnim"
 import type { LatencySnapshot } from "../../runtime/latency-source.ts"
 import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
 import { COLORS } from "../../shared/theme-tokens.ts"
+import SectionHeader from "../../shared/ui/SectionHeader.tsx"
 
 const MAX_MS = 200
 const LATENCY_BG = COLORS.rgb["np-border"]
@@ -57,10 +58,7 @@ export default function LatencySection(props: LatencySectionProps) {
 
   return (
     <box class="NpSection" orientation={Gtk.Orientation.VERTICAL} spacing={2}>
-      <box class="NpSectionHeader" spacing={6}>
-        <label class="NpSectionLabel" label="LATENCY" />
-        <box class="NpSectionLine" hexpand valign={Gtk.Align.CENTER} />
-      </box>
+      <SectionHeader label="LATENCY" />
       <box class="NpLatencyGrid" orientation={Gtk.Orientation.VERTICAL} spacing={3} marginTop={2}>
         {cards.map((card) => (
           <box class="NpLatencyCard" spacing={0} orientation={Gtk.Orientation.VERTICAL}>

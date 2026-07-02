@@ -6,6 +6,7 @@ import type { WorkspaceSnapshot, WorkspaceInfo } from "../../modules/workspace/d
 import { getDisplayLayoutSource } from "../../runtime/display-layout-source.ts"
 import { switchToWorkspace } from "../../runtime/workspace-source.ts"
 import { toggleDashboardVisibility } from "../../app/dashboard-controller.ts"
+import TabBar from "../../shared/ui/TabBar.tsx"
 import DisplayLayoutView from "./DisplayLayoutView.tsx"
 
 export interface WorkspaceViewProps {
@@ -32,18 +33,12 @@ export default function WorkspaceView(props: WorkspaceViewProps) {
   return (
     <box class="WsPanel" orientation={Gtk.Orientation.VERTICAL} spacing={16} widthRequest={panelWidth}>
       <box class="WsTopBar" spacing={8}>
-        <button
-          class={activeTab((tab) => tab === "workspaces" ? "WsTabButton WsTabButtonActive" : "WsTabButton")}
-          onClicked={() => setActiveTab("workspaces")}
-        >
-          <label label="Workspaces" />
-        </button>
-        <button
-          class={activeTab((tab) => tab === "displays" ? "WsTabButton WsTabButtonActive" : "WsTabButton")}
-          onClicked={() => setActiveTab("displays")}
-        >
-          <label label="Displays" />
-        </button>
+        <TabBar
+          tabs={[{ id: "workspaces", label: "WORKSPACES" }, { id: "displays", label: "DISPLAYS" }]}
+          active={activeTab}
+          onSelect={(id) => setActiveTab(id)}
+          variant="filled"
+        />
       </box>
 
       <box visible={activeTab((tab) => tab === "workspaces")} orientation={Gtk.Orientation.VERTICAL} spacing={16}>
@@ -51,7 +46,7 @@ export default function WorkspaceView(props: WorkspaceViewProps) {
           <label class="WsHeaderLabel" label="WORKSPACES" halign={Gtk.Align.START} hexpand />
           <label
             class="WsHeaderActive"
-            label={props.snapshot((s) => s ? `Active: ${s.activeId}` : "--")}
+            label={props.snapshot((s) => s ? `Active: ${s.activeId}` : "—")}
             halign={Gtk.Align.END}
           />
         </box>

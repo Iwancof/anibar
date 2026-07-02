@@ -3,26 +3,21 @@ import { Gtk } from "ags/gtk4"
 import { createMemo } from "gnim"
 import type { Accessor } from "gnim"
 import type { BandwidthSnapshot } from "../../runtime/bandwidth-source.ts"
+import { formatBytesPerSecond } from "../../shared/format.ts"
 import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
 import { COLORS } from "../../shared/theme-tokens.ts"
+import SectionHeader from "../../shared/ui/SectionHeader.tsx"
 
 export interface BandwidthSectionProps {
   bandwidthSnapshot: Accessor<BandwidthSnapshot>
-}
-
-function formatSpeed(bps: number): string {
-  if (bps < 1024) return `${bps.toFixed(0)} B/s`
-  if (bps < 1024 * 1024) return `${(bps / 1024).toFixed(1)} KB/s`
-  if (bps < 1024 * 1024 * 1024) return `${(bps / (1024 * 1024)).toFixed(1)} MB/s`
-  return `${(bps / (1024 * 1024 * 1024)).toFixed(2)} GB/s`
 }
 
 const CYAN = COLORS.rgb["np-cyan"]
 const MAGENTA = COLORS.rgb["np-magenta"]
 
 export default function BandwidthSection(props: BandwidthSectionProps) {
-  const txLabel = createMemo(() => `TX ${formatSpeed(props.bandwidthSnapshot().currentTx)}`)
-  const rxLabel = createMemo(() => `RX ${formatSpeed(props.bandwidthSnapshot().currentRx)}`)
+  const txLabel = createMemo(() => `TX ${formatBytesPerSecond(props.bandwidthSnapshot().currentTx)}`)
+  const rxLabel = createMemo(() => `RX ${formatBytesPerSecond(props.bandwidthSnapshot().currentRx)}`)
 
   let drawingArea: any = null
 
@@ -114,10 +109,7 @@ export default function BandwidthSection(props: BandwidthSectionProps) {
 
   return (
     <box class="NpSection" orientation={Gtk.Orientation.VERTICAL} spacing={2}>
-      <box class="NpSectionHeader" spacing={6}>
-        <label class="NpSectionLabel" label="BANDWIDTH" />
-        <box class="NpSectionLine" hexpand valign={Gtk.Align.CENTER} />
-      </box>
+      <SectionHeader label="BANDWIDTH" />
       <Gtk.DrawingArea
         class="NpSparkline"
         widthRequest={380}

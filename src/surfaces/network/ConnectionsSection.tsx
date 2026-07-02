@@ -2,6 +2,8 @@ import { Gtk } from "ags/gtk4"
 import { createMemo } from "gnim"
 import type { Accessor } from "gnim"
 import type { ConnectionsSnapshot } from "../../runtime/connections-source.ts"
+import SectionHeader from "../../shared/ui/SectionHeader.tsx"
+import StatTile from "../../shared/ui/StatTile.tsx"
 
 export interface ConnectionsSectionProps {
   connectionsSnapshot: Accessor<ConnectionsSnapshot>
@@ -14,23 +16,11 @@ export default function ConnectionsSection(props: ConnectionsSectionProps) {
 
   return (
     <box class="NpSection" orientation={Gtk.Orientation.VERTICAL} spacing={2}>
-      <box class="NpSectionHeader" spacing={6}>
-        <label class="NpSectionLabel" label="CONNECTIONS" />
-        <box class="NpSectionLine" hexpand valign={Gtk.Align.CENTER} />
-      </box>
+      <SectionHeader label="CONNECTIONS" />
       <box class="NpConnCards" spacing={6} marginTop={2}>
-        <box class="NpConnCard" orientation={Gtk.Orientation.VERTICAL} spacing={1} hexpand>
-          <label class="NpConnCardValue NpConnCardCyan" label={established} />
-          <label class="NpConnCardLabel" label="Established" />
-        </box>
-        <box class="NpConnCard" orientation={Gtk.Orientation.VERTICAL} spacing={1} hexpand>
-          <label class="NpConnCardValue" label={listening} />
-          <label class="NpConnCardLabel" label="Listening" />
-        </box>
-        <box class="NpConnCard" orientation={Gtk.Orientation.VERTICAL} spacing={1} hexpand>
-          <label class="NpConnCardValue" label={openPorts} />
-          <label class="NpConnCardLabel" label="Open Ports" />
-        </box>
+        <StatTile label="Established" value={established} tone="accent" />
+        <StatTile label="Listening" value={listening} />
+        <StatTile label="Open Ports" value={openPorts} />
       </box>
     </box>
   )

@@ -24,6 +24,7 @@ import SessionSection from "./SessionSection.tsx"
 import ConnectionsSection from "./ConnectionsSection.tsx"
 import TabArea from "./TabArea.tsx"
 import WifiTab from "./WifiTab.tsx"
+import SectionHeader from "../../shared/ui/SectionHeader.tsx"
 
 export interface NetworkPanelProps {
   gdkmonitor: Gdk.Monitor
@@ -101,7 +102,7 @@ export default function NetworkPanel(props: NetworkPanelProps) {
           {/* 右パネル: APs 専用 */}
           <box class="NpApPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={380} vexpand>
             <box class="NpApPanelHeader" spacing={6}>
-              <label class="NpSectionLabel" label="ACCESS POINTS" hexpand halign={Gtk.Align.START} />
+              <SectionHeader label="ACCESS POINTS" />
             </box>
             <Gtk.ScrolledWindow
               class="NpApPanelScroll"

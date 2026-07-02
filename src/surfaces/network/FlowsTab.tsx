@@ -2,6 +2,7 @@ import { Gtk } from "ags/gtk4"
 import { createMemo } from "gnim"
 import type { Accessor } from "gnim"
 import type { FlowEntry } from "../../runtime/netmon-source.ts"
+import { fixedSlots } from "../../shared/fixed-slots.ts"
 
 const MAX_FLOWS = 15
 
@@ -37,7 +38,7 @@ export default function FlowsTab(props: FlowsTabProps) {
       spacing={0}
       visible={props.visible}
     >
-      {Array.from({ length: MAX_FLOWS }).map((_, i) => {
+      {fixedSlots(MAX_FLOWS).map((i) => {
         const entry = createMemo(() => props.flows()[i] ?? null)
         return <FlowRow entry={entry} />
       })}

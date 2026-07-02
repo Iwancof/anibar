@@ -2,6 +2,8 @@ import { Gtk } from "ags/gtk4"
 import { createMemo } from "gnim"
 import type { Accessor } from "gnim"
 import type { QualitySnapshot } from "../../runtime/quality-source.ts"
+import SectionHeader from "../../shared/ui/SectionHeader.tsx"
+import StatTile, { type StatTileTone } from "../../shared/ui/StatTile.tsx"
 
 export interface QualitySectionProps {
   qualitySnapshot: Accessor<QualitySnapshot>
@@ -43,22 +45,17 @@ function rssiLevel(rssi: number | null): QualityLevel {
   return "bad"
 }
 
-function levelClass(level: QualityLevel): string {
+function levelTone(level: QualityLevel): StatTileTone {
   switch (level) {
-    case "good": return "NpQualGood"
-    case "warn": return "NpQualWarn"
-    case "bad": return "NpQualBad"
+    case "good": return "good"
+    case "warn": return "warn"
+    case "bad": return "crit"
   }
 }
 
 function MiniCard(props: { label: string; value: Accessor<string>; level: Accessor<QualityLevel> }) {
-  const cssClass = createMemo(() => `NpMiniCard ${levelClass(props.level())}`)
-  return (
-    <box class={cssClass} orientation={Gtk.Orientation.VERTICAL} spacing={1} hexpand>
-      <label class="NpMiniValue" label={props.value} />
-      <label class="NpMiniLabel" label={props.label} />
-    </box>
-  )
+  const tone = createMemo(() => levelTone(props.level()))
+  return <StatTile label={props.label} value={props.value} tone={tone} />
 }
 
 export default function QualitySection(props: QualitySectionProps) {
@@ -100,10 +97,7 @@ export default function QualitySection(props: QualitySectionProps) {
 
   return (
     <box class="NpSection" orientation={Gtk.Orientation.VERTICAL} spacing={2}>
-      <box class="NpSectionHeader" spacing={6}>
-        <label class="NpSectionLabel" label="QUALITY" />
-        <box class="NpSectionLine" hexpand valign={Gtk.Align.CENTER} />
-      </box>
+      <SectionHeader label="QUALITY" />
       <box class="NpQualRow" spacing={4}>
         <MiniCard label="RTT ms" value={rttVal} level={rttLvl} />
         <MiniCard label="JITTER ms" value={jitterVal} level={jitterLvl} />

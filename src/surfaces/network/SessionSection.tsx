@@ -2,6 +2,8 @@ import { Gtk } from "ags/gtk4"
 import { createMemo } from "gnim"
 import type { Accessor } from "gnim"
 import type { SessionSnapshot } from "../../runtime/session-source.ts"
+import InfoRow from "../../shared/ui/InfoRow.tsx"
+import SectionHeader from "../../shared/ui/SectionHeader.tsx"
 
 export interface SessionSectionProps {
   sessionSnapshot: Accessor<SessionSnapshot>
@@ -26,24 +28,10 @@ export default function SessionSection(props: SessionSectionProps) {
 
   return (
     <box class="NpSection" orientation={Gtk.Orientation.VERTICAL} spacing={2}>
-      <box class="NpSectionHeader" spacing={6}>
-        <label class="NpSectionLabel" label="SESSION" />
-        <box class="NpSectionLine" hexpand valign={Gtk.Align.CENTER} />
-      </box>
-      <box spacing={4}>
-        <label class="NpInfoLabel" label="Uptime" />
-        <label class="NpInfoValueCyan" label={duration} />
-      </box>
-      <box spacing={8}>
-        <box spacing={4}>
-          <label class="NpInfoLabel" label="Reconnects" />
-          <label class="NpInfoValue" label={reconnects} />
-        </box>
-        <box spacing={4}>
-          <label class="NpInfoLabel" label="Last Drop" />
-          <label class="NpInfoValue" label={lastDrop} />
-        </box>
-      </box>
+      <SectionHeader label="SESSION" />
+      <InfoRow label="Uptime" value={duration} tone="accent" />
+      <InfoRow label="Reconnects" value={reconnects} />
+      <InfoRow label="Last Drop" value={lastDrop} />
     </box>
   )
 }

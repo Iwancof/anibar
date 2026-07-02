@@ -17,6 +17,9 @@ import {
   setOutputTransform,
   snapOutputPosition,
 } from "../../modules/display-layout/domain.ts"
+import Icon from "../../shared/ui/Icon.tsx"
+import SectionHeader from "../../shared/ui/SectionHeader.tsx"
+import { ICONS } from "../../shared/ui/icons.ts"
 
 const SCALE_OPTIONS = [0.75, 1, 1.25, 1.5, 2]
 const ROTATION_OPTIONS: DisplayTransform[] = [0, 1, 2, 3]
@@ -205,7 +208,7 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
   return (
     <box class="DisplayLayoutRoot" spacing={16} hexpand>
       <box class="DisplaySidebar" orientation={Gtk.Orientation.VERTICAL} spacing={10} widthRequest={220}>
-        <label class="DisplaySidebarTitle" label="PROFILES" halign={Gtk.Align.START} />
+        <SectionHeader label="PROFILES" />
         <label class="DisplaySidebarMeta" label={profileCountLabel} halign={Gtk.Align.START} />
 
         <box class="DisplayPresetGroup" orientation={Gtk.Orientation.VERTICAL} spacing={6}>
@@ -247,7 +250,7 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
           </button>
         </box>
 
-        <label class="DisplaySidebarTitle" label="SAVED" halign={Gtk.Align.START} />
+        <SectionHeader label="SAVED" />
         <Gtk.ScrolledWindow
           class="DisplayProfilesScroll"
           hscrollbarPolicy={Gtk.PolicyType.NEVER}
@@ -378,7 +381,7 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
                 )
               }}
             >
-              <label label="‹" />
+              <Icon icon={ICONS.chevronLeft} />
             </button>
             <label
               class="DisplayModeLabel"
@@ -399,7 +402,7 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
                 )
               }}
             >
-              <label label="›" />
+              <Icon icon={ICONS.chevronRight} />
             </button>
           </box>
         </box>

@@ -2,6 +2,8 @@ import { Gtk } from "ags/gtk4"
 import { createMemo } from "gnim"
 import type { Accessor } from "gnim"
 import type { DnsSnapshot } from "../../runtime/dns-source.ts"
+import { fixedSlots } from "../../shared/fixed-slots.ts"
+import SectionHeader from "../../shared/ui/SectionHeader.tsx"
 
 const MAX_DNS_SERVERS = 4
 const MAX_PROTOCOLS = 4
@@ -11,14 +13,14 @@ export interface DnsSectionProps {
 }
 
 export default function DnsSection(props: DnsSectionProps) {
-  const serverChips = Array.from({ length: MAX_DNS_SERVERS }, (_, i) => {
+  const serverChips = fixedSlots(MAX_DNS_SERVERS).map((i) => {
     const server = createMemo(() => props.dnsSnapshot().servers[i] ?? null)
     const visible = createMemo(() => server() != null)
     const label = createMemo(() => server() ?? "")
     return { visible, label }
   })
 
-  const protocolChips = Array.from({ length: MAX_PROTOCOLS }, (_, i) => {
+  const protocolChips = fixedSlots(MAX_PROTOCOLS).map((i) => {
     const proto = createMemo(() => props.dnsSnapshot().protocols[i] ?? null)
     const visible = createMemo(() => proto() != null)
     const label = createMemo(() => proto() ?? "")
@@ -33,10 +35,7 @@ export default function DnsSection(props: DnsSectionProps) {
 
   return (
     <box class="NpSection" orientation={Gtk.Orientation.VERTICAL} spacing={2}>
-      <box class="NpSectionHeader" spacing={6}>
-        <label class="NpSectionLabel" label="DNS" />
-        <box class="NpSectionLine" hexpand valign={Gtk.Align.CENTER} />
-      </box>
+      <SectionHeader label="DNS" />
       <box spacing={4} marginTop={2}>
         {protocolChips.map((chip) => (
           <label class="NpDnsBadgeOn" label={chip.label} visible={chip.visible} />
