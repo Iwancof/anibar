@@ -19,9 +19,22 @@
   background: rgba($popup-backdrop, 0.5);
 }
 
+.UiPanel {
+  background: $popup-panel-bg;
+  border: 1px solid $np-border;
+  border-radius: $radius-lg;
+  box-shadow: $popup-shadow;
+  margin: 8px 8px 8px 0;
+  padding: 0;
+}
+
+.UiPanelBody {
+  padding: 16px;
+}
+
 .UiPanelHeader {
   border-bottom: 1px solid $np-border;
-  padding: 10px 16px;
+  padding: 12px 16px;
 }
 
 .UiPanelHeaderDot {
