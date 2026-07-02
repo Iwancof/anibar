@@ -26,17 +26,13 @@ window.NotifCenter {
 }
 
 .NotifCenterPanel {
-  @include popup-panel($np-border, $radius-lg, 380px);
-  background: rgba($np-bg1, 0.92);
-  margin-top: 6px;
-  margin-right: 8px;
-  box-shadow: $popup-shadow;
+  min-width: 380px;
   opacity: 0;
 }
 
 .NotifCenterActions {
   @extend %section-divider;
-  padding: 8px 16px;
+  padding: 0 0 8px;
 }
 
 .NotifDndBtn {
@@ -78,7 +74,7 @@ window.NotifCenter {
 }
 
 .NotifCenterList {
-  padding: 8px;
+  padding: 0;
 }
 
 .NotifCenterEmpty {

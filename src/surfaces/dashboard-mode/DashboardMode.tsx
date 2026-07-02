@@ -21,7 +21,6 @@ import PopupShell from "../../shared/ui/PopupShell.tsx"
 import WideSpectrum from "./WideSpectrum.tsx"
 
 // Network sections (reuse from network panel)
-import HeaderSection from "../network/HeaderSection.tsx"
 import IdentitySection from "../network/IdentitySection.tsx"
 import DnsSection from "../network/DnsSection.tsx"
 import BandwidthSection from "../network/BandwidthSection.tsx"
@@ -103,7 +102,6 @@ export default function DashboardMode(props: DashboardModeProps) {
       <box class="DmMainArea" spacing={16} hexpand vexpand>
         {/* 左: ネットワーク */}
         <box class="DmNetPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={520} vexpand>
-          <HeaderSection />
           <box orientation={Gtk.Orientation.VERTICAL} spacing={0}>
             <IdentitySection wifiSnapshot={props.wifiSnapshot} />
             <DnsSection dnsSnapshot={props.dnsSnapshot} />
@@ -125,6 +123,7 @@ export default function DashboardMode(props: DashboardModeProps) {
             systemStats={props.systemStats}
             pwsaveStatus={props.pwsaveStatus}
             lidAction={props.lidAction}
+            showHeader={false}
             onToggleMeasure={props.onToggleMeasure}
             onToggleAll={props.onToggleAll}
             onSetLidAction={props.onSetLidAction}

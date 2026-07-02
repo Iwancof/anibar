@@ -6,7 +6,6 @@ import type { NotificationSource, NotificationItem } from "../../runtime/notific
 import type { PlayerSource } from "../../runtime/player-source.ts"
 import { DIM } from "../../shared/theme-tokens.ts"
 import { formatDurationMinutes, placeholder, timeAgo } from "../../shared/format.ts"
-import Icon from "../../shared/ui/Icon.tsx"
 import NotificationCard from "../../shared/ui/NotificationCard.tsx"
 import PanelHeader from "../../shared/ui/PanelHeader.tsx"
 import PlayerControls from "../../shared/ui/PlayerControls.tsx"
@@ -14,7 +13,6 @@ import PopupShell from "../../shared/ui/PopupShell.tsx"
 import SectionHeader from "../../shared/ui/SectionHeader.tsx"
 import StatTile, { type StatTileTone } from "../../shared/ui/StatTile.tsx"
 import ToggleRow from "../../shared/ui/ToggleRow.tsx"
-import { ICONS } from "../../shared/ui/icons.ts"
 
 // ── Props ──────────────────────────────────
 
@@ -208,16 +206,12 @@ export default function SwipeDashboard(props: SwipeDashboardProps) {
       onClose={props.onClose}
     >
       <box
-        class="SwipeDashPanel"
+        class="SwipeDashPanel UiPanel"
         orientation={Gtk.Orientation.VERTICAL}
         widthRequest={DIM["panel-side"]}
+        vexpand
       >
-        <box class="SwipeDashHeader" spacing={8}>
-          <PanelHeader class="SwipeDashPanelHeader" title="SYS::GLANCE" />
-          <button class="SwipeDashCloseBtn" onClicked={props.onClose} valign={Gtk.Align.CENTER}>
-            <Icon icon={ICONS.close} />
-          </button>
-        </box>
+        <PanelHeader title="SYS::GLANCE" meta="LIVE" />
 
         <Gtk.ScrolledWindow
           class="SwipeDashScroll"
@@ -225,7 +219,7 @@ export default function SwipeDashboard(props: SwipeDashboardProps) {
           vscrollbarPolicy={Gtk.PolicyType.AUTOMATIC}
           vexpand
         >
-          <box class="SwipeDashContent" orientation={Gtk.Orientation.VERTICAL} spacing={14}>
+          <box class="SwipeDashContent UiPanelBody" orientation={Gtk.Orientation.VERTICAL} spacing={14}>
             <BatterySection snapshot={props.batterySnapshot} />
             <MediaSection player={props.player} />
             <NotificationSection notifications={props.notifications} />

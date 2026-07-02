@@ -13,20 +13,13 @@
 }
 
 .BatPopupPanel {
-  @include popup-panel(rgba($hud-border, 0.8), $radius-lg, 420px);
-  margin-top: 6px;
-  margin-right: 8px;
-  box-shadow: $popup-shadow;
+  min-width: 420px;
   opacity: 0;
 }
 
 // ── HUD ──────────────────────────────────
 .Hud {
   font-family: $font-family;
-}
-
-.HudBody {
-  padding: 20px 16px 16px;
 }
 
 .HudPercent {

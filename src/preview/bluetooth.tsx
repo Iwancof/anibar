@@ -16,7 +16,7 @@ function PreviewPanel(props: { name: string; state: BluetoothSnapshot }) {
   return (
     <box orientation={Gtk.Orientation.VERTICAL} spacing={6}>
       <label class="BtPreviewLabel" label={props.name.toUpperCase()} halign={Gtk.Align.START} />
-      <box class="BtPopupPanel BtPreviewPanel">
+      <box class="BtPopupPanel UiPanel BtPreviewPanel">
         <BluetoothPopupView
           snapshot={snapshot}
           onSetPowered={async () => okResult}

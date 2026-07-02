@@ -1,10 +1,22 @@
-import { Gtk } from "ags/gtk4"
+import { createMemo, type Accessor } from "gnim"
 
-export default function HeaderSection() {
+import type { NetworkSnapshot } from "../../modules/network/domain.ts"
+import type { WifiSnapshot } from "../../modules/wifi/domain.ts"
+import PanelHeader from "../../shared/ui/PanelHeader.tsx"
+
+export interface HeaderSectionProps {
+  networkSnapshot: Accessor<NetworkSnapshot>
+  wifiSnapshot: Accessor<WifiSnapshot>
+}
+
+export default function HeaderSection(props: HeaderSectionProps) {
+  const interfaceName = createMemo(() =>
+    props.wifiSnapshot().iface?.name
+      ?? props.networkSnapshot().interfaceName
+      ?? "LIVE",
+  )
+
   return (
-    <box class="NpHeader" spacing={6} halign={Gtk.Align.START} valign={Gtk.Align.CENTER}>
-      <label class="NpHeaderTitle" label="NETWORK" />
-      <box class="NpLiveDot" widthRequest={5} heightRequest={5} valign={Gtk.Align.CENTER} />
-    </box>
+    <PanelHeader title="NET::LINK" meta={interfaceName} />
   )
 }

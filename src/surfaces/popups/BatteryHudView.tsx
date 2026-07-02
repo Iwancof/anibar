@@ -31,6 +31,7 @@ export interface BatteryHudViewProps {
   systemStats: Accessor<SystemStatsSnapshot | null>
   pwsaveStatus: Accessor<PwsaveStatus | null>
   lidAction: Accessor<LidAction>
+  showHeader?: boolean
   onToggleMeasure: (name: MeasureName, enable: boolean) => void
   onToggleAll: (enable: boolean) => void
   onSetLidAction: (action: LidAction) => void
@@ -69,6 +70,7 @@ const MEASURE_META: Record<MeasureName, { label: string; sub: string }> = {
 }
 
 export default function BatteryHudView(props: BatteryHudViewProps) {
+  const showHeader = props.showHeader ?? true
   const headerRight = props.snapshot((s) =>
     !s || !s.present ? "—" : isOnAC(s) ? "AC::IN" : "BATTERY",
   )
@@ -164,10 +166,10 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
 
   return (
     <box class="Hud" orientation={Gtk.Orientation.VERTICAL} spacing={0}>
-      <PanelHeader title="POWER::SYSTEM" meta={headerRight} dotClass={dotClass} />
+      {showHeader ? <PanelHeader title="POWER::SYSTEM" meta={headerRight} dotClass={dotClass} /> : null}
 
       {/* ── Main content ── */}
-      <box class="HudBody" orientation={Gtk.Orientation.VERTICAL} spacing={12}>
+      <box class="HudBody UiPanelBody" orientation={Gtk.Orientation.VERTICAL} spacing={12}>
         {/* Percent + segments */}
         <box spacing={16}>
           <box orientation={Gtk.Orientation.VERTICAL} valign={Gtk.Align.END}>

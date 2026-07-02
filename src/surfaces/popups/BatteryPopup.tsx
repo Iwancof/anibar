@@ -34,7 +34,7 @@ export default function BatteryPopup(props: BatteryPopupProps) {
       contentValign={Gtk.Align.START}
       onClose={closeBatteryPopup}
     >
-      <box class="BatPopupPanel" >
+      <box class="BatPopupPanel UiPanel">
         <BatteryHudView
           snapshot={props.snapshot}
           systemStats={props.systemStats}

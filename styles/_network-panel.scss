@@ -10,42 +10,6 @@ window.NpWindow {
   background: transparent;
 }
 
-.NpPanel {
-  background: rgba($np-bg1, 0.92);
-  border: 1px solid $np-border;
-  border-radius: 8px;
-  margin-top: 6px;
-  margin-right: 8px;
-  box-shadow: $popup-shadow;
-}
-
-.NpContent {
-  padding: 0;
-}
-
-// ── Header ──
-.NpHeader {
-  @extend %section-divider;
-  padding: 8px 13px;
-  border-bottom: 1px solid $np-border;
-}
-
-.NpHeaderTitle {
-  font-family: $network-panel-font-family, $font-family;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 2.5px;
-  color: $np-cyan;
-}
-
-
-.NpLiveDot {
-  border-radius: 99px;
-  background: $np-green;
-  animation: np-pulse 2s ease-in-out infinite;
-}
-
-
 // ── Section 共通 ──
 .NpSection {
   @extend %section-divider;
@@ -331,20 +295,6 @@ window.NpWindow {
 }
 
 // ── AP Side Panel ──
-.NpApPanel {
-  background: rgba($np-bg1, 0.92);
-  border: 1px solid $np-border;
-  border-radius: 8px;
-  margin-top: 6px;
-  margin-right: 8px;
-}
-
-.NpApPanelHeader {
-  @extend %section-divider;
-  padding: 10px 13px;
-  border-bottom: 1px solid $np-border;
-}
-
 .NpApPanelScroll {
   background: transparent;
 }

@@ -11,10 +11,7 @@ window.BtPopup {
 }
 
 .BtPopupPanel {
-  @include popup-panel(rgba($hud-border, 0.8), $radius-lg, $dim-panel-side * 1px);
-  margin-top: 6px;
-  margin-right: 8px;
-  box-shadow: $popup-shadow;
+  min-width: $dim-panel-side * 1px;
   opacity: 0;
 }
 
@@ -39,10 +36,6 @@ window.BtPopup {
 
 .BtPanelHeaderDotPulse {
   animation: np-pulse 1s ease-in-out infinite;
-}
-
-.BtBody {
-  padding: 14px 14px 12px;
 }
 
 .BtSection {

@@ -132,7 +132,7 @@ export function BluetoothPopupView(props: BluetoothPopupViewProps) {
   return (
     <box class="BtView" orientation={Gtk.Orientation.VERTICAL} spacing={0} widthRequest={DIM["panel-side"]}>
       <PanelHeader title="BT::DEVICES" meta={headerRight} dotClass={headerDotClass} />
-      <box class="BtBody" orientation={Gtk.Orientation.VERTICAL} spacing={12}>
+      <box class="BtBody UiPanelBody" orientation={Gtk.Orientation.VERTICAL} spacing={12}>
         <box class="BtSection" orientation={Gtk.Orientation.VERTICAL} spacing={8}>
           <SectionHeader label="ADAPTER" />
           <box class="BtAdapterControls" spacing={10}>
@@ -262,7 +262,7 @@ export default function BluetoothPopup(props: BluetoothPopupProps) {
       contentValign={Gtk.Align.START}
       onClose={closeBluetoothPopup}
     >
-      <box class="BtPopupPanel">
+      <box class="BtPopupPanel UiPanel">
         <BluetoothPopupView
           snapshot={props.snapshot}
           onSetPowered={props.onSetPowered}

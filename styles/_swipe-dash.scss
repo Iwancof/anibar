@@ -7,44 +7,10 @@ window.SwipeDash {
 
 .SwipeDashPanel {
   min-width: 380px;
-  background: $np-bg1;
-  border-left: 1px solid $np-border;
-  box-shadow: $popup-shadow;
-}
-
-.SwipeDashHeader {
-  border-bottom: 1px solid $np-border;
-  padding: 10px 12px 10px 16px;
-}
-
-.SwipeDashPanelHeader {
-  border-bottom: none;
-  padding: 0;
-}
-
-.SwipeDashCloseBtn {
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: $radius-md;
-  padding: 3px 7px;
-  color: $np-text-sec;
-}
-
-.SwipeDashCloseBtn:hover,
-.SwipeDashCloseBtn:active {
-  border-color: rgba($np-cyan, 0.35);
-}
-
-.SwipeDashCloseBtn .UiIcon {
-  font-size: 15px;
 }
 
 .SwipeDashScroll {
   min-width: 380px;
-}
-
-.SwipeDashContent {
-  padding: 14px 16px 16px;
 }
 
 .GlanceSection {
