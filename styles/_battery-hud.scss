@@ -25,31 +25,6 @@
   font-family: $font-family;
 }
 
-.HudHeader {
-  @extend %section-divider;
-  padding: 10px 16px;
-}
-
-.HudHeaderLabel {
-  @extend %eyebrow-label;
-  letter-spacing: 0.10em;
-  color: rgba($hud-text, 0.5);
-}
-
-.HudHeaderRight {
-  font-size: 10px;
-  color: rgba($hud-text, 0.3);
-}
-
-.HudDot {
-  border-radius: $radius-pill;
-  background: $np-text-sec;
-}
-.HudDotNormal { background: $colors-accent; }
-.HudDotCharge { background: $colors-accent; }
-.HudDotWarn   { background: $colors-warning; }
-.HudDotCrit   { background: $colors-critical; }
-
 .HudBody {
   padding: 20px 16px 16px;
 }

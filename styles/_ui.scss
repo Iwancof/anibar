@@ -19,6 +19,45 @@
   background: rgba($popup-backdrop, 0.5);
 }
 
+.UiPanelHeader {
+  border-bottom: 1px solid $np-border;
+  padding: 10px 16px;
+}
+
+.UiPanelHeaderDot {
+  border-radius: $radius-pill;
+  background: $np-text-sec;
+}
+
+.UiPanelHeaderDotAccent,
+.UiPanelHeaderDotNormal,
+.UiPanelHeaderDotCharge {
+  background: $colors-accent;
+}
+
+.UiPanelHeaderDotWarn {
+  background: $colors-warning;
+}
+
+.UiPanelHeaderDotCrit {
+  background: $colors-critical;
+}
+
+.UiPanelHeaderTitle {
+  font-family: $network-panel-font-family, $font-family;
+  font-size: $fontsize-dense;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: $np-text;
+}
+
+.UiPanelHeaderMeta {
+  font-family: $network-panel-font-family, $font-family;
+  font-size: $fontsize-caption;
+  letter-spacing: 0.10em;
+  color: $np-text-sec;
+}
+
 .UiSectionHeader {
   margin-bottom: 4px;
 }
@@ -224,20 +263,21 @@
 }
 
 .UiNotificationCard {
-  border-radius: $radius-lg;
+  border-radius: $radius-md;
   padding: 10px 14px;
 }
 
 .UiNotificationCardPopup {
   background: $popup-panel-bg;
   border: 1px solid rgba($colors-accent, 0.2);
+  border-radius: $radius-lg;
   min-width: 320px;
   margin-top: 4px;
 }
 
 .UiNotificationCardHistory {
-  background: rgba($np-bg2, 0.5);
-  border: 1px solid rgba($hud-border, 0.7);
+  background: $np-bg2;
+  border: 1px solid $np-border;
 }
 
 .UiNotificationCardMini {

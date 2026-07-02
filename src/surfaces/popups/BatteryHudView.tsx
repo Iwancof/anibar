@@ -20,6 +20,7 @@ import {
   type LidAction,
 } from "../../modules/power-save/domain.ts"
 import { formatDurationMinutes, formatWatts } from "../../shared/format.ts"
+import PanelHeader from "../../shared/ui/PanelHeader.tsx"
 import SectionHeader from "../../shared/ui/SectionHeader.tsx"
 import StatTile, { type StatTileTone } from "../../shared/ui/StatTile.tsx"
 import ToggleRow from "../../shared/ui/ToggleRow.tsx"
@@ -73,12 +74,12 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
   )
 
   const dotClass = props.snapshot((s) => {
-    if (!s || !s.present) return "HudDot"
+    if (!s || !s.present) return "UiPanelHeaderDot"
     const tone = hudTone(s)
-    if (tone === "charge") return "HudDot HudDotCharge"
-    if (tone === "critical") return "HudDot HudDotCrit"
-    if (tone === "warning") return "HudDot HudDotWarn"
-    return "HudDot HudDotNormal"
+    if (tone === "charge") return "UiPanelHeaderDot UiPanelHeaderDotCharge"
+    if (tone === "critical") return "UiPanelHeaderDot UiPanelHeaderDotCrit"
+    if (tone === "warning") return "UiPanelHeaderDot UiPanelHeaderDotWarn"
+    return "UiPanelHeaderDot UiPanelHeaderDotNormal"
   })
 
   const percentText = props.snapshot((s) =>
@@ -163,14 +164,7 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
 
   return (
     <box class="Hud" orientation={Gtk.Orientation.VERTICAL} spacing={0}>
-      {/* ── Header ── */}
-      <box class="HudHeader" spacing={0}>
-        <box spacing={8} halign={Gtk.Align.START} hexpand>
-          <box class={dotClass} widthRequest={8} heightRequest={8} valign={Gtk.Align.CENTER} />
-          <label class="HudHeaderLabel" label="POWER::SYSTEM" />
-        </box>
-        <label class="HudHeaderRight" label={headerRight} halign={Gtk.Align.END} />
-      </box>
+      <PanelHeader title="POWER::SYSTEM" meta={headerRight} dotClass={dotClass} />
 
       {/* ── Main content ── */}
       <box class="HudBody" orientation={Gtk.Orientation.VERTICAL} spacing={12}>

@@ -6,6 +6,7 @@ import { closeNotifCenter } from "../../app/controllers.ts"
 import { fixedSlots } from "../../shared/fixed-slots.ts"
 import { timeAgo } from "../../shared/format.ts"
 import NotificationCard from "../../shared/ui/NotificationCard.tsx"
+import PanelHeader from "../../shared/ui/PanelHeader.tsx"
 import PopupShell from "../../shared/ui/PopupShell.tsx"
 
 const MAX_HISTORY = 20
@@ -25,6 +26,7 @@ export default function NotificationCenter(props: NotificationCenterProps) {
     notifications.all().length === 0 ? "NO HISTORY" : "",
   )
   const hasEmpty = createMemo(() => notifications.all().length === 0)
+  const headerMeta = createMemo(() => `${notifications.all().length}/${MAX_HISTORY}`)
 
   return (
     <PopupShell
@@ -39,13 +41,8 @@ export default function NotificationCenter(props: NotificationCenterProps) {
       onClose={closeNotifCenter}
     >
       <box class="NotifCenterPanel" orientation={Gtk.Orientation.VERTICAL} spacing={0}>
-        <box class="NotifCenterHeader" spacing={8}>
-          <label
-            class="NotifCenterTitle"
-            label="NOTIFICATIONS"
-            hexpand
-            halign={Gtk.Align.START}
-          />
+        <PanelHeader title="NOTIF::HISTORY" meta={headerMeta} />
+        <box class="NotifCenterActions" spacing={8}>
           <button
             class={notifications.dnd((d) => d ? "NotifDndBtn NotifDndOn" : "NotifDndBtn")}
             onClicked={() => notifications.setDnd(!notifications.dnd())}
