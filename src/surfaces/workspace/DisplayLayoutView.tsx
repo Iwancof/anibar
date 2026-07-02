@@ -51,14 +51,14 @@ function formatScale(scale: number): string {
 }
 
 function formatRotation(transform: DisplayTransform): string {
-  if (transform === 0) return "0 deg"
-  if (transform === 1) return "90 deg"
-  if (transform === 2) return "180 deg"
-  if (transform === 3) return "270 deg"
-  if (transform === 4) return "flipped"
-  if (transform === 5) return "flip 90"
-  if (transform === 6) return "flip 180"
-  return "flip 270"
+  if (transform === 0) return "0 DEG"
+  if (transform === 1) return "90 DEG"
+  if (transform === 2) return "180 DEG"
+  if (transform === 3) return "270 DEG"
+  if (transform === 4) return "FLIPPED"
+  if (transform === 5) return "FLIP 90"
+  if (transform === 6) return "FLIP 180"
+  return "FLIP 270"
 }
 
 function cycleMode(output: DisplayOutput, delta: number): string {
@@ -79,7 +79,7 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
   const [saveName, setSaveName] = createState("")
   const [dirty, setDirty] = createState(false)
   const [busy, setBusy] = createState(false)
-  const [status, setStatus] = createState("Drag outputs to rearrange them, then apply or save the draft.")
+  const [status, setStatus] = createState("LAYOUT::READY")
 
   function resetDraft(profile: DisplayProfile, nextDirty: boolean): void {
     const cloned = cloneProfile(profile)
@@ -134,10 +134,10 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
   })
   const canSave = createMemo(() => !busy() && draft() != null && saveName().trim().length > 0)
   const rotationOptions = createMemo(() => ROTATION_OPTIONS)
-  const dirtyLabel = dirty((value) => value ? "Draft has unapplied changes." : "Draft matches current outputs.")
+  const dirtyLabel = dirty((value) => value ? "DIRTY" : "CURRENT")
   const outputCountLabel = createMemo(() => {
     const count = draft()?.outputs.length ?? 0
-    return count === 1 ? "1 output" : `${count} outputs`
+    return count === 1 ? "1 OUTPUT" : `${count} OUTPUTS`
   })
 
   function updateDraft(updater: (profile: DisplayProfile) => DisplayProfile, message?: string): void {
@@ -158,7 +158,7 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
     setSelectedConnector(selectConnector(cloned, selectedConnector()))
     setSaveName(profile.name)
     setDirty(true)
-    setStatus(`Loaded profile: ${profile.name}`)
+    setStatus(`PROFILE::LOADED ${profile.name}`)
   }
 
   async function handleApply(): Promise<void> {
@@ -171,9 +171,9 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
 
     if (result.ok) {
       setDirty(false)
-      setStatus("Applied display layout.")
+      setStatus("APPLY::OK")
     } else {
-      setStatus(result.error ?? "Failed to apply display layout.")
+      setStatus(result.error ? `APPLY::FAIL ${result.error}` : "APPLY::FAIL")
     }
   }
 
@@ -187,9 +187,9 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
     setBusy(false)
 
     if (result.ok) {
-      setStatus(`Saved profile: ${name}`)
+      setStatus(`SAVE::OK ${name}`)
     } else {
-      setStatus(result.error ?? "Failed to save display profile.")
+      setStatus(result.error ? `SAVE::FAIL ${result.error}` : "SAVE::FAIL")
     }
   }
 
@@ -198,11 +198,11 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
     setBusy(true)
     await props.onRefresh()
     setBusy(false)
-    setStatus("Refreshed current monitor state.")
+    setStatus("REFRESH::OK")
   }
 
   const profileCountLabel = props.savedProfiles((profiles) =>
-    profiles.length > 0 ? `${profiles.length} saved` : "No saved profiles",
+    profiles.length > 0 ? `${profiles.length} SAVED` : "NO PROFILES",
   )
 
   return (
@@ -218,22 +218,22 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
               const current = props.currentProfile()
               if (!current) return
               resetDraft(current, false)
-              setStatus("Reset draft to current layout.")
+              setStatus("RESET::CURRENT")
             }}
           >
-            <label label="Current" halign={Gtk.Align.START} xalign={0} />
+            <label label="CURRENT" halign={Gtk.Align.START} xalign={0} />
           </button>
           <button
             class="DisplayPresetButton"
-            onClicked={() => updateDraft(applyHorizontalPreset, "Applied horizontal preset to draft.")}
+            onClicked={() => updateDraft(applyHorizontalPreset, "PRESET::HORIZONTAL")}
           >
-            <label label="Horizontal" halign={Gtk.Align.START} xalign={0} />
+            <label label="HORIZONTAL" halign={Gtk.Align.START} xalign={0} />
           </button>
           <button
             class="DisplayPresetButton"
-            onClicked={() => updateDraft(applySwapHorizontalPreset, "Swapped the draft's horizontal order.")}
+            onClicked={() => updateDraft(applySwapHorizontalPreset, "PRESET::SWAP")}
           >
-            <label label="Swap Left/Right" halign={Gtk.Align.START} xalign={0} />
+            <label label="SWAP" halign={Gtk.Align.START} xalign={0} />
           </button>
           <button
             class="DisplayPresetButton"
@@ -242,11 +242,11 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
               if (!output) return
               updateDraft(
                 (profile) => applySingleOutputPreset(profile, output.connector),
-                `Kept only ${output.connector} enabled in the draft.`,
+                `ONLY::${output.connector}`,
               )
             }}
           >
-            <label label="Single Output" halign={Gtk.Align.START} xalign={0} />
+            <label label="SINGLE" halign={Gtk.Align.START} xalign={0} />
           </button>
         </box>
 
@@ -265,7 +265,7 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
                     <label class="DisplayProfileName" label={profile.name} halign={Gtk.Align.START} xalign={0} />
                     <label
                       class="DisplayProfileMeta"
-                      label={`${profile.outputs.filter((output) => output.enabled).length} active outputs`}
+                      label={`${profile.outputs.filter((output) => output.enabled).length} ACTIVE`}
                       halign={Gtk.Align.START}
                       xalign={0}
                     />
@@ -299,7 +299,7 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
 
         <box class="DisplayActions" spacing={8}>
           <button class="DisplayActionButton" onClicked={handleRefresh}>
-            <label label="Refresh" />
+            <label label="REFRESH" />
           </button>
           <button
             class="DisplayActionButton"
@@ -308,26 +308,26 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
               const current = props.currentProfile()
               if (!current) return
               resetDraft(current, false)
-              setStatus("Reverted draft to current layout.")
+              setStatus("REVERT::CURRENT")
             }}
           >
-            <label label="Revert" />
+            <label label="REVERT" />
           </button>
           <button class="DisplayActionButton DisplayActionButtonPrimary" sensitive={canApply} onClicked={handleApply}>
-            <label label={busy((value) => value ? "Applying..." : "Apply")} />
+            <label label={busy((value) => value ? "APPLYING" : "APPLY")} />
           </button>
           <entry
             class="DisplaySaveEntry"
             hexpand
             text={saveName}
-            placeholder_text="Profile name"
+            placeholder_text="PROFILE NAME"
             onChanged={(self: any) => setSaveName(self.text ?? "")}
             onActivate={() => {
               void handleSave()
             }}
           />
           <button class="DisplayActionButton" sensitive={canSave} onClicked={handleSave}>
-            <label label="Save" />
+            <label label="SAVE" />
           </button>
         </box>
 
@@ -338,13 +338,13 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
         <label class="DisplayInspectorTitle" label="INSPECTOR" halign={Gtk.Align.START} />
         <label
           class="DisplayInspectorConnector"
-          label={selectedOutput((output) => output?.connector || "No output selected")}
+          label={selectedOutput((output) => output?.connector || "NO OUTPUT")}
           halign={Gtk.Align.START}
           xalign={0}
         />
         <label
           class="DisplayInspectorMeta"
-          label={selectedOutput((output) => output?.description || "Select an output on the canvas or from a saved profile.")}
+          label={selectedOutput((output) => output?.description || "SELECT OUTPUT")}
           halign={Gtk.Align.START}
           xalign={0}
           wrap
@@ -359,11 +359,11 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
             if (!output) return
             updateDraft(
               (profile) => setOutputEnabled(profile, output.connector, !output.enabled),
-              `${output.connector} ${output.enabled ? "disabled" : "enabled"} in the draft.`,
+              `${output.connector}::${output.enabled ? "DISABLED" : "ENABLED"}`,
             )
           }}
         >
-          <label label={selectedOutput((output) => output?.enabled ? "Enabled" : "Disabled")} />
+          <label label={selectedOutput((output) => output?.enabled ? "ENABLED" : "DISABLED")} />
         </togglebutton>
 
         <box class="DisplayModePicker" orientation={Gtk.Orientation.VERTICAL} spacing={6}>
@@ -377,7 +377,7 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
                 if (!output) return
                 updateDraft(
                   (profile) => setOutputMode(profile, output.connector, cycleMode(output, -1)),
-                  `Changed ${output.connector} mode.`,
+                  `${output.connector}::MODE`,
                 )
               }}
             >
@@ -398,7 +398,7 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
                 if (!output) return
                 updateDraft(
                   (profile) => setOutputMode(profile, output.connector, cycleMode(output, 1)),
-                  `Changed ${output.connector} mode.`,
+                  `${output.connector}::MODE`,
                 )
               }}
             >
@@ -426,7 +426,7 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
                     if (!output) return
                     updateDraft(
                       (profile) => setOutputScale(profile, output.connector, scaleValue),
-                      `Changed ${output.connector} scale.`,
+                      `${output.connector}::SCALE`,
                     )
                   }}
                 >
@@ -457,7 +457,7 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
                     if (!output) return
                     updateDraft(
                       (profile) => setOutputTransform(profile, output.connector, transformValue),
-                      `Changed ${output.connector} rotation.`,
+                      `${output.connector}::ROTATION`,
                     )
                   }}
                 >
@@ -474,7 +474,7 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
           <label
             class="DisplayInspectorMeta"
             label={selectedOutput((output) =>
-              output ? `x=${output.x}, y=${output.y}` : "Drag a card to move it"
+              output ? `X=${output.x}, Y=${output.y}` : "DRAG CARD"
             )}
             halign={Gtk.Align.START}
             xalign={0}
@@ -482,7 +482,7 @@ export default function DisplayLayoutView(props: DisplayLayoutViewProps) {
           <label
             class="DisplayInspectorMeta"
             label={selectedOutput((output) =>
-              output ? `${output.logicalWidth} × ${output.logicalHeight} logical px` : ""
+              output ? `${output.logicalWidth} x ${output.logicalHeight} LOGICAL PX` : ""
             )}
             halign={Gtk.Align.START}
             xalign={0}
@@ -594,7 +594,7 @@ function DisplayCanvasFixed(props: DisplayCanvasFixedProps) {
       const refs = ensureCard(output.connector)
 
       refs.connectorLabel.label = output.connector
-      refs.metaLabel.label = output.enabled ? `${output.mode} / ${formatRotation(output.transform)}` : "disabled"
+      refs.metaLabel.label = output.enabled ? `${output.mode} / ${formatRotation(output.transform)}` : "DISABLED"
       refs.button.widthRequest = Math.max(84, Math.round(output.logicalWidth * layout.scale))
       refs.button.heightRequest = Math.max(54, Math.round(output.logicalHeight * layout.scale))
       refs.button.cssClasses = [
