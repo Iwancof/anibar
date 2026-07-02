@@ -14,7 +14,7 @@
 }
 
 @mixin popup-anim($root) {
-  #{$root}.open #{$root}Backdrop {
+  #{$root}.open .UiBackdrop {
     animation: backdrop-fade-in 200ms ease-out forwards;
   }
 
@@ -22,7 +22,7 @@
     @content;
   }
 
-  #{$root}.closing #{$root}Backdrop {
+  #{$root}.closing .UiBackdrop {
     animation: backdrop-fade-out 200ms ease-in forwards;
   }
 

@@ -6,12 +6,6 @@ window.Launcher {
   font-family: $font-family;
 }
 
-.LauncherBackdrop {
-  background: transparent;
-  border: none;
-  padding: 0;
-}
-
 .LauncherPanel {
   background: rgba(12, 14, 20, 0.82);
   border: 1px solid rgba($colors-accent, 0.2);

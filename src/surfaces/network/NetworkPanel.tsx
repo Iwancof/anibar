@@ -1,4 +1,3 @@
-import app from "ags/gtk4/app"
 import { Astal, Gdk, Gtk } from "ags/gtk4"
 import type { Accessor } from "gnim"
 
@@ -13,7 +12,8 @@ import type { ConnectionsSnapshot } from "../../runtime/connections-source.ts"
 import type { FlowEntry } from "../../runtime/netmon-source.ts"
 import type { LogEntry } from "../../runtime/netmon-source.ts"
 
-import { closeNetworkPopup } from "../../app/network-controller.ts"
+import { closeNetworkPopup } from "../../app/controllers.ts"
+import PopupShell from "../../shared/ui/PopupShell.tsx"
 import HeaderSection from "./HeaderSection.tsx"
 import IdentitySection from "./IdentitySection.tsx"
 import BandwidthSection from "./BandwidthSection.tsx"
@@ -43,81 +43,59 @@ export interface NetworkPanelProps {
 }
 
 export default function NetworkPanel(props: NetworkPanelProps) {
-  const { TOP, LEFT, RIGHT, BOTTOM } = Astal.WindowAnchor
-
   return (
-    <window
+    <PopupShell
       name={`network-popup:${props.monitor}`}
-      class="NpWindow"
-      visible={false}
-      application={app}
+      windowClass="NpWindow"
       gdkmonitor={props.gdkmonitor}
-      anchor={TOP | LEFT | RIGHT | BOTTOM}
       exclusivity={Astal.Exclusivity.NORMAL}
       keymode={Astal.Keymode.ON_DEMAND}
       layer={Astal.Layer.TOP}
-      onRealize={(self: any) => {
-        const keyCtrl = new Gtk.EventControllerKey()
-        keyCtrl.connect("key-pressed", (_ctrl: any, keyval: number) => {
-          if (keyval === Gdk.KEY_Escape) {
-            closeNetworkPopup()
-            return true
-          }
-          return false
-        })
-        self.add_controller(keyCtrl)
-      }}
+      contentHalign={Gtk.Align.END}
+      contentValign={Gtk.Align.FILL}
+      contentSpacing={6}
+      onClose={closeNetworkPopup}
     >
-      <overlay>
-        <button class="NpBackdrop" hexpand vexpand onClicked={closeNetworkPopup} />
-        <box
-          $type="overlay"
-          halign={Gtk.Align.END}
-          valign={Gtk.Align.FILL}
-          spacing={6}
-        >
-          {/* 左パネル: メイン情報 + Flows/Log */}
-          <box class="NpPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={520} vexpand>
-            <HeaderSection />
-            <box class="NpContent" orientation={Gtk.Orientation.VERTICAL} spacing={0}>
-              <IdentitySection wifiSnapshot={props.wifiSnapshot} />
-              <DnsSection dnsSnapshot={props.dnsSnapshot} />
-              <BandwidthSection bandwidthSnapshot={props.bandwidthSnapshot} />
-              <box spacing={8}>
-                <box hexpand><QualitySection qualitySnapshot={props.qualitySnapshot} /></box>
-              </box>
-              <box spacing={8}>
-                <box hexpand><LatencySection latencySnapshot={props.latencySnapshot} /></box>
-              </box>
-              <box class="NpCompactRow" spacing={12}>
-                <box hexpand><SessionSection sessionSnapshot={props.sessionSnapshot} /></box>
-                <box hexpand><ConnectionsSection connectionsSnapshot={props.connectionsSnapshot} /></box>
-              </box>
-            </box>
-            <TabArea
-              flows={props.flows}
-              logs={props.logs}
-            />
+      {/* 左パネル: メイン情報 + Flows/Log */}
+      <box class="NpPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={520} vexpand>
+        <HeaderSection />
+        <box class="NpContent" orientation={Gtk.Orientation.VERTICAL} spacing={0}>
+          <IdentitySection wifiSnapshot={props.wifiSnapshot} />
+          <DnsSection dnsSnapshot={props.dnsSnapshot} />
+          <BandwidthSection bandwidthSnapshot={props.bandwidthSnapshot} />
+          <box spacing={8}>
+            <box hexpand><QualitySection qualitySnapshot={props.qualitySnapshot} /></box>
           </box>
-          {/* 右パネル: APs 専用 */}
-          <box class="NpApPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={380} vexpand>
-            <box class="NpApPanelHeader" spacing={6}>
-              <SectionHeader label="ACCESS POINTS" />
-            </box>
-            <Gtk.ScrolledWindow
-              class="NpApPanelScroll"
-              vscrollbarPolicy={Gtk.PolicyType.AUTOMATIC}
-              hscrollbarPolicy={Gtk.PolicyType.NEVER}
-              vexpand
-            >
-              <WifiTab
-                wifiSnapshot={props.wifiSnapshot}
-                onConnect={props.onConnect}
-              />
-            </Gtk.ScrolledWindow>
+          <box spacing={8}>
+            <box hexpand><LatencySection latencySnapshot={props.latencySnapshot} /></box>
+          </box>
+          <box class="NpCompactRow" spacing={12}>
+            <box hexpand><SessionSection sessionSnapshot={props.sessionSnapshot} /></box>
+            <box hexpand><ConnectionsSection connectionsSnapshot={props.connectionsSnapshot} /></box>
           </box>
         </box>
-      </overlay>
-    </window>
+        <TabArea
+          flows={props.flows}
+          logs={props.logs}
+        />
+      </box>
+      {/* 右パネル: APs 専用 */}
+      <box class="NpApPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={380} vexpand>
+        <box class="NpApPanelHeader" spacing={6}>
+          <SectionHeader label="ACCESS POINTS" />
+        </box>
+        <Gtk.ScrolledWindow
+          class="NpApPanelScroll"
+          vscrollbarPolicy={Gtk.PolicyType.AUTOMATIC}
+          hscrollbarPolicy={Gtk.PolicyType.NEVER}
+          vexpand
+        >
+          <WifiTab
+            wifiSnapshot={props.wifiSnapshot}
+            onConnect={props.onConnect}
+          />
+        </Gtk.ScrolledWindow>
+      </box>
+    </PopupShell>
   )
 }

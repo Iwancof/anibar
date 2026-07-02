@@ -5,6 +5,20 @@
   font-family: $font-icon, $font-family;
 }
 
+.UiBackdrop {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.SwipeDash .UiBackdrop {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.WsOverview .UiBackdrop {
+  background: rgba($popup-backdrop, 0.5);
+}
+
 .UiSectionHeader {
   margin-bottom: 4px;
 }

@@ -21,11 +21,6 @@ window.NotifCenter {
   background: transparent;
 }
 
-.NotifCenterBackdrop {
-  background: transparent;
-  border: none;
-}
-
 @include popup-anim(".NotifCenter") {
   animation: popup-slide-in 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

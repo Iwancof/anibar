@@ -7,11 +7,6 @@ window.WsOverview {
   font-family: $font-family;
 }
 
-.WsBackdrop {
-  background: rgba($popup-backdrop, 0.5);
-  border: none;
-}
-
 .WsPanel {
   background: rgba(12, 14, 20, 0.88);
   border: 1px solid rgba($colors-accent, 0.2);

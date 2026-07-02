@@ -1,4 +1,3 @@
-import app from "ags/gtk4/app"
 import { Astal, Gdk, Gtk } from "ags/gtk4"
 import type { Accessor } from "gnim"
 
@@ -16,8 +15,9 @@ import type { PwsaveStatus, MeasureName, LidAction } from "../../modules/power-s
 import type { FlowEntry, LogEntry } from "../../runtime/netmon-source.ts"
 import type { PlayerSource } from "../../runtime/player-source.ts"
 
-import { closeDashboardMode } from "../../app/dashboard-mode-controller.ts"
+import { closeDashboardMode } from "../../app/controllers.ts"
 import PlayerControls from "../../shared/ui/PlayerControls.tsx"
+import PopupShell from "../../shared/ui/PopupShell.tsx"
 import WideSpectrum from "./WideSpectrum.tsx"
 
 // Network sections (reuse from network panel)
@@ -63,89 +63,78 @@ export interface DashboardModeProps {
 }
 
 export default function DashboardMode(props: DashboardModeProps) {
-  const { TOP, LEFT, RIGHT, BOTTOM } = Astal.WindowAnchor
-
   return (
-    <window
+    <PopupShell
       name={`dashboard-mode:${props.monitor}`}
-      class="DmWindow"
-      visible={false}
-      application={app}
+      windowClass="DmWindow"
       gdkmonitor={props.gdkmonitor}
-      anchor={TOP | LEFT | RIGHT | BOTTOM}
       exclusivity={Astal.Exclusivity.IGNORE}
       keymode={Astal.Keymode.EXCLUSIVE}
       layer={Astal.Layer.OVERLAY}
-      onRealize={(self: any) => {
-        const keyCtrl = new Gtk.EventControllerKey()
-        keyCtrl.connect("key-pressed", (_ctrl: any, keyval: number) => {
-          if (keyval === Gdk.KEY_Escape) {
-            closeDashboardMode()
-            return true
-          }
-          return false
-        })
-        self.add_controller(keyCtrl)
-      }}
+      contentClass="DmBackdrop"
+      contentOrientation={Gtk.Orientation.VERTICAL}
+      contentHalign={Gtk.Align.FILL}
+      contentValign={Gtk.Align.FILL}
+      contentHexpand
+      contentVexpand
+      onClose={closeDashboardMode}
     >
-      <box class="DmBackdrop" orientation={Gtk.Orientation.VERTICAL} spacing={0} hexpand vexpand>
-        {/* 上部: 時計 */}
-        <box class="DmClockArea" halign={Gtk.Align.CENTER} valign={Gtk.Align.START}>
-          <label class="DmClock" label={props.clock} />
-        </box>
+      {/* 上部: 時計 */}
+      <box class="DmClockArea" halign={Gtk.Align.CENTER} valign={Gtk.Align.START}>
+        <label class="DmClock" label={props.clock} />
+      </box>
 
-        {/* 音楽 + スペクトラム */}
-        <box class="DmMusicArea" orientation={Gtk.Orientation.VERTICAL} spacing={8} halign={Gtk.Align.CENTER}>
-          <WideSpectrum bars={props.spectrumBars} />
-          <box spacing={12} halign={Gtk.Align.CENTER}>
-            <label class="DmMusicTitle" label={props.player.label} />
-            <PlayerControls
-              class="DmMusicControls"
-              isPlaying={props.player.isPlaying}
-              onPrevious={() => props.player.previous()}
-              onPlayPause={() => props.player.playPause()}
-              onNext={() => props.player.next()}
-            />
-          </box>
-        </box>
-
-        {/* メイン: 左=ネットワーク 右=バッテリー */}
-        <box class="DmMainArea" spacing={16} hexpand vexpand>
-          {/* 左: ネットワーク */}
-          <box class="DmNetPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={520} vexpand>
-            <HeaderSection />
-            <box orientation={Gtk.Orientation.VERTICAL} spacing={0}>
-              <IdentitySection wifiSnapshot={props.wifiSnapshot} />
-              <DnsSection dnsSnapshot={props.dnsSnapshot} />
-              <BandwidthSection bandwidthSnapshot={props.bandwidthSnapshot} />
-              <box spacing={8}>
-                <box hexpand><QualitySection qualitySnapshot={props.qualitySnapshot} /></box>
-              </box>
-              <box spacing={8}>
-                <box hexpand><LatencySection latencySnapshot={props.latencySnapshot} /></box>
-              </box>
-              <box spacing={12}>
-                <box hexpand><SessionSection sessionSnapshot={props.sessionSnapshot} /></box>
-                <box hexpand><ConnectionsSection connectionsSnapshot={props.connectionsSnapshot} /></box>
-              </box>
-            </box>
-            <TabArea flows={props.flows} logs={props.logs} />
-          </box>
-
-          {/* 右: バッテリー */}
-          <box class="DmBatPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={480} vexpand>
-            <BatteryHudView
-              snapshot={props.batterySnapshot}
-              systemStats={props.systemStats}
-              pwsaveStatus={props.pwsaveStatus}
-              lidAction={props.lidAction}
-              onToggleMeasure={props.onToggleMeasure}
-              onToggleAll={props.onToggleAll}
-              onSetLidAction={props.onSetLidAction}
-            />
-          </box>
+      {/* 音楽 + スペクトラム */}
+      <box class="DmMusicArea" orientation={Gtk.Orientation.VERTICAL} spacing={8} halign={Gtk.Align.CENTER}>
+        <WideSpectrum bars={props.spectrumBars} />
+        <box spacing={12} halign={Gtk.Align.CENTER}>
+          <label class="DmMusicTitle" label={props.player.label} />
+          <PlayerControls
+            class="DmMusicControls"
+            isPlaying={props.player.isPlaying}
+            onPrevious={() => props.player.previous()}
+            onPlayPause={() => props.player.playPause()}
+            onNext={() => props.player.next()}
+          />
         </box>
       </box>
-    </window>
+
+      {/* メイン: 左=ネットワーク 右=バッテリー */}
+      <box class="DmMainArea" spacing={16} hexpand vexpand>
+        {/* 左: ネットワーク */}
+        <box class="DmNetPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={520} vexpand>
+          <HeaderSection />
+          <box orientation={Gtk.Orientation.VERTICAL} spacing={0}>
+            <IdentitySection wifiSnapshot={props.wifiSnapshot} />
+            <DnsSection dnsSnapshot={props.dnsSnapshot} />
+            <BandwidthSection bandwidthSnapshot={props.bandwidthSnapshot} />
+            <box spacing={8}>
+              <box hexpand><QualitySection qualitySnapshot={props.qualitySnapshot} /></box>
+            </box>
+            <box spacing={8}>
+              <box hexpand><LatencySection latencySnapshot={props.latencySnapshot} /></box>
+            </box>
+            <box spacing={12}>
+              <box hexpand><SessionSection sessionSnapshot={props.sessionSnapshot} /></box>
+              <box hexpand><ConnectionsSection connectionsSnapshot={props.connectionsSnapshot} /></box>
+            </box>
+          </box>
+          <TabArea flows={props.flows} logs={props.logs} />
+        </box>
+
+        {/* 右: バッテリー */}
+        <box class="DmBatPanel" orientation={Gtk.Orientation.VERTICAL} widthRequest={480} vexpand>
+          <BatteryHudView
+            snapshot={props.batterySnapshot}
+            systemStats={props.systemStats}
+            pwsaveStatus={props.pwsaveStatus}
+            lidAction={props.lidAction}
+            onToggleMeasure={props.onToggleMeasure}
+            onToggleAll={props.onToggleAll}
+            onSetLidAction={props.onSetLidAction}
+          />
+        </box>
+      </box>
+    </PopupShell>
   )
 }

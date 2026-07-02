@@ -1,4 +1,3 @@
-import app from "ags/gtk4/app"
 import { Astal, Gdk, Gtk } from "ags/gtk4"
 import { createMemo, type Accessor } from "gnim"
 
@@ -9,6 +8,7 @@ import { formatDurationMinutes, timeAgo } from "../../shared/format.ts"
 import Icon from "../../shared/ui/Icon.tsx"
 import NotificationCard from "../../shared/ui/NotificationCard.tsx"
 import PlayerControls from "../../shared/ui/PlayerControls.tsx"
+import PopupShell from "../../shared/ui/PopupShell.tsx"
 import SectionHeader from "../../shared/ui/SectionHeader.tsx"
 import { ICONS } from "../../shared/ui/icons.ts"
 
@@ -139,61 +139,39 @@ function PlayerSection(props: { player: PlayerSource }) {
 // ── Window ─────────────────────────────────
 
 export default function SwipeDashboard(props: SwipeDashboardProps) {
-  const { TOP, LEFT, RIGHT, BOTTOM } = Astal.WindowAnchor
-
   return (
-    <window
+    <PopupShell
       name={`swipe-dashboard:${props.monitor}`}
-      class="SwipeDash"
-      visible={false}
-      application={app}
+      windowClass="SwipeDash"
       gdkmonitor={props.gdkmonitor}
-      anchor={TOP | LEFT | RIGHT | BOTTOM}
       exclusivity={Astal.Exclusivity.IGNORE}
       keymode={Astal.Keymode.ON_DEMAND}
       layer={Astal.Layer.OVERLAY}
-      onRealize={(self: any) => {
-        const keyCtrl = new Gtk.EventControllerKey()
-        keyCtrl.connect("key-pressed", (_ctrl: any, keyval: number) => {
-          if (keyval === Gdk.KEY_Escape) {
-            props.onClose()
-            return true
-          }
-          return false
-        })
-        self.add_controller(keyCtrl)
-      }}
+      contentHalign={Gtk.Align.END}
+      contentValign={Gtk.Align.FILL}
+      onClose={props.onClose}
     >
-      <overlay>
-        <button class="SwipeDashBackdrop" hexpand vexpand onClicked={props.onClose} />
-        <box
-          $type="overlay"
-          halign={Gtk.Align.END}
-          valign={Gtk.Align.FILL}
-        >
-          <box class="SwipeDashPanel" orientation={Gtk.Orientation.VERTICAL} spacing={12}>
-            <box class="SwipeDashHeader" spacing={8}>
-              <label class="SwipeDashTitle" label="Dashboard" hexpand halign={Gtk.Align.START} />
-              <button class="SwipeDashCloseBtn" onClicked={props.onClose}>
-                <Icon icon={ICONS.close} />
-              </button>
-            </box>
-
-            <Gtk.ScrolledWindow
-              class="SwipeDashScroll"
-              hscrollbarPolicy={Gtk.PolicyType.NEVER}
-              vscrollbarPolicy={Gtk.PolicyType.AUTOMATIC}
-              vexpand
-            >
-              <box orientation={Gtk.Orientation.VERTICAL} spacing={12}>
-                <BatterySection snapshot={props.batterySnapshot} />
-                <NotificationSection notifications={props.notifications} />
-                <PlayerSection player={props.player} />
-              </box>
-            </Gtk.ScrolledWindow>
-          </box>
+      <box class="SwipeDashPanel" orientation={Gtk.Orientation.VERTICAL} spacing={12}>
+        <box class="SwipeDashHeader" spacing={8}>
+          <label class="SwipeDashTitle" label="Dashboard" hexpand halign={Gtk.Align.START} />
+          <button class="SwipeDashCloseBtn" onClicked={props.onClose}>
+            <Icon icon={ICONS.close} />
+          </button>
         </box>
-      </overlay>
-    </window>
+
+        <Gtk.ScrolledWindow
+          class="SwipeDashScroll"
+          hscrollbarPolicy={Gtk.PolicyType.NEVER}
+          vscrollbarPolicy={Gtk.PolicyType.AUTOMATIC}
+          vexpand
+        >
+          <box orientation={Gtk.Orientation.VERTICAL} spacing={12}>
+            <BatterySection snapshot={props.batterySnapshot} />
+            <NotificationSection notifications={props.notifications} />
+            <PlayerSection player={props.player} />
+          </box>
+        </Gtk.ScrolledWindow>
+      </box>
+    </PopupShell>
   )
 }

@@ -8,11 +8,6 @@
   background: transparent;
 }
 
-.BatPopupBackdrop {
-  background: transparent;
-  border: none;
-}
-
 @include popup-anim(".BatPopup") {
   animation: popup-slide-in 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards,
              glow-pulse 3s ease-in-out 400ms infinite;

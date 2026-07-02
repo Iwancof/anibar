@@ -5,7 +5,7 @@ import type { Accessor } from "gnim"
 import type { WorkspaceSnapshot, WorkspaceInfo } from "../../modules/workspace/domain.ts"
 import { getDisplayLayoutSource } from "../../runtime/display-layout-source.ts"
 import { switchToWorkspace } from "../../runtime/workspace-source.ts"
-import { toggleDashboardVisibility } from "../../app/dashboard-controller.ts"
+import { toggleWorkspaceVisibility } from "../../app/controllers.ts"
 import TabBar from "../../shared/ui/TabBar.tsx"
 import DisplayLayoutView from "./DisplayLayoutView.tsx"
 
@@ -71,7 +71,7 @@ export default function WorkspaceView(props: WorkspaceViewProps) {
                 const w = ws()
                 if (w.id > 0) {
                   switchToWorkspace(w.id)
-                  toggleDashboardVisibility()
+                  toggleWorkspaceVisibility()
                 }
               }} />
             )

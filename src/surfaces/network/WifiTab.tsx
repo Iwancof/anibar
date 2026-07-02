@@ -1,8 +1,9 @@
-import { Gdk, Gtk } from "ags/gtk4"
+import { Gtk } from "ags/gtk4"
 import { createMemo, createState } from "gnim"
 import type { Accessor } from "gnim"
 import { signalColorClass, signalIcon, signalLevel, type WifiSnapshot } from "../../modules/wifi/domain.ts"
 import { ICONS } from "../../shared/ui/icons.ts"
+import { KEY_ESCAPE } from "../../shared/ui/key-events.ts"
 
 const MAX_APS = 50
 
@@ -65,7 +66,7 @@ export default function WifiTab(props: WifiTabProps) {
       onRealize={(self: Gtk.Widget) => {
         const keyCtrl = new Gtk.EventControllerKey()
         keyCtrl.connect("key-pressed", (_ctrl: any, keyval: number) => {
-          if (keyval === Gdk.KEY_Escape && selectedAp() >= 0) {
+          if (keyval === KEY_ESCAPE && selectedAp() >= 0) {
             setSelectedAp(-1)
             return true
           }
