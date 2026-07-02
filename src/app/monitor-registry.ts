@@ -43,6 +43,17 @@ export interface MonitorRegistry {
   readonly registry: ReadonlyMap<string, MonitorEntry>
 }
 
+let activeRegistry: MonitorRegistry | null = null
+
+export function setActiveRegistry(registry: MonitorRegistry | null): void {
+  activeRegistry = registry
+}
+
+export function isConnectorAvailable(connector: string): boolean {
+  if (!activeRegistry) return true
+  return activeRegistry.registry.get(connector)?.available === true
+}
+
 function describeWindow(window: Gtk.Window): string {
   try {
     return `${window.name ?? "<noname>"} (realized=${window.get_realized()}, visible=${window.visible})`
