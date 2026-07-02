@@ -4,7 +4,7 @@ import app from "ags/gtk4/app"
 import { Gdk, Gtk } from "ags/gtk4"
 
 import style from "../../style.scss"
-import { createRuntimeAppModules, barIndicators } from "../modules/index.ts"
+import { createRuntimeAppModules } from "../modules/index.ts"
 import { createSystemStatsSource } from "../runtime/system-stats-source.ts"
 import { createWorkspaceSource } from "../runtime/workspace-source.ts"
 import { createImeSource } from "../runtime/ime-source.ts"
@@ -64,7 +64,6 @@ export function startMainApp() {
   const connectionsSource = createConnectionsSource()
   const flowsSource = createFlowsSource()
   const logSource = createLogSource()
-  const indicators = barIndicators(modules)
 
   function createMonitorWindows(
     gdkmonitor: Gdk.Monitor,
@@ -76,7 +75,7 @@ export function startMainApp() {
         gdkmonitor,
         monitor,
         clock: barClock,
-        indicators,
+        volumeSnapshot: modules.volume.snapshot,
         spectrumBars: spectrumSource.bars,
         player: playerSource,
         networkSnapshot: modules.network.snapshot,
@@ -145,6 +144,8 @@ export function startMainApp() {
         batterySnapshot: modules.battery.snapshot,
         notifications: notificationSource,
         player: playerSource,
+        pwsaveAllEnabled: pwsaveSource.allEnabled,
+        onToggleAllPowerSave: pwsaveSource.toggleAll,
         onClose: () => {
           closeSwipeDashboard()
         },

@@ -1,15 +1,19 @@
 import { Astal, Gdk, Gtk } from "ags/gtk4"
 import { createMemo, type Accessor } from "gnim"
 
-import { estimateBatteryMinutes, type BatterySnapshot } from "../../modules/battery/domain.ts"
+import { batteryTone, estimateBatteryMinutes, type BatterySnapshot } from "../../modules/battery/domain.ts"
 import type { NotificationSource, NotificationItem } from "../../runtime/notification-source.ts"
 import type { PlayerSource } from "../../runtime/player-source.ts"
-import { formatDurationMinutes, timeAgo } from "../../shared/format.ts"
+import { DIM } from "../../shared/theme-tokens.ts"
+import { formatDurationMinutes, placeholder, timeAgo } from "../../shared/format.ts"
 import Icon from "../../shared/ui/Icon.tsx"
 import NotificationCard from "../../shared/ui/NotificationCard.tsx"
+import PanelHeader from "../../shared/ui/PanelHeader.tsx"
 import PlayerControls from "../../shared/ui/PlayerControls.tsx"
 import PopupShell from "../../shared/ui/PopupShell.tsx"
 import SectionHeader from "../../shared/ui/SectionHeader.tsx"
+import StatTile, { type StatTileTone } from "../../shared/ui/StatTile.tsx"
+import ToggleRow from "../../shared/ui/ToggleRow.tsx"
 import { ICONS } from "../../shared/ui/icons.ts"
 
 // ── Props ──────────────────────────────────
@@ -20,69 +24,120 @@ export interface SwipeDashboardProps {
   batterySnapshot: Accessor<BatterySnapshot | null>
   notifications: NotificationSource
   player: PlayerSource
+  pwsaveAllEnabled: Accessor<boolean>
+  onToggleAllPowerSave: (active: boolean) => void
   onClose: () => void
 }
 
 // ── Battery section ────────────────────────
 
+function tileTone(snapshot: BatterySnapshot | null): StatTileTone {
+  switch (batteryTone(snapshot)) {
+    case "healthy":
+      return snapshot?.state === "charging" ? "charge" : "good"
+    case "warning":
+      return "warn"
+    case "critical":
+      return "crit"
+    case "muted":
+      return "muted"
+  }
+}
+
+function formatDrawWatts(value: number | null | undefined): string {
+  if (value == null || !Number.isFinite(value)) return "—"
+  const digits = Math.abs(value) >= 10 ? 0 : 1
+  return value.toFixed(digits)
+}
+
 function BatterySection(props: { snapshot: Accessor<BatterySnapshot | null> }) {
-  const label = createMemo(() => {
+  const percent = createMemo(() => {
     const s = props.snapshot()
-    if (!s || !s.present) return "No battery"
-    const pct = `${Math.round(s.percent)}%`
-    const state =
-      s.state === "charging" ? "Charging"
-        : s.state === "discharging" ? "Discharging"
-          : s.state === "full" ? "Full"
-            : s.state === "not-charging" ? "On AC"
-              : "Unknown"
-    return `${pct} \u2022 ${state}`
+    return s && s.present ? `${Math.round(s.percent)}` : "—"
   })
 
-  const eta = createMemo(() => {
+  const timeLeft = createMemo(() => {
     const s = props.snapshot()
-    if (!s || !s.present) return ""
+    if (!s || !s.present) return "—"
     const mins = estimateBatteryMinutes(s)
-    return mins == null ? "" : `${formatDurationMinutes(mins)} remaining`
+    return mins == null || !Number.isFinite(mins) || mins <= 0
+      ? placeholder(null)
+      : formatDurationMinutes(mins)
   })
 
-  const toneClass = createMemo(() => {
-    const s = props.snapshot()
-    if (!s || !s.present) return "SwipeDashSection"
-    if (s.percent <= 15 && s.state === "discharging") return "SwipeDashSection SwipeDashCritical"
-    if (s.percent <= 30 && s.state === "discharging") return "SwipeDashSection SwipeDashWarning"
-    return "SwipeDashSection"
-  })
+  const draw = createMemo(() => formatDrawWatts(props.snapshot()?.powerNowW))
+  const drawVisible = createMemo(() => props.snapshot()?.powerNowW != null)
+  const tone = createMemo(() => tileTone(props.snapshot()))
 
   return (
-    <box class={toneClass} orientation={Gtk.Orientation.VERTICAL} spacing={4}>
-      <SectionHeader label="BATTERY" />
-      <label class="SwipeDashSectionBody" label={label} halign={Gtk.Align.START} />
-      <label class="SwipeDashSectionMeta" label={eta} halign={Gtk.Align.START} />
+    <box class="GlanceSection" orientation={Gtk.Orientation.VERTICAL} spacing={8}>
+      <SectionHeader label="POWER" />
+      <box class="SwipeDashStatRow" spacing={8}>
+        <StatTile label="BAT" value={percent} unit="%" tone={tone} />
+        <StatTile label="TIME LEFT" value={timeLeft} tone="normal" />
+        <box visible={drawVisible} hexpand>
+          <StatTile label="DRAW" value={draw} unit="W" tone="normal" />
+        </box>
+      </box>
+    </box>
+  )
+}
+
+// ── Media section ──────────────────────────
+
+function MediaSection(props: { player: PlayerSource }) {
+  const { player } = props
+  const active = createMemo(() => player.snapshot() != null)
+  const idle = createMemo(() => !active())
+
+  return (
+    <box class="GlanceSection" orientation={Gtk.Orientation.VERTICAL} spacing={8}>
+      <SectionHeader label="MEDIA" />
+      <box class="SwipeDashMediaRow" spacing={8} visible={active}>
+        <label
+          class="SwipeDashMediaTrack"
+          label={player.label}
+          halign={Gtk.Align.START}
+          hexpand
+          maxWidthChars={30}
+          ellipsize={3}
+        />
+        <PlayerControls
+          isPlaying={player.isPlaying}
+          onPrevious={() => player.previous()}
+          onPlayPause={() => player.playPause()}
+          onNext={() => player.next()}
+        />
+      </box>
+      <label
+        class="SwipeDashEmptyRow"
+        label="MEDIA::IDLE"
+        visible={idle}
+        halign={Gtk.Align.FILL}
+      />
     </box>
   )
 }
 
 // ── Notification section ───────────────────
 
-const MAX_NOTIF = 3
+const MAX_NOTIF = 5
 
 function NotificationSection(props: { notifications: NotificationSource }) {
   const { notifications } = props
-  const countLabel = createMemo(() => {
-    const n = notifications.all().length
-    return n === 0 ? "No notifications" : `${n} total`
-  })
+  const emptyVisible = createMemo(() => notifications.all().length === 0)
 
   return (
-    <box class="SwipeDashSection" orientation={Gtk.Orientation.VERTICAL} spacing={6}>
-      <SectionHeader label="NOTIFICATIONS" meta={countLabel} />
+    <box class="GlanceSection" orientation={Gtk.Orientation.VERTICAL} spacing={8}>
+      <SectionHeader label="NOTIFICATIONS" />
       {Array.from({ length: MAX_NOTIF }).map((_, i) => {
         const item = createMemo((): NotificationItem | null => notifications.all()[i] ?? null)
         const visible = createMemo(() => item() != null)
         const urgency = createMemo(() => item()?.urgency ?? 1)
         const appName = createMemo(() => item()?.appName ?? "")
         const summary = createMemo(() => item()?.summary ?? "")
+        const body = createMemo(() => item()?.body ?? "")
+        const bodyVisible = createMemo(() => (item()?.body ?? "").length > 0)
         const time = createMemo(() => {
           const n = item()
           return n ? timeAgo(n.time) : ""
@@ -96,42 +151,43 @@ function NotificationSection(props: { notifications: NotificationSource }) {
             appName={appName}
             time={time}
             summary={summary}
+            body={body}
+            bodyVisible={bodyVisible}
           />
         )
       })}
+      <label
+        class="SwipeDashEmptyRow"
+        label="NO HISTORY"
+        visible={emptyVisible}
+        halign={Gtk.Align.FILL}
+      />
     </box>
   )
 }
 
-// ── Player section ─────────────────────────
+// ── Quick section ──────────────────────────
 
-function PlayerSection(props: { player: PlayerSource }) {
-  const { player } = props
-  const visible = createMemo(() => player.snapshot() != null)
-  const statusText = createMemo(() => {
-    const s = player.snapshot()
-    return s ? s.status : ""
-  })
-
+function QuickSection(props: {
+  notifications: NotificationSource
+  pwsaveAllEnabled: Accessor<boolean>
+  onToggleAllPowerSave: (active: boolean) => void
+}) {
   return (
-    <box class="SwipeDashSection" orientation={Gtk.Orientation.VERTICAL} spacing={6} visible={visible}>
-      <SectionHeader label="NOW PLAYING" />
-      <label
-        class="SwipeDashPlayerTrack"
-        label={player.label}
-        halign={Gtk.Align.START}
-        maxWidthChars={36}
-        ellipsize={3}
+    <box class="GlanceSection" orientation={Gtk.Orientation.VERTICAL} spacing={4}>
+      <SectionHeader label="QUICK" />
+      <ToggleRow
+        label="DND"
+        subLabel="NOTIF::MUTE"
+        active={props.notifications.dnd}
+        onToggle={props.notifications.setDnd}
       />
-      <box spacing={6}>
-        <label class="SwipeDashSectionMeta" label={statusText} hexpand halign={Gtk.Align.START} />
-        <PlayerControls
-          isPlaying={player.isPlaying}
-          onPrevious={() => player.previous()}
-          onPlayPause={() => player.playPause()}
-          onNext={() => player.next()}
-        />
-      </box>
+      <ToggleRow
+        label="ALL POWER SAVE"
+        subLabel="PWSAVE::ALL"
+        active={props.pwsaveAllEnabled}
+        onToggle={props.onToggleAllPowerSave}
+      />
     </box>
   )
 }
@@ -151,10 +207,14 @@ export default function SwipeDashboard(props: SwipeDashboardProps) {
       contentValign={Gtk.Align.FILL}
       onClose={props.onClose}
     >
-      <box class="SwipeDashPanel" orientation={Gtk.Orientation.VERTICAL} spacing={12}>
+      <box
+        class="SwipeDashPanel"
+        orientation={Gtk.Orientation.VERTICAL}
+        widthRequest={DIM["panel-side"]}
+      >
         <box class="SwipeDashHeader" spacing={8}>
-          <label class="SwipeDashTitle" label="Dashboard" hexpand halign={Gtk.Align.START} />
-          <button class="SwipeDashCloseBtn" onClicked={props.onClose}>
+          <PanelHeader class="SwipeDashPanelHeader" title="SYS::GLANCE" />
+          <button class="SwipeDashCloseBtn" onClicked={props.onClose} valign={Gtk.Align.CENTER}>
             <Icon icon={ICONS.close} />
           </button>
         </box>
@@ -165,10 +225,15 @@ export default function SwipeDashboard(props: SwipeDashboardProps) {
           vscrollbarPolicy={Gtk.PolicyType.AUTOMATIC}
           vexpand
         >
-          <box orientation={Gtk.Orientation.VERTICAL} spacing={12}>
+          <box class="SwipeDashContent" orientation={Gtk.Orientation.VERTICAL} spacing={14}>
             <BatterySection snapshot={props.batterySnapshot} />
+            <MediaSection player={props.player} />
             <NotificationSection notifications={props.notifications} />
-            <PlayerSection player={props.player} />
+            <QuickSection
+              notifications={props.notifications}
+              pwsaveAllEnabled={props.pwsaveAllEnabled}
+              onToggleAllPowerSave={props.onToggleAllPowerSave}
+            />
           </box>
         </Gtk.ScrolledWindow>
       </box>

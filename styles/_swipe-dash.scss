@@ -6,63 +6,75 @@ window.SwipeDash {
 }
 
 .SwipeDashPanel {
-  min-width: 350px;
-  background: $colors-panel;
-  border-left: 1px solid $colors-outline;
-  padding: 16px;
+  min-width: 380px;
+  background: $np-bg1;
+  border-left: 1px solid $np-border;
+  box-shadow: $popup-shadow;
 }
 
 .SwipeDashHeader {
-  margin-bottom: 4px;
+  border-bottom: 1px solid $np-border;
+  padding: 10px 12px 10px 16px;
 }
 
-.SwipeDashTitle {
-  color: $colors-text;
-  font-size: 18px;
-  font-weight: 800;
+.SwipeDashPanelHeader {
+  border-bottom: none;
+  padding: 0;
 }
 
 .SwipeDashCloseBtn {
-  background: $colors-surface;
-  border: 1px solid $colors-outline;
-  border-radius: 8px;
-  padding: 4px 10px;
-  color: $colors-muted;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: $radius-md;
+  padding: 3px 7px;
+  color: $np-text-sec;
+}
+
+.SwipeDashCloseBtn:hover,
+.SwipeDashCloseBtn:active {
+  border-color: rgba($np-cyan, 0.35);
+}
+
+.SwipeDashCloseBtn .UiIcon {
+  font-size: 15px;
 }
 
 .SwipeDashScroll {
-  min-width: 350px;
+  min-width: 380px;
 }
 
-.SwipeDashSection {
-  background: $colors-surface;
-  border: 1px solid $colors-outline;
-  border-radius: 14px;
-  padding: 14px;
+.SwipeDashContent {
+  padding: 14px 16px 16px;
 }
 
-.SwipeDashSectionBody {
-  color: $colors-text;
-  font-size: 16px;
-  font-weight: 700;
+.GlanceSection {
+  padding: 0;
 }
 
-.SwipeDashSectionMeta {
-  color: $colors-muted;
-  font-size: 12px;
+.SwipeDashStatRow {
+  min-height: 55px;
 }
 
-.SwipeDashCritical {
-  border-left: 3px solid $colors-critical;
+.SwipeDashMediaRow {
+  background: rgba($np-bg2, 0.55);
+  border: 1px solid $np-border;
+  border-radius: $radius-md;
+  padding: 8px 10px;
 }
 
-.SwipeDashWarning {
-  border-left: 3px solid $colors-warning;
-}
-
-// ── スワイプダッシュ プレイヤー ──────────────
-.SwipeDashPlayerTrack {
-  color: $colors-text;
-  font-size: 14px;
+.SwipeDashMediaTrack {
+  color: $np-text;
+  font-size: $fontsize-body;
   font-weight: 600;
+}
+
+.SwipeDashEmptyRow {
+  background: transparent;
+  border: 1px solid rgba($np-border, 0.55);
+  border-radius: $radius-md;
+  color: $np-text-sec;
+  font-family: $network-panel-font-family, $font-family;
+  font-size: $fontsize-dense;
+  letter-spacing: 0.10em;
+  padding: 7px 10px;
 }

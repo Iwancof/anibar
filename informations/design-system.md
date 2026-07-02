@@ -139,7 +139,7 @@ anatomy を固定する。**ModuleCard は正ではない**（旧世代、廃止
 | DashboardMode | 全画面 glance | 時計/player/net/power の複合 | 独自実装（共通コンポーネント必須） |
 | WorkspaceWindow | ws 一覧/display 編集 | ws cards / layout editor | 丸カード |
 | Launcher | コマンドパレット | 検索+結果 8 slots | — |
-| SwipeDashboard | **廃止候補**。W3 で再定義判断（quick command tray 案） | — | 現状の空カード列 |
+| SwipeDashboard | GLANCE パネル（採用） | power/media/notifications/quick toggles | Dashboard 見出し、空カード列 |
 
 ## 10. 構造・命名規約
 
