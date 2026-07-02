@@ -78,8 +78,15 @@ capture_preview() {
   # スクリーンショット取得
   grim -o "$monitor" "$output_file"
 
-  # AGS を終了
-  ags quit -i "$instance" 2>/dev/null || kill "$ags_pid" 2>/dev/null || true
+  # AGS を終了。ags quit が効かない場合、wrapper だけ kill すると
+  # 子の gjs が孤児化して残るので、子プロセスも明示的に落とす。
+  # (グローバルな pkill は本体 AGS を巻き込むため使わない)
+  ags quit -i "$instance" 2>/dev/null || true
+  sleep 0.5
+  if kill -0 "$ags_pid" 2>/dev/null; then
+    pkill -P "$ags_pid" 2>/dev/null || true
+    kill "$ags_pid" 2>/dev/null || true
+  fi
   wait "$ags_pid" 2>/dev/null || true
 
   if [[ -f "$output_file" ]]; then
