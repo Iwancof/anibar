@@ -5,6 +5,7 @@ import {
   formatBytesPerSecond,
   formatDurationMinutes,
   formatPercent,
+  placeholder,
 } from "../../src/shared/format.ts"
 
 test("formatPercent clamps values to 0..100", () => {
@@ -23,4 +24,10 @@ test("formatDurationMinutes renders short human labels", () => {
   assert.equal(formatDurationMinutes(15), "15m")
   assert.equal(formatDurationMinutes(60), "1h")
   assert.equal(formatDurationMinutes(125), "2h 5m")
+})
+
+test("placeholder renders empty data with the design-system dash", () => {
+  assert.equal(placeholder(null), "—")
+  assert.equal(placeholder(undefined), "—")
+  assert.equal(placeholder("hci0"), "hci0")
 })

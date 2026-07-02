@@ -6,6 +6,10 @@ export function formatPercent(value: number): string {
   return `${Math.round(clamp(value, 0, 100))}%`
 }
 
+export function placeholder(value: string | number | null | undefined): string {
+  return value == null ? "—" : String(value)
+}
+
 export function formatWatts(value: number | null | undefined): string {
   if (value == null || Number.isNaN(value)) {
     return "n/a"
