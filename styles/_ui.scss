@@ -1,0 +1,318 @@
+@use "../theme" as *;
+@use "mixins" as *;
+
+.UiIcon {
+  font-family: $font-icon, $font-family;
+}
+
+.UiSectionHeader {
+  margin-bottom: 4px;
+}
+
+.UiSectionHeaderLabel {
+  font-family: $network-panel-font-family, $font-family;
+  font-size: $fontsize-caption;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  color: $np-cyan-dim;
+}
+
+.UiSectionHeaderRule {
+  min-height: 1px;
+  background: rgba($np-border, 0.3);
+}
+
+.UiSectionHeaderMeta {
+  font-size: $fontsize-dense;
+  color: $colors-muted;
+}
+
+.UiCountryBadge {
+  font-family: $network-panel-font-family, $font-family;
+  font-size: $fontsize-caption;
+  font-weight: 800;
+  color: $np-bg0;
+  background: rgba($np-cyan, 0.85);
+  border-radius: $radius-sm;
+  padding: 1px 5px;
+}
+
+.UiInfoRow {
+  padding: 1px 0;
+}
+
+.UiInfoRowLabel {
+  font-family: $network-panel-font-family, $font-family;
+  font-size: $fontsize-dense;
+  color: $np-text-dim;
+}
+
+.UiInfoRowValue {
+  font-family: $network-panel-font-family, $font-family;
+  font-size: $fontsize-dense;
+}
+
+.UiInfoRowToneNormal { color: $np-text; }
+.UiInfoRowToneAccent { color: $np-cyan; }
+.UiInfoRowToneMagenta { color: $np-magenta; }
+.UiInfoRowToneDim { color: $np-text-sec; }
+.UiInfoRowToneSmall { color: $np-text; }
+
+.UiStatTile {
+  background: rgba($np-bg3, 0.5);
+  border: 1px solid $np-border;
+  border-radius: $radius-sm;
+  padding: 6px 8px;
+}
+
+.UiStatTileReadout {
+  min-height: 18px;
+}
+
+.UiStatTileValue {
+  font-family: $network-panel-font-family, $font-family;
+  font-size: $fontsize-emph;
+  font-weight: 600;
+  color: $np-text;
+}
+
+.UiStatTileUnit {
+  font-size: $fontsize-caption;
+  color: $colors-muted;
+}
+
+.UiStatTileLabel {
+  font-size: $fontsize-caption;
+  color: $np-text-sec;
+}
+
+.UiStatTileToneNormal .UiStatTileValue { color: $np-text; }
+.UiStatTileToneInfo .UiStatTileValue { color: $hud-blue; }
+.UiStatTileToneAccent .UiStatTileValue { color: $np-cyan; }
+.UiStatTileToneGood .UiStatTileValue { color: $np-green; }
+.UiStatTileToneCharge .UiStatTileValue { color: $hud-cyan; }
+.UiStatTileToneWarn .UiStatTileValue { color: $np-amber; }
+.UiStatTileToneCrit .UiStatTileValue { color: $np-red; }
+.UiStatTileToneMuted .UiStatTileValue { color: $colors-muted; }
+
+.UiToggleRow {
+  padding: 6px 0;
+}
+
+.UiToggleRowEmphasis {
+  @extend %section-divider;
+  padding: 8px 0;
+  margin-bottom: 4px;
+}
+
+.UiToggleLabel {
+  font-size: 13px;
+  color: rgba($hud-text, 0.85);
+}
+
+.UiToggleRowEmphasis .UiToggleLabel {
+  font-weight: 700;
+  color: rgba($hud-text, 0.95);
+}
+
+.UiToggleSub {
+  font-size: $fontsize-caption;
+  letter-spacing: 0.10em;
+  color: rgba($hud-text, 0.3);
+}
+
+.UiToggleSwitchBtn {
+  @extend %icon-btn-reset;
+  padding: 0;
+  margin: 0;
+}
+
+.UiToggleTrack {
+  min-width: 51px;
+  min-height: 31px;
+  border-radius: 16px;
+  background: rgba($np-bg3, 0.6);
+  border: 1.5px solid rgba($hud-border, 0.9);
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.UiToggleTrackOn {
+  background: rgba($hud-cyan, 0.18);
+  border-color: rgba($hud-cyan, 0.30);
+  box-shadow: 0 0 16px rgba($hud-cyan, 0.08);
+}
+
+.UiToggleKnob {
+  min-width: 25px;
+  min-height: 25px;
+  border-radius: 13px;
+  background: rgba($hud-text, 0.24);
+  margin-top: 2px;
+  margin-bottom: 2px;
+  margin-left: 2px;
+  box-shadow: 0 1px 2px rgba($np-bg0, 0.8),
+              0 3px 6px rgba($np-bg0, 0.55);
+  transition: margin-left 350ms cubic-bezier(0.5, 1.5, 0.4, 0.85),
+              background 300ms ease,
+              box-shadow 300ms ease,
+              min-width 180ms ease;
+}
+
+.UiToggleKnobOn {
+  background: $hud-cyan;
+  margin-left: 22px;
+  box-shadow: 0 0 8px rgba($hud-cyan, 0.45),
+              0 0 3px rgba($hud-cyan, 0.7),
+              0 2px 4px rgba($np-bg0, 0.7);
+}
+
+.UiToggleSwitchBtn:active .UiToggleKnob {
+  min-width: 30px;
+}
+
+.UiToggleSwitchBtn:active .UiToggleKnobOn {
+  margin-left: 17px;
+}
+
+.UiPlayerControls {
+  padding: 0;
+}
+
+.UiPlayerBtn {
+  @extend %icon-btn-reset;
+  padding: 0 3px;
+  margin: 0;
+  min-width: 20px;
+  min-height: 20px;
+}
+
+.UiPlayerBtn .UiIcon {
+  font-size: 15px;
+  color: $colors-muted;
+}
+
+.UiPlayerBtn:hover .UiIcon {
+  color: $colors-text;
+}
+
+.DmMusicControls .UiPlayerBtn {
+  padding: 0 6px;
+}
+
+.DmMusicControls .UiPlayerBtn .UiIcon {
+  font-size: 18px;
+  color: $np-text-sec;
+}
+
+.DmMusicControls .UiPlayerBtn:hover .UiIcon {
+  color: $np-text;
+}
+
+.UiNotificationCard {
+  border-radius: $radius-lg;
+  padding: 10px 14px;
+}
+
+.UiNotificationCardPopup {
+  background: $popup-panel-bg;
+  border: 1px solid rgba($colors-accent, 0.2);
+  min-width: 320px;
+  margin-top: 4px;
+}
+
+.UiNotificationCardHistory {
+  background: rgba($np-bg2, 0.5);
+  border: 1px solid rgba($hud-border, 0.7);
+}
+
+.UiNotificationCardMini {
+  background: $colors-surface-2;
+  border: 1px solid rgba($colors-outline, 0.8);
+  padding: 8px 10px;
+}
+
+.UiNotificationCard:hover {
+  border-color: rgba($colors-accent, 0.35);
+}
+
+.UiNotificationCardToneCritical {
+  border-color: rgba($colors-critical, 0.4);
+}
+
+.UiNotificationCardToneCritical:hover {
+  border-color: rgba($colors-critical, 0.6);
+}
+
+.UiNotificationCardToneLow {
+  border-color: rgba($colors-muted, 0.15);
+}
+
+.UiNotificationIcon {
+  opacity: 0.9;
+}
+
+.UiNotificationApp {
+  font-size: $fontsize-caption;
+  letter-spacing: 0.10em;
+  color: rgba($hud-text, 0.4);
+  font-weight: 600;
+}
+
+.UiNotificationTime {
+  font-size: $fontsize-caption;
+  color: rgba($hud-text, 0.25);
+}
+
+.UiNotificationSummary {
+  font-size: 13px;
+  font-weight: 700;
+  color: $colors-text;
+}
+
+.UiNotificationCardPopup .UiNotificationSummary {
+  font-size: $fontsize-emph;
+}
+
+.UiNotificationBody {
+  font-size: $fontsize-body;
+  color: $colors-muted;
+}
+
+.UiNotificationCardHistory .UiNotificationBody {
+  font-size: $fontsize-dense;
+}
+
+.UiTabBarUnderline {
+  padding: 4px 8px 0;
+}
+
+.UiTabButton {
+  @extend %icon-btn-reset;
+  font-family: $network-panel-font-family, $font-family;
+  font-size: 13px;
+  font-weight: 600;
+  color: $np-text-sec;
+  border-bottom: 2px solid transparent;
+  padding: 4px 12px 3px;
+  margin: 0 2px;
+  border-radius: 0;
+}
+
+.UiTabBarUnderline .UiTabButtonActive {
+  color: $np-cyan;
+  border-bottom: 2px solid $np-cyan;
+}
+
+.UiTabBarFilled .UiTabButton {
+  background: rgba($np-bg2, 0.7);
+  border: 1px solid $hud-border;
+  border-radius: $radius-md;
+  padding: 6px 14px;
+  color: $colors-muted;
+}
+
+.UiTabBarFilled .UiTabButtonActive {
+  background: rgba($colors-accent, 0.18);
+  border-color: rgba($colors-accent, 0.45);
+  color: $colors-text;
+}

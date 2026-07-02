@@ -1,0 +1,26 @@
+export const ICONS = {
+  play: "󰐊",
+  pause: "󰏤",
+  previous: "󰒮",
+  next: "󰒭",
+  close: "󰅖",
+  check: "󰄬",
+  chevronLeft: "󰁍",
+  chevronRight: "󰁔",
+  appFallback: "󰘔",
+  bell: "󰂚",
+  wifi: "󰤨",
+  wifi4: "󰤨",
+  wifi3: "󰤥",
+  wifi2: "󰤢",
+  wifi1: "󰤟",
+  wifiOff: "󰤯",
+  wifiDisconnected: "󰤭",
+  wired: "󰈁",
+  bluetooth: "󰂯",
+  btOff: "󰂲",
+  btConnected: "󰂱",
+  batteryCharging: "󰚥",
+} as const
+
+export type IconName = keyof typeof ICONS

@@ -4,7 +4,7 @@
 set -euo pipefail
 
 MAX_SCSS_HEX=10
-MAX_TSX_SYMBOLS=2
+MAX_TSX_SYMBOLS=0
 MAX_ESCAPE_FILES=8
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
