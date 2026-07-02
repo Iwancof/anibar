@@ -3,6 +3,8 @@ font:
   family:    "Consolas, Noto Sans Mono CJK JP, monospace"
   clock-size: 17px
 
+font-icon: "HackGen Console NF"
+
 # ── 色 ──────────────────────────────────────
 colors:
   bg:        "#0d1118"
@@ -16,6 +18,68 @@ colors:
   warning:   "#e0af68"
   critical:  "#f7768e"
   accent:    "#7aa2f7"
+
+hud:
+  cyan:   "#00ffcc"
+  blue:   "#00aaff"
+  amber:  "#ffaa00"
+  pink:   "#ff2266"
+  border: "#1a1e2e"
+  text:   "#e0e6f0"
+
+np:
+  bg0:       "#080c12"
+  bg1:       "#0d1219"
+  bg2:       "#121a24"
+  bg3:       "#182030"
+  cyan:      "#00e5ff"
+  cyan-dim:  "#007a8a"
+  magenta:   "#ff2d78"
+  amber:     "#ffb627"
+  green:     "#00ff9d"
+  red:       "#ff3d3d"
+  text:      "#c8d3e0"
+  text-sec:  "#5a6a7e"
+  text-dim:  "#2e3d50"
+  border:    "#1a2436"
+
+popup:
+  panel-bg:      "rgba(12, 14, 20, 0.75)"
+  shadow:        "0 8px 32px rgba(0, 0, 0, 0.6)"
+  backdrop-rgb:  "8, 10, 16"
+  anim-close-ms: 200
+
+radius:
+  xs:   2px
+  sm:   4px
+  md:   6px
+  lg:   8px
+  pill: 999px
+
+fontsize:
+  caption: 10px
+  dense:   11px
+  body:    12px
+  emph:    14px
+  title:   17px
+  display: 26px
+  hero:    46px
+
+space:
+  1: 4px
+  2: 8px
+  3: 12px
+  4: 16px
+  5: 24px
+
+dim:
+  panel-main:  520
+  panel-side:  380
+  label-sm:    80
+  slots-ap:    50
+  slots-notif: 20
+  slots-flows: 15
+  slots-log:   30
 
 # ── バー ────────────────────────────────────
 bar:
