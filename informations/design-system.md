@@ -1,105 +1,159 @@
-# AGS Design System — "Terminal HUD"
+# AGS Design System — "Terminal HUD" v2
 
-作成: 2026-07-02。全 surface の統一デザイン言語の定義。改修・新規 UI は必ずこれに従う。
+作成: 2026-07-02。oracle (gpt-5.5-pro) レビューを反映した改訂版。
+全 surface の統一デザイン言語の定義。改修・新規 UI は必ずこれに従う。
 
 ## 0. 方針
 
-現状は 3 系統のデザイン言語が並立している（Tokyo Night 系カード / ネオン HUD 直書き系 / Cyberpunk Np 系）。
-このうち**最も作り込まれ独自性がある NetworkPanel (Np*) の言語を正**とし、全 surface を寄せる。
-Tokyo Night 系（$colors-accent #7aa2f7 等）の汎用カード UI は段階的に廃止する。
+現状 3 系統のデザイン言語（Tokyo Night カード / ネオン HUD 直書き / Cyberpunk Np）のうち、
+**最も作り込まれた NetworkPanel (Np*) の言語を正**とし全 surface を寄せる。
+抽象化するのは「cyan のテーマ」ではなく **密度・文言・状態表現・実機語彙・固定スロット感**。
+迷ったら NetworkPanel の実物に合わせる。
 
-判断基準: 迷ったら NetworkPanel の見た目・密度・文言スタイルに合わせる。
+## 1. カラートークン
 
-## 1. カラートークン（theme.yaml が単一ソース）
+`theme.yaml` が単一ソース → `gen-theme.py` が `_theme.scss` と `src/shared/theme-tokens.ts` を生成。
+style.scss / Cairo コードへの hex/rgba 直書きは禁止。
 
-`theme.yaml` → `scripts/gen-theme.py` → `_theme.scss` + `src/shared/theme-tokens.ts`（TS 側生成を新設）。
-style.scss への hex/rgba 直書きは禁止。Cairo 描画も theme-tokens.ts を参照する。
+**基底色**と**役割トークン**を分離する（α 付きトークンをさらに α 化しない）:
 
-| トークン | 値 | 用途 |
-|---|---|---|
-| `bg-deep` | `#0a0e14` | window/backdrop 系 |
-| `bg-panel` | `rgba(12, 16, 24, 0.92)` | パネル背景 |
-| `bg-card` | `#111826` | カード・行の背景 |
-| `border` | `#1a2436` | 全ボーダー・区切り線 |
-| `text` | `#e0e6f0` | 主要テキスト |
-| `text-muted` | `#8a95b3` | 補助テキスト |
-| `text-faint` | `#5a6a7e` | 最弱テキスト（eyebrow 等） |
-| `accent` | `#00e5ff` (cyan) | 主アクセント。旧 `#00ffcc`/`#7aa2f7` は全てこれに置換 |
-| `accent-alt` | `#ff2d78` (magenta) | 対アクセント（TX/RX ペア等のデータ視覚化のみ） |
-| `ok` | `#00ff9d` | 正常 |
-| `warn` | `#ffb627` | 警告 |
-| `crit` | `#ff3d3d` | 危険 |
-| `info` | `#00aaff` | 情報 |
+| 基底 | 値 |
+|---|---|
+| `base-deep` | `#0a0e14` |
+| `base-panel` | `#0c1018` |
+| `base-card` | `#111826` |
+| `border` | `#1a2436` |
+| `text` | `#e0e6f0` |
+| `text-muted` | `#8a95b3` |
+| `text-faint` | `#5a6a7e` |
+| `accent` | `#00e5ff` (cyan) — 旧 `#00ffcc`/`#7aa2f7` は全て置換 |
+| `accent-alt` | `#ff2d78` (magenta) — TX/RX 等データ視覚化ペアのみ |
+| `ok` `#00ff9d` / `warn` `#ffb627` / `crit` `#ff3d3d` / `info` `#00aaff` | 意味色 |
 
-- 透過は `rgba($token, α)` で表現。α は 0.08 / 0.18 / 0.35 / 0.6 / 0.92 の 5 段のみ。
-- 虹色ゲージ・グラデーション・glow アニメ・多重 box-shadow は禁止。
-- shadow は 2 種のみ: panel `0 8px 32px rgba(0,0,0,0.6)` / card `0 4px 12px rgba(0,0,0,0.4)`。
+役割トークン例: `surface.panel.bg = rgba(base-panel, .92)`、backdrop = `rgba(base-deep, .5)`。
+α は 0.08 / 0.18 / 0.35 / 0.6 / 0.92 の 5 段。
+
+**状態表現**（全インタラクティブ要素で共通）:
+- hover: border を `rgba(accent, .35)` に tint（背景は変えない）
+- selected/active: accent border + `rgba(accent, .08)` fill
+- disabled: `text-faint` + shadow なし
+- focus (キーボード): selected と同一
+- 禁止: hover での glow・拡大・影追加
 
 ## 2. スケール
 
-- **radius**: `xs=2px`(バー内チップ) / `sm=4px`(badge) / `md=8px`(ボタン・行・カード) / `lg=12px`(パネル) / `pill=999px`。それ以外の値は禁止（16/24px パネルは 12px に統一）。
-- **font-size**: `caption=10px` / `body=12px` / `emph=14px` / `title=17px` / `display=26px` / `hero=46px` の 6 段。9/11/13px は隣接段へ丸める。
-- **font-weight**: 400 / 600 / 800 の 3 段（`bold` キーワード禁止）。
-- **letter-spacing**: `0.08em`(eyebrow/セクション見出し) / `0.12em`(パネルタイトル) の 2 種のみ。px 単位禁止。
-- **spacing**: 4px グリッド — 4 / 8 / 12 / 16 / 24 / 32 のみ。JSX `spacing=` も同様（1,2,3,6,10 禁止）。
-- **font**: 本文 = `$font-family`（モノスペース）、アイコン = `HackGen Console NF`（トークン `font-icon` 経由）。
+- **radius**（Np 実測に寄せる。丸い=汎用カード臭）: `xs=2`(チップ) / `sm=4`(タイル・badge) / `md=6`(行・ボタン) / `lg=8`(パネル・カード) / `pill=999`。12px 以上は禁止。
+- **font-size** 7 段: `caption=10` / `dense=11`(AP メタ・log 行・bar compact 等の密度優先箇所) / `body=12` / `emph=14` / `title=17` / `display=26` / `hero=46`。
+- **font-weight**: 400 / 600 / 800。`bold` キーワード禁止。
+- **letter-spacing**（役割別）: eyebrow=`0.10em` / panel-title=`0.12em` / hero-clock=`0.04em`。px 単位禁止。
+- **spacing**: 4px グリッド — 4 / 8 / 12 / 16 / 24。
+- **shadow**: パネルのみ `0 8px 32px rgba(0,0,0,.6)`。カード・タイルは **border のみ**（影禁止）。
+- **禁止**: グラデーション、glow、多重 shadow、虹色ゲージ。
+- **font**: 本文 = `$font-family`、アイコン = `HackGen Console NF`（`font-icon` トークン）。
 
-## 3. アイコン
+## 3. TSX 側寸法トークン（theme-tokens.ts）
 
-- **Nerd Font グリフのみ**。Unicode 記号（⏮▶⏸⏭✕✓●‹›）・絵文字・国旗絵文字は禁止。
-- `src/shared/ui/icons.ts` に全グリフを定数定義し、`<Icon>` コンポーネント経由で使う。
-  例: `ICONS.play=󰐊 pause=󰏤 prev=󰒮 next=󰒭 close=󰅖 check=󰄬 bluetooth=󰂯 bluetoothOff=󰂲 bluetoothConnected=󰂱`
-- 国旗は 2 文字国コード（`JP` `CH`）のテキスト badge で表現。
+JSX の `widthRequest` 等のマジックナンバーはここから取る:
+`panel.width.main=520 / side=380 / narrow=340`、`label.width.sm=80`、
+`popup.animCloseMs=200`（controller と SCSS で共有）、`list.slots.ap=50 / notif=20 / flows=15 / log=30`、
+色は `[r,g,b]` 0-1 で Cairo 用にも出力。
+※ 1 箇所でしか使わない描画都合の数値までトークン化しない。
 
-## 4. 文言規約
+## 4. アイコン
 
-- **パネルタイトル**: `● TITLE::SUB` 形式の ALL CAPS（例 `POWER::SYSTEM`, `NET::LINK`, `BT::DEVICES`）。ステータスドット + 右肩に状態メタ（`AC_IN` → `AC::IN` に統一）。
-- **セクション見出し (eyebrow)**: ALL CAPS + caption サイズ + 0.08em + rule 線。例 `IDENTITY`, `TOP CONSUMERS`。
-- **サブラベル**: `A::B` 形式に統一（`LID::SWITCH`, `CPU::TURBO`）。`_` 区切りは廃止。
-- **ボタン文言**: ALL CAPS 短語（`CONNECT`, `CLEAR ALL`, `CLOSE`）。
-- **空値**: `—`（em dash）のみ。`--`, `---`, `N/A`, `?` は `shared/format.ts` の `placeholder()` に置換。
-- UI 文言は英語、コード内コメントは日本語。
+- Nerd Font グリフのみ。Unicode 記号（⏮▶⏸⏭✕✓●‹›）・絵文字・国旗絵文字は禁止。
+- `src/shared/ui/icons.ts` に定数定義し `<Icon>` 経由で使用。
+  `ICONS.play=󰐊 pause=󰏤 prev=󰒮 next=󰒭 close=󰅖 check=󰄬 bluetooth=󰂯 btOff=󰂲 btConnected=󰂱 bell=󰂚 wifi=󰤨`
+- 国旗は 2 文字国コード badge（`JP` `CH`）。
+- `preview:icons` で全グリフを並べて豆腐化・絵文字化を目視検収する。
 
-## 5. 共通コンポーネント（src/shared/ui/）
+## 5. 文言規約 + copy dictionary
 
-改修・新規 surface は必ずこれらを使う。CSS クラスは `Ui*` prefix。
+- パネルタイトル: `● TITLE::SUB` ALL CAPS（`POWER::SYSTEM`, `NET::LINK`, `BT::DEVICES`）+ 右肩メタ。
+- セクション見出し (eyebrow): ALL CAPS + caption + 0.10em + rule 線。
+- サブラベル: `A::B` 形式（`LID::SWITCH`, `CPU::TURBO`）。`_` 区切り廃止。
+- ボタン: ALL CAPS 短語。アイコンは任意、ラベルは必須ではない（icon-only 可）。
+- 空値: `—` のみ（`shared/format.ts` の `placeholder()`）。
+- **empty/loading/error も HUD 語彙で**: `SCAN::IDLE`, `DBUS::DOWN`, `LINK::DOWN`, `NO HISTORY`, 空スロットは薄 border の空行（大きな blank card 禁止）。
+- **実機語彙を積極的に出す**: `wlp194s0`, `hci0`, `RSSI`, `RTT`, `eDP-1` 等。設計説明文・マーケ文言は UI に出さない。
 
-| コンポーネント | 役割 | 置換対象 |
-|---|---|---|
-| `PopupShell` | window + backdrop + Esc 閉じ + open/closing アニメクラス | 8 surface のコピペ雛形 |
-| `PanelHeader` | ● TITLE::SUB + 右肩メタ | HudDot/NpHeader/NotifCenterTitle 等 |
-| `SectionHeader` | eyebrow + rule | NpSectionHeader ×7 ほか |
-| `StatTile` | 値上・ラベル下の縦タイル | QualitySection MiniCard / NpConnCard / HudStat |
-| `InfoRow` | ラベル + 値の横行 | IdentitySection InfoRow ほか |
-| `ToggleRow` | ラベル + HUD 風トグル（track+knob、accent 単色） | BatteryHudView の iOS 風トグル |
-| `Icon` | Nerd Font グリフ表示 | 全 Unicode 記号 |
-| `PlayerControls` | prev/play/next 3 ボタン | 3 箇所のコピペ |
-| `NotificationCard` | 通知カード | NotifCard / NotifHistoryCard / SwipeDash 簡略版 |
-| `TabBar` | タブ切替 | TabArea / WorkspaceView |
-| `FixedList` | 固定スロットリストのイディオム | 12 箇所の Array.from 同型 |
+| 旧 | 新 |
+|---|---|
+| `AC_IN` | `AC::IN` |
+| `Clear all` | `CLEAR ALL` |
+| `Connect` / `Save` / `Revert` | `CONNECT` / `SAVE` / `REVERT` |
+| `Dashboard`(title) | 各 surface の役割名 (`WS::OVERVIEW` 等) |
+| `N/A` `--` `---` `?` | `—` |
+| `LID_ACTION` | `LID::ACTION` |
 
-ヘルパ統合: `timeAgo`/`placeholder` → `shared/format.ts`、`countryFlag→countryBadge`/`signalIcon` → `modules/wifi/domain.ts`、`isOnAC` → `modules/battery/domain.ts`。
+## 6. Bar grammar
 
-## 6. 構造規約
+Bar 右側は `[Icon][compact value]` のモジュール列。グループ間に separator（`rgba(border,1)` 1px）。
+- 例: `󰕾 0%`(vol) / `󰤨`(wifi, SSID は出さない→panel で見る) / `󰂱 2`(bt 接続数) / `󰂚 1`(notif) / `あ|A`(IME chip) / `󰁹 94`(bat)
+- 生テキストラベル（`VOL0 0%`、SSID 生表示）は禁止。値は最大 4 文字、省略は `…` でなく丸め。
+- 左: workspace pills + spectrum + player。中央: clock。
 
-- ネストは「パネル > カード」の 2 階層まで。3 階層目は border 無しの行（separator or インデント）。
-- CSS prefix: 共有 = `Ui*`、surface 固有 = surface のフル名 PascalCase（新規・改修時に順次移行）。
-- window name prefix と controller は `src/app/window-controller.ts` の `makeWindowController(prefix, opts)` に集約。
-- controller の閉アニメ時間は theme.yaml `popup.anim-close-ms` と同期。
+## 7. 共通コンポーネント（src/shared/ui/、CSS prefix `Ui*`）
 
-## 7. SCSS 構成
+anatomy を固定する。**ModuleCard は正ではない**（旧世代、廃止方向）。
 
-```
-style.scss            # @use エントリのみ
-styles/_mixins.scss   # %icon-btn-reset, @mixin popup-panel, %eyebrow-label, %dark-card 等
-styles/_animations.scss
-styles/_ui.scss       # Ui* 共通コンポーネント
-styles/_bar.scss  _battery-hud.scss  _network-panel.scss  _notifications.scss
-styles/_launcher.scss _workspace.scss _swipe-dash.scss _dashboard-mode.scss _preview.scss
-```
+| コンポーネント | anatomy |
+|---|---|
+| `Icon` | `<label class="UiIcon" label={ICONS.x}/>` フォント=font-icon |
+| `PanelHeader` | 左 status dot ● + title(caps/0.12em) + 右肩 meta |
+| `SectionHeader` | eyebrow label + 水平 rule |
+| `StatTile` | value(emph/mono) + unit + label(caption) + tone class。border のみ、影なし |
+| `InfoRow` | label(width=token) + value。密度 dense |
+| `ToggleRow` | label + `A::B` サブラベル + HUD トグル（矩形 track+knob、accent 単色） |
+| `CommandButton` | icon? + CAPS label |
+| `PlayerControls` | prev/play/next、Icon 使用 |
+| `NotificationCard` | app 名 + 時刻(timeAgo) + summary + body、urgency tone |
+| `TabBar` | caps タブ + active=accent 下線 or 塗り |
+| `PopupShell` | window + backdrop + Esc 閉じ + open/closing クラス。**view のみ**（controller は app 層） |
 
-## 8. 検証
+- 固定スロットリストは `fixedSlots()` 純ヘルパで（汎用 JSX コンポーネント化はしない）。
+- ヘルパ統合: `timeAgo`/`placeholder` → `shared/format.ts`、`signalIcon`/`countryBadge` → `modules/wifi/domain.ts`、`isOnAC` → `modules/battery/domain.ts`。
 
-- 変更のたび: `npm run check`（typecheck + test。テストは全 green を維持）
-- 視覚変更: `bash scripts/ui-test.sh <preview>`（headless）+ 実機 `grim` スクリーンショットで確認
-- `ags request <scope> open/close` で各 surface を開閉できる（引数はクォートせず分けて渡す）
+## 8. Motion policy
+
+- open/close: 200ms（トークン `popup.animCloseMs` と SCSS keyframes を同期）。
+- infinite アニメ禁止（例外: scan 中の dot pulse のみ）。critical は blink しない。
+- hover/press はコスメティック変化のみ（§1 状態表現）。
+
+## 9. Surface role matrix
+
+| surface | 役割 | 主情報 | 禁止 |
+|---|---|---|---|
+| Bar | 常時 telemetry | ws/clock/vol/net/bt/notif/bat | 生テキスト、SSID |
+| NetworkPanel | ネットワーク診断 | identity/dns/bw/quality/latency/flows/AP | — |
+| BatteryPopup | 電源制御 | %/draw/health/consumers/power controls | 虹色ゲージ、iOS トグル |
+| BluetoothPopup | BT 制御 | adapter power/devices/battery/scan | pairing UI (v1) |
+| NotificationCenter | 通知履歴 | 履歴 20 slots + DND | — |
+| NotificationPopup | 一時通知 | 最新 3 件 | — |
+| DashboardMode | 全画面 glance | 時計/player/net/power の複合 | 独自実装（共通コンポーネント必須） |
+| WorkspaceWindow | ws 一覧/display 編集 | ws cards / layout editor | 丸カード |
+| Launcher | コマンドパレット | 検索+結果 8 slots | — |
+| SwipeDashboard | **廃止候補**。W3 で再定義判断（quick command tray 案） | — | 現状の空カード列 |
+
+## 10. 構造・命名規約
+
+- ネストは「パネル > カード」2 階層まで。
+- CSS prefix: 共有 = `Ui*`、surface 固有 = フル名 PascalCase（改修時に移行）。
+- window name prefix / controller は `src/app/window-controller.ts` の `makeWindowController(prefix, opts)` に集約。
+  controller は monitor-registry の available な connector の window のみ present する。
+- SCSS 構成: `style.scss`(エントリ) + `styles/_mixins.scss` `_animations.scss` `_ui.scss` + surface 別 partial。
+
+## 11. Negative examples（見たら差し戻す）
+
+- Title Case の汎用カード見出し（`Dashboard`）
+- `✕` `✓` `▶` 等の Unicode アイコン、国旗絵文字、`✕` リテラル
+- 虹色 battery gauge、iOS 風緑トグル、glow パルス
+- `Overlay first, modules second...` のような設計説明文の UI 露出
+- 下半分が空の巨大パネル、radius 12px 超の丸カード
+- `N/A` / `--` / `VOL0 0%` のような生テキスト
+
+## 12. 検証
+
+- `npm run check`（typecheck + test 全 green 維持）
+- 再汚染ガード: `scripts/check-design.sh`（styles への hex 直書き・src への Unicode アイコン・Gdk.KEY_Escape コピペの新規追加を grep 検出）
+- 視覚変更: `bash scripts/ui-test.sh <preview>` + 実機 `grim`。`ags request <scope> open`（引数はクォートしない）
