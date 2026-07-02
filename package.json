@@ -5,7 +5,7 @@
     "theme": "python3 scripts/gen-theme.py",
     "dev": "bash scripts/dev.sh",
     "run": "npm run theme && ags run --gtk 4",
-    "check": "npm run typecheck && npm run test",
+    "check": "npm run typecheck && npm run test && bash scripts/check-design.sh",
     "typecheck": "tsc --noEmit --project tsconfig.pure.json",
     "test": "node --experimental-strip-types --test tests/shared/*.test.ts tests/modules/*.test.ts",
     "layout": "node --experimental-strip-types scripts/layoutctl.ts",

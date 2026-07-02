@@ -10,7 +10,7 @@ set -euo pipefail
 
 DIR="$(cd "$(dirname "$0")/.." && pwd)"
 SETTLE_TIME="${SETTLE_TIME:-3}"
-OUTPUT_DIR="/tmp/ags-screenshots"
+OUTPUT_DIR="${OUTPUT_DIR:-/tmp/ags-screenshots}"
 
 red()   { printf '\033[1;31m%s\033[0m\n' "$*"; }
 green() { printf '\033[1;32m%s\033[0m\n' "$*"; }
@@ -39,10 +39,10 @@ list_previews() {
 # ヘッドレスモニタを作成し、名前を返す
 create_headless() {
   local before after
-  before=$(hyprctl monitors all -j | grep -o '"name":"HEADLESS-[0-9]*"' | sort)
+  before=$(hyprctl monitors all -j | grep -o '"name"[[:space:]]*:[[:space:]]*"HEADLESS-[0-9]*"' | sort || true)
   hyprctl output create headless >/dev/null
   sleep 0.3
-  after=$(hyprctl monitors all -j | grep -o '"name":"HEADLESS-[0-9]*"' | sort)
+  after=$(hyprctl monitors all -j | grep -o '"name"[[:space:]]*:[[:space:]]*"HEADLESS-[0-9]*"' | sort || true)
   comm -13 <(echo "$before") <(echo "$after") | grep -o 'HEADLESS-[0-9]*' | head -1
 }
 
@@ -56,7 +56,6 @@ capture_preview() {
   local preview_name="$1"
   local monitor="$2"
   local output_file="$OUTPUT_DIR/${preview_name}.png"
-  local instance="ui-test-${preview_name}"
 
   dim "  プレビュー起動: $preview_name"
 
@@ -64,7 +63,7 @@ capture_preview() {
   python3 "$DIR/scripts/gen-theme.py" >/dev/null 2>&1 || true
 
   # AGS プレビューをバックグラウンドで起動
-  ags run "src/preview/${preview_name}.tsx" --gtk 4 -i "$instance" &
+  setsid ags run "src/preview/${preview_name}.tsx" --gtk 4 &
   local ags_pid=$!
 
   # 描画完了を待つ
@@ -78,14 +77,12 @@ capture_preview() {
   # スクリーンショット取得
   grim -o "$monitor" "$output_file"
 
-  # AGS を終了。ags quit が効かない場合、wrapper だけ kill すると
-  # 子の gjs が孤児化して残るので、子プロセスも明示的に落とす。
-  # (グローバルな pkill は本体 AGS を巻き込むため使わない)
-  ags quit -i "$instance" 2>/dev/null || true
+  # AGS を終了。専用 process group を使い、ユーザ本体 AGS を巻き込まない。
+  kill -TERM -- "-$ags_pid" 2>/dev/null || true
   sleep 0.5
-  if kill -0 "$ags_pid" 2>/dev/null; then
+  if pgrep -g "$ags_pid" >/dev/null 2>&1; then
     pkill -P "$ags_pid" 2>/dev/null || true
-    kill "$ags_pid" 2>/dev/null || true
+    kill -KILL -- "-$ags_pid" 2>/dev/null || true
   fi
   wait "$ags_pid" 2>/dev/null || true
 
@@ -145,9 +142,9 @@ main() {
   for preview in "${targets[@]}"; do
     echo "--- $preview ---"
     if capture_preview "$preview" "$monitor"; then
-      ((passed++))
+      ((passed+=1))
     else
-      ((failed++))
+      ((failed+=1))
     fi
     echo ""
   done
