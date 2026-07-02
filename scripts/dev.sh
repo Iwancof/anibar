@@ -4,12 +4,19 @@ set -uo pipefail
 
 DIR="$(cd "$(dirname "$0")/.." && pwd)"
 RUNTIME_LOG="${TMPDIR:-/tmp}/ags-runtime.log"
+AGS_BUNDLE="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/ags.js"
 
 reload() {
   echo "[dev] テーマ生成中..."
   python3 "$DIR/scripts/gen-theme.py"
   echo "[dev] AGS 再起動中..."
   ags quit 2>/dev/null || true
+  # ags quit が届かなかった旧インスタンスの gjs を掃除する。
+  # 連続 reload 時にインスタンス名を取れなかった gjs が孤児として残り、
+  # ポーリングを続けて CPU を食い潰す事故 (2026-07-02, 91 プロセス) の再発防止。
+  if pkill -f "gjs -m $AGS_BUNDLE" 2>/dev/null; then
+    sleep 0.5
+  fi
   : > "$RUNTIME_LOG"
   ags run --gtk 4 >>"$RUNTIME_LOG" 2>&1 &
   echo "[dev] 起動完了 ($(date +%H:%M:%S))"
@@ -41,6 +48,7 @@ while true; do
     sleep 1
     continue
   fi
-  sleep 0.3
+  # 一括変更 (git checkout 等) のイベントバーストを 1 回の reload にまとめる
+  sleep 1
   reload
 done

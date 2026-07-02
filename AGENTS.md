@@ -1,4 +1,10 @@
 変更は割と細かくgit commitしてください。remoteはありませんので、pushは必要ないです。
+
+**重要: この working tree はユーザの tmux で `npm run dev` (inotifywait 監視 + AGS 自動再起動) が常駐していることがある。**
+エージェントが直接この tree でブランチ切替や大量編集をすると、変更のたびに AGS が再起動され、孤児 gjs プロセスが蓄積して
+システム全体が固まる事故が起きた (2026-07-02, gjs 91 個)。大きな編集作業は必ず `git worktree add` で別ディレクトリに
+worktree を切ってそこで行い、レビュー後に master へマージすること。worktree には `node_modules` と `@girs` を
+メイン checkout から symlink すれば typecheck も動く。
 開発中、重要な情報等があった場合、context compactionの影響を受けないよう、AGENTS.mdへ追記しても構いません。
 その他、開発において重要な情報があった際は、./informationsの下にmarkdown形式で情報を追加しても構いません。その際、通し番号は振らないようにしてください。
 また、なにか大規模な作業をする際は、現在の作業状態をSTATUS.mdに書き出し、適宜編集するようにしてください。
