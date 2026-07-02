@@ -80,14 +80,6 @@ spectrum:
   sensitivity:     150
   noise-reduction: 0
 
-# ── ネットワークポップアップ ──────────────────
-network:
-  popup-width:     380px
-  info-label-width: 90px
-  ip-font:         "Consolas"
-  bssid-size:      9px
-  ap-scroll-height: 400px
-
 # ── ネットワークパネル ────────────────────────
 network-panel:
   font-family:      "Consolas"
