@@ -1,6 +1,6 @@
-node_modules/
-@girs/
+node_modules
+@girs
 _theme.scss
-src/shared/theme-tokens.ts
 nohup.out
 sessions/
+src/shared/theme-tokens.ts
