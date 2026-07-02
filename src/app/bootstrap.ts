@@ -31,13 +31,15 @@ import NotificationPopup from "../surfaces/notifications/NotificationPopup.tsx"
 import NotificationCenter from "../surfaces/notifications/NotificationCenter.tsx"
 import SwipeDashboard from "../surfaces/dashboard/SwipeDashboard.tsx"
 import DashboardMode from "../surfaces/dashboard-mode/DashboardMode.tsx"
-import { toggleNotifCenter } from "./notification-controller.ts"
-import { toggleDashboardVisibility } from "./dashboard-controller.ts"
-import { closeSwipeDashboard } from "./swipe-dashboard-controller.ts"
-import { toggleBatteryPopup } from "./popup-controller.ts"
-import { toggleNetworkPopup } from "./network-controller.ts"
+import {
+  closeSwipeDashboard,
+  toggleBatteryPopup,
+  toggleNetworkPopup,
+  toggleNotifCenter,
+  toggleWorkspaceVisibility,
+} from "./controllers.ts"
 import { handleAppRequest } from "./request-handler.ts"
-import { createMonitorRegistry, getMonitorsListModel } from "./monitor-registry.ts"
+import { createMonitorRegistry, getMonitorsListModel, setActiveRegistry } from "./monitor-registry.ts"
 
 const MONITOR_SAFETY_POLL_MS = 5000
 
@@ -83,7 +85,7 @@ export function startMainApp() {
         batterySnapshot: modules.battery.snapshot,
         imeSnapshot: imeSource.snapshot,
         workspaceSnapshot: workspaceSource.snapshot,
-        onToggleDashboard: toggleDashboardVisibility,
+        onToggleDashboard: toggleWorkspaceVisibility,
         onToggleBatteryPopup: toggleBatteryPopup,
         onToggleNotifCenter: () => {
           notificationSource.markAllRead()
@@ -178,7 +180,7 @@ export function startMainApp() {
         monitor,
         snapshot: workspaceSource.snapshot,
         onClose: () => {
-          void toggleDashboardVisibility()
+          void toggleWorkspaceVisibility()
         },
       }),
     ]
@@ -196,6 +198,7 @@ export function startMainApp() {
       const reg = createMonitorRegistry((monitor, connector, index) =>
         createMonitorWindows(monitor, connector, index),
       )
+      setActiveRegistry(reg)
 
       const monitorsModel = getMonitorsListModel()
       let reconcilePending = false
@@ -243,6 +246,7 @@ export function startMainApp() {
         }
         GLib.source_remove(safetyPollId)
         reg.disposeAll()
+        setActiveRegistry(null)
       })
 
       reg.reconcile()

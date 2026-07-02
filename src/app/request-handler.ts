@@ -1,15 +1,28 @@
-import { anyDashboardVisible, setDashboardVisibility, toggleDashboardVisibility } from "./dashboard-controller.ts"
-import { anyLauncherVisible, toggleLauncher, openLauncher, closeLauncher } from "./launcher-controller.ts"
 import {
+  anyLauncherVisible,
   anySwipeDashboardVisible,
+  anyWorkspaceVisible,
+  closeBatteryPopup,
+  closeDashboardMode,
+  closeLauncher,
+  closeNetworkPopup,
+  closeNotifCenter,
   closeSwipeDashboard,
+  openBatteryPopup,
+  openDashboardMode,
+  openLauncher,
+  openNetworkPopup,
+  openNotifCenter,
   openSwipeDashboard,
+  setWorkspaceVisibility,
+  toggleBatteryPopup,
+  toggleDashboardMode,
+  toggleLauncher,
+  toggleNetworkPopup,
+  toggleNotifCenter,
   toggleSwipeDashboard,
-} from "./swipe-dashboard-controller.ts"
-import { toggleBatteryPopup, openBatteryPopup, closeBatteryPopup } from "./popup-controller.ts"
-import { toggleNetworkPopup, openNetworkPopup, closeNetworkPopup } from "./network-controller.ts"
-import { toggleNotifCenter, openNotifCenter, closeNotifCenter } from "./notification-controller.ts"
-import { toggleDashboardMode, openDashboardMode, closeDashboardMode } from "./dashboard-mode-controller.ts"
+  toggleWorkspaceVisibility,
+} from "./controllers.ts"
 
 function normalizeArgs(args: string[]): string[] {
   return args.filter(Boolean).filter((arg, index) => {
@@ -100,25 +113,26 @@ export function handleAppRequest(args: string[]): string {
     }
   }
 
-  if (scope !== "dashboard") {
-    return 'unknown request. use "ags request battery|network|notif-center|dashboard|launcher|swipe-dashboard toggle"'
+  if (scope !== "dashboard" && scope !== "workspace") {
+    return 'unknown request. use "ags request battery|network|notif-center|dashboard|workspace|launcher|swipe-dashboard toggle"'
   }
 
+  const label = scope === "workspace" ? "workspace" : "dashboard"
   switch (action) {
     case "toggle":
-      toggleDashboardVisibility()
-      return `dashboard ${anyDashboardVisible() ? "visible" : "hidden"}`
+      toggleWorkspaceVisibility()
+      return `${label} ${anyWorkspaceVisible() ? "visible" : "hidden"}`
     case "open":
     case "show":
-      setDashboardVisibility(true)
-      return "dashboard visible"
+      setWorkspaceVisibility(true)
+      return `${label} visible`
     case "close":
     case "hide":
-      setDashboardVisibility(false)
-      return "dashboard hidden"
+      setWorkspaceVisibility(false)
+      return `${label} hidden`
     case "status":
-      return anyDashboardVisible() ? "dashboard visible" : "dashboard hidden"
+      return anyWorkspaceVisible() ? `${label} visible` : `${label} hidden`
     default:
-      return `unknown dashboard action "${action}"`
+      return `unknown ${label} action "${action}"`
   }
 }
