@@ -1,3 +1,4 @@
+import GLib from "gi://GLib?version=2.0"
 import { subprocess } from "ags/process"
 import { createState } from "gnim"
 
@@ -6,6 +7,7 @@ import type { BatterySource } from "../modules/battery/ports.ts"
 import { fileExists, readNumberFile, readTextFile } from "./fs.ts"
 
 const BATTERY_CANDIDATES = ["BAT0", "BAT1", "BAT2"]
+const BATTERY_UPDATE_DEBOUNCE_MS = 1000
 
 function findBatteryRoot(): string | null {
   for (const candidate of BATTERY_CANDIDATES) {
@@ -50,16 +52,35 @@ function readCurrentSnapshot(): BatterySnapshot | null {
 
 export function createBatterySource(): BatterySource {
   const [snapshot, setSnapshot] = createState<BatterySnapshot | null>(null)
+  let refreshSourceId = 0
+
+  function refreshSnapshot(): void {
+    setSnapshot(readCurrentSnapshot())
+  }
+
+  function scheduleRefresh(): void {
+    if (refreshSourceId !== 0) return
+
+    refreshSourceId = GLib.timeout_add(
+      GLib.PRIORITY_DEFAULT,
+      BATTERY_UPDATE_DEBOUNCE_MS,
+      () => {
+        refreshSourceId = 0
+        refreshSnapshot()
+        return GLib.SOURCE_REMOVE
+      },
+    )
+  }
 
   // 初回読み込み
-  setSnapshot(readCurrentSnapshot())
+  refreshSnapshot()
 
-  // upower --monitor でバッテリー変化を検知し即時更新
+  // upower のイベント嵐で UI 側が sysfs 読み取りを増幅しないように間引く。
   subprocess(
     ["upower", "--monitor"],
     (line) => {
       if (line.includes("battery") || line.includes("line_power") || line.includes("BAT")) {
-        setSnapshot(readCurrentSnapshot())
+        scheduleRefresh()
       }
     },
   )
