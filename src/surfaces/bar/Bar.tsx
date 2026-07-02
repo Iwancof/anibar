@@ -5,6 +5,11 @@ import { createMemo } from "gnim"
 import type { Accessor } from "gnim"
 
 import type { BatterySnapshot } from "../../modules/battery/domain.ts"
+import {
+  bluetoothTone as bluetoothHealthTone,
+  connectedDevices,
+  type BluetoothSnapshot,
+} from "../../modules/bluetooth/domain.ts"
 import type { VolumeSnapshot } from "../../modules/volume/domain.ts"
 import type { WorkspaceSnapshot } from "../../modules/workspace/domain.ts"
 import type { ImeSnapshot } from "../../runtime/ime-source.ts"
@@ -31,9 +36,11 @@ export interface BarProps {
   player: PlayerSource
   networkSnapshot: Accessor<NetworkSnapshot>
   wifiSnapshot: Accessor<WifiSnapshot>
+  bluetoothSnapshot: Accessor<BluetoothSnapshot>
   notifUnreadCount: Accessor<number>
   onToggleDashboard: () => void
   onToggleBatteryPopup: () => void
+  onToggleBluetoothPopup: () => void
   onToggleNotifCenter: () => void
   onToggleNetworkPopup: () => void
 }
@@ -61,6 +68,27 @@ function volumeTone(snapshot: VolumeSnapshot | null): BarModuleTone {
 
 function wifiTone(snapshot: NetworkSnapshot): BarModuleTone {
   return snapshot.online ? "normal" : "muted"
+}
+
+function bluetoothIcon(snapshot: BluetoothSnapshot): string {
+  if (!snapshot.available || !snapshot.adapters.some((adapter) => adapter.powered)) {
+    return ICONS.btOff
+  }
+
+  return connectedDevices(snapshot).length > 0 ? ICONS.btConnected : ICONS.bluetooth
+}
+
+function bluetoothValue(snapshot: BluetoothSnapshot): string {
+  const count = connectedDevices(snapshot).length
+  return count > 0 ? `${count}` : ""
+}
+
+function bluetoothTone(snapshot: BluetoothSnapshot): BarModuleTone {
+  const tone = bluetoothHealthTone(snapshot)
+  if (tone === "warning") return "warn"
+  if (tone === "critical") return "crit"
+  if (tone === "muted") return "muted"
+  return connectedDevices(snapshot).length > 0 ? "accent" : "normal"
 }
 
 export default function Bar(props: BarProps) {
@@ -145,6 +173,17 @@ export default function Bar(props: BarProps) {
                   return signalIcon(level)
                 })}
                 tone={props.networkSnapshot(wifiTone)}
+              />
+            </button>
+            <button
+              class="BtBarBtn"
+              valign={Gtk.Align.CENTER}
+              onClicked={props.onToggleBluetoothPopup}
+            >
+              <BarModule
+                icon={props.bluetoothSnapshot(bluetoothIcon)}
+                value={props.bluetoothSnapshot(bluetoothValue)}
+                tone={props.bluetoothSnapshot(bluetoothTone)}
               />
             </button>
           </box>

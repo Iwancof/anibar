@@ -4,6 +4,7 @@ import app from "ags/gtk4/app"
 import { Gdk, Gtk } from "ags/gtk4"
 
 import style from "../../style.scss"
+import { createBluetoothModule } from "../modules/bluetooth/service.ts"
 import { createRuntimeAppModules } from "../modules/index.ts"
 import { createSystemStatsSource } from "../runtime/system-stats-source.ts"
 import { createWorkspaceSource } from "../runtime/workspace-source.ts"
@@ -22,9 +23,11 @@ import { createLatencySource } from "../runtime/latency-source.ts"
 import { createSessionSource } from "../runtime/session-source.ts"
 import { createConnectionsSource } from "../runtime/connections-source.ts"
 import { createFlowsSource, createLogSource } from "../runtime/netmon-source.ts"
+import { createBluetoothSource } from "../runtime/bluetooth-source.ts"
 import Bar from "../surfaces/bar/Bar.tsx"
 import WorkspaceWindow from "../surfaces/workspace/WorkspaceWindow.tsx"
 import BatteryPopup from "../surfaces/popups/BatteryPopup.tsx"
+import BluetoothPopup from "../surfaces/popups/BluetoothPopup.tsx"
 import NetworkPanel from "../surfaces/network/NetworkPanel.tsx"
 import LauncherWindow from "../surfaces/launcher/LauncherWindow.tsx"
 import NotificationPopup from "../surfaces/notifications/NotificationPopup.tsx"
@@ -34,6 +37,7 @@ import DashboardMode from "../surfaces/dashboard-mode/DashboardMode.tsx"
 import {
   closeSwipeDashboard,
   toggleBatteryPopup,
+  toggleBluetoothPopup,
   toggleNetworkPopup,
   toggleNotifCenter,
   toggleWorkspaceVisibility,
@@ -45,6 +49,7 @@ const MONITOR_SAFETY_POLL_MS = 5000
 
 export function startMainApp() {
   const modules = createRuntimeAppModules()
+  const bluetoothModule = createBluetoothModule(createBluetoothSource())
   const systemStats = createSystemStatsSource()
   const workspaceSource = createWorkspaceSource()
   const imeSource = createImeSource()
@@ -80,12 +85,14 @@ export function startMainApp() {
         player: playerSource,
         networkSnapshot: modules.network.snapshot,
         wifiSnapshot: wifiSource.snapshot,
+        bluetoothSnapshot: bluetoothModule.snapshot,
         notifUnreadCount: notificationSource.unreadCount,
         batterySnapshot: modules.battery.snapshot,
         imeSnapshot: imeSource.snapshot,
         workspaceSnapshot: workspaceSource.snapshot,
         onToggleDashboard: toggleWorkspaceVisibility,
         onToggleBatteryPopup: toggleBatteryPopup,
+        onToggleBluetoothPopup: toggleBluetoothPopup,
         onToggleNotifCenter: () => {
           notificationSource.markAllRead()
           toggleNotifCenter()
@@ -119,6 +126,17 @@ export function startMainApp() {
         onToggleMeasure: pwsaveSource.toggleMeasure,
         onToggleAll: pwsaveSource.toggleAll,
         onSetLidAction: lidActionSource.setAction,
+      }),
+
+      BluetoothPopup({
+        gdkmonitor,
+        monitor,
+        snapshot: bluetoothModule.snapshot,
+        onSetPowered: bluetoothModule.setPowered,
+        onConnectDevice: bluetoothModule.connectDevice,
+        onDisconnectDevice: bluetoothModule.disconnectDevice,
+        onStartDiscovery: bluetoothModule.startDiscovery,
+        onStopDiscovery: bluetoothModule.stopDiscovery,
       }),
 
       LauncherWindow({

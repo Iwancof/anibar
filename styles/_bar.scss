@@ -233,6 +233,12 @@ window.Bar {
   margin: 0;
 }
 
+.BtBarBtn {
+  @extend %icon-btn-reset;
+  padding: 0;
+  margin: 0;
+}
+
 // ── 通知ベルアイコン (バー) ────────────────
 .NotifBellBtn {
   @extend %icon-btn-reset;
