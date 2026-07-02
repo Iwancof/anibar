@@ -68,7 +68,9 @@ export default function NotificationPopup(props: NotificationPopupProps) {
       exclusivity={Astal.Exclusivity.NORMAL}
       keymode={Astal.Keymode.ON_DEMAND}
       layer={Astal.Layer.OVERLAY}
-      onRealize={(self: any) => { windowRef = self }}
+      // onRealize は一度も表示されない window では発火せず windowRef が
+      // null のままポップアップが永遠に出ない。$ (構築時 setup) で取る。
+      $={(self: Astal.Window) => { windowRef = self }}
     >
       <overlay>
         {/* バックドロップ: クリックで全ポップアップを閉じる */}
