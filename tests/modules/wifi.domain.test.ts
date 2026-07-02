@@ -6,6 +6,9 @@ import {
   parseNmcliIpInfo,
   parseIpInfoJson,
   signalLevel,
+  signalIcon,
+  signalColorClass,
+  countryBadge,
 } from "../../src/modules/wifi/domain.ts"
 
 // ── signalLevel ─────────────────────────────
@@ -17,6 +20,15 @@ test("signalLevel maps 0-100 to discrete levels", () => {
   assert.equal(signalLevel(50), 3)
   assert.equal(signalLevel(75), 4)
   assert.equal(signalLevel(100), 4)
+})
+
+test("signal helpers render shared classes and country badges", () => {
+  assert.equal(signalIcon(4), "󰤨")
+  assert.equal(signalIcon(0), "󰤯")
+  assert.equal(signalColorClass(3), "NpApSignalHigh")
+  assert.equal(signalColorClass(1), "NpApSignalLow")
+  assert.equal(countryBadge("jp"), "JP")
+  assert.equal(countryBadge(""), "")
 })
 
 // ── parseWifiList ───────────────────────────

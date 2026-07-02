@@ -6,6 +6,7 @@ import {
   formatDurationMinutes,
   formatPercent,
   placeholder,
+  timeAgo,
 } from "../../src/shared/format.ts"
 
 test("formatPercent clamps values to 0..100", () => {
@@ -30,4 +31,13 @@ test("placeholder renders empty data with the design-system dash", () => {
   assert.equal(placeholder(null), "—")
   assert.equal(placeholder(undefined), "—")
   assert.equal(placeholder("hci0"), "hci0")
+})
+
+test("timeAgo renders compact notification ages", () => {
+  const now = Math.floor(Date.now() / 1000)
+
+  assert.equal(timeAgo(now), "now")
+  assert.equal(timeAgo(now - 5 * 60), "5m")
+  assert.equal(timeAgo(now - 2 * 3600), "2h")
+  assert.equal(timeAgo(now - 3 * 86400), "3d")
 })

@@ -35,6 +35,14 @@ export function formatBytesPerSecond(value: number): string {
   return `${current.toFixed(digits)} ${units[unit]}`
 }
 
+export function timeAgo(epochSeconds: number): string {
+  const diff = Math.max(0, Math.floor(Date.now() / 1000 - epochSeconds))
+  if (diff < 60) return "now"
+  if (diff < 3600) return `${Math.floor(diff / 60)}m`
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h`
+  return `${Math.floor(diff / 86400)}d`
+}
+
 export function formatDurationMinutes(value: number | null | undefined): string {
   if (value == null || !Number.isFinite(value) || value <= 0) {
     return "n/a"

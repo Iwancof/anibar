@@ -56,6 +56,11 @@ export function estimateBatteryMinutes(snapshot: BatterySnapshot): number | null
   return null
 }
 
+export function isOnAC(snapshot: BatterySnapshot | null): boolean {
+  return snapshot?.present === true &&
+    (snapshot.state === "charging" || snapshot.state === "full" || snapshot.state === "not-charging")
+}
+
 export function batteryTone(snapshot: BatterySnapshot | null): HealthTone {
   if (!snapshot || !snapshot.present) {
     return "muted"

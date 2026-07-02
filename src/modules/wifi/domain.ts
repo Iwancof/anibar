@@ -1,3 +1,5 @@
+import { ICONS } from "../../shared/ui/icons.ts"
+
 export interface WifiNetwork {
   ssid: string
   signal: number
@@ -62,6 +64,28 @@ export function signalLevel(signal: number): 0 | 1 | 2 | 3 | 4 {
   if (signal >= 25) return 2
   if (signal > 0) return 1
   return 0
+}
+
+export function signalIcon(level: number): string {
+  switch (level) {
+    case 4: return ICONS.wifi4
+    case 3: return ICONS.wifi3
+    case 2: return ICONS.wifi2
+    case 1: return ICONS.wifi1
+    default: return ICONS.wifiOff
+  }
+}
+
+export function signalColorClass(level: number): string {
+  if (level >= 3) return "NpApSignalHigh"
+  if (level >= 2) return "NpApSignalMid"
+  if (level >= 1) return "NpApSignalLow"
+  return "NpApSignalWeak"
+}
+
+export function countryBadge(code: string | null | undefined): string {
+  const normalized = (code ?? "").trim().toUpperCase()
+  return normalized.length === 2 ? normalized : ""
 }
 
 // BSSID pattern: escaped colons in nmcli -t output e.g. "DE\:AD\:BE\:EF\:00\:01"

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 
-import { estimateBatteryMinutes } from "../../src/modules/battery/domain.ts"
+import { estimateBatteryMinutes, isOnAC } from "../../src/modules/battery/domain.ts"
 import { toBatteryViewModel } from "../../src/modules/battery/view-model.ts"
 
 test("estimateBatteryMinutes calculates discharge ETA", () => {
@@ -15,6 +15,20 @@ test("estimateBatteryMinutes calculates discharge ETA", () => {
   })
 
   assert.equal(minutes, 120)
+})
+
+test("isOnAC follows charging, full, and not-charging states", () => {
+  assert.equal(isOnAC(null), false)
+  assert.equal(isOnAC({
+    present: true,
+    percent: 100,
+    state: "full",
+    energyNowWh: null,
+    energyFullWh: null,
+    energyFullDesignWh: null,
+    powerNowW: null,
+    cycleCount: null,
+  }), true)
 })
 
 test("toBatteryViewModel marks low discharging battery as critical", () => {
