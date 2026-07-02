@@ -95,7 +95,7 @@ JSX の `widthRequest` 等のマジックナンバーはここから取る:
 ## 6. Bar grammar
 
 Bar 右側は `[Icon][compact value]` のモジュール列。グループ間に separator（`rgba(border,1)` 1px）。
-- 例: `󰕾 0%`(vol) / `󰤨`(wifi, SSID は出さない→panel で見る) / `󰂱 2`(bt 接続数) / `󰂚 1`(notif) / `あ|A`(IME chip) / `󰁹 94`(bat)
+- 例: `󰕾 0%`(vol) / `󰤨 MySSID`(wifi+SSID) / `󰂱 2`(bt 接続数) / `󰂚 1`(notif) / `あ|A`(IME chip) / `󰁹 94`(bat)
 - 生テキストラベル（`VOL0 0%`、SSID 生表示）は禁止。値は最大 4 文字、省略は `…` でなく丸め。
 - 左: workspace pills + spectrum + player。中央: clock。
 

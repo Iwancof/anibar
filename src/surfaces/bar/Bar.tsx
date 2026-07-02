@@ -172,6 +172,10 @@ export default function Bar(props: BarProps) {
                   const level = signalLevel(sig)
                   return signalIcon(level)
                 })}
+                value={createMemo(() => {
+                  const ws = props.wifiSnapshot()
+                  return ws?.connected?.ssid ?? ""
+                })}
                 tone={props.networkSnapshot(wifiTone)}
               />
             </button>
