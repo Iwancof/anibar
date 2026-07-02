@@ -29,6 +29,9 @@ function pickFocusedMonitorWindow(prefix: string, windows: Gtk.Window[]): Gtk.Wi
 const batteryPopup = makeWindowController(WINDOW_PREFIXES.batteryPopup, {
   closeAnimMs: WINDOW_CLOSE_ANIM_MS,
 })
+const bluetoothPopup = makeWindowController(WINDOW_PREFIXES.bluetoothPopup, {
+  closeAnimMs: WINDOW_CLOSE_ANIM_MS,
+})
 const dashboardMode = makeWindowController(WINDOW_PREFIXES.dashboardMode)
 const launcher = makeWindowController(WINDOW_PREFIXES.launcher, {
   pick: (windows) => pickFocusedMonitorWindow(WINDOW_PREFIXES.launcher, windows),
@@ -46,6 +49,11 @@ export const anyBatteryPopupVisible = batteryPopup.anyVisible
 export const openBatteryPopup = batteryPopup.open
 export const closeBatteryPopup = batteryPopup.close
 export const toggleBatteryPopup = batteryPopup.toggle
+
+export const anyBluetoothPopupVisible = bluetoothPopup.anyVisible
+export const openBluetoothPopup = bluetoothPopup.open
+export const closeBluetoothPopup = bluetoothPopup.close
+export const toggleBluetoothPopup = bluetoothPopup.toggle
 
 export const anyDashboardModeVisible = dashboardMode.anyVisible
 export const openDashboardMode = dashboardMode.open

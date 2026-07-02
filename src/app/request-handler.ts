@@ -3,12 +3,14 @@ import {
   anySwipeDashboardVisible,
   anyWorkspaceVisible,
   closeBatteryPopup,
+  closeBluetoothPopup,
   closeDashboardMode,
   closeLauncher,
   closeNetworkPopup,
   closeNotifCenter,
   closeSwipeDashboard,
   openBatteryPopup,
+  openBluetoothPopup,
   openDashboardMode,
   openLauncher,
   openNetworkPopup,
@@ -16,6 +18,7 @@ import {
   openSwipeDashboard,
   setWorkspaceVisibility,
   toggleBatteryPopup,
+  toggleBluetoothPopup,
   toggleDashboardMode,
   toggleLauncher,
   toggleNetworkPopup,
@@ -95,6 +98,15 @@ export function handleAppRequest(args: string[]): string {
     }
   }
 
+  if (scope === "bluetooth") {
+    switch (action) {
+      case "toggle": toggleBluetoothPopup(); return "ok"
+      case "open": openBluetoothPopup(); return "ok"
+      case "close": closeBluetoothPopup(); return "ok"
+      default: return `unknown bluetooth action "${action}"`
+    }
+  }
+
   if (scope === "network") {
     switch (action) {
       case "toggle": toggleNetworkPopup(); return "ok"
@@ -114,7 +126,7 @@ export function handleAppRequest(args: string[]): string {
   }
 
   if (scope !== "dashboard" && scope !== "workspace") {
-    return 'unknown request. use "ags request battery|network|notif-center|dashboard|workspace|launcher|swipe-dashboard toggle"'
+    return 'unknown request. use "ags request battery|bluetooth|network|notif-center|dashboard|workspace|launcher|swipe-dashboard toggle"'
   }
 
   const label = scope === "workspace" ? "workspace" : "dashboard"
