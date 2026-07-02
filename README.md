@@ -24,7 +24,6 @@ AGS v3 / Astal GTK4 ベースの shell 設定です。
 │   ├── shared/               # formatters, tone model, shared UI
 │   └── surfaces/             # bar / dashboard windows and views
 ├── tests/                    # Node-based tests for pure layers
-└── widget/Bar.tsx            # compatibility re-export
 ```
 
 ## Dev commands

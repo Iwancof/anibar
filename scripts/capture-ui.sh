@@ -18,10 +18,10 @@ capture_bar() {
 
 capture_popup() {
   local name="$1" request="$2" delay="${3:-1}"
-  ags request "$request open" 2>/dev/null || true
+  ags request "$request" open 2>/dev/null || true
   sleep "$delay"
   grim "$OUT/${name}.png"
-  ags request "$request close" 2>/dev/null || true
+  ags request "$request" close 2>/dev/null || true
   echo "✓ ${name} → $OUT/${name}.png"
 }
 

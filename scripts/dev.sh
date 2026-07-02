@@ -26,14 +26,13 @@ trap cleanup SIGINT SIGTERM
 # 初回起動
 reload
 
-echo "[dev] 監視開始: theme.yaml, style.scss, src/, widget/"
+echo "[dev] 監視開始: theme.yaml, style.scss, src/"
 while true; do
   echo "[dev] inotifywait 待機中..."
   RESULT=$(inotifywait -r -e modify,create,delete \
     "$DIR/theme.yaml" \
     "$DIR/style.scss" \
     "$DIR/src" \
-    "$DIR/widget" \
     2>&1)
   RC=$?
   echo "[dev] inotifywait 終了 (rc=$RC): $RESULT"
