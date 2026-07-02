@@ -6,6 +6,7 @@ import type { Accessor } from "gnim"
 
 import type { BatterySnapshot } from "../../modules/battery/domain.ts"
 import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
+import { COLORS } from "../../shared/theme-tokens.ts"
 
 export interface BatteryBarWidgetProps {
   snapshot: Accessor<BatterySnapshot | null>
@@ -22,6 +23,9 @@ const GROW_MS = 2000
 const FADE_MS = 500
 const CYCLE_MS = HOLD_MS + GROW_MS + FADE_MS
 const TICK_MS = 30
+const BATTERY_GREEN = COLORS.rgb["bar-battery-green"]
+const BATTERY_AMBER = COLORS.rgb["bar-battery-amber"]
+const BATTERY_CHARGE = COLORS.rgb["bar-battery-charge"]
 
 export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
   const isOnAC = (s: BatterySnapshot | null) =>
@@ -80,9 +84,9 @@ export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
 
                 // Base fill color
                 if (low) {
-                  cr.setSourceRGBA(0.89, 0.65, 0.41, 1) // warning orange
+                  cr.setSourceRGBA(BATTERY_AMBER[0], BATTERY_AMBER[1], BATTERY_AMBER[2], 1)
                 } else {
-                  cr.setSourceRGBA(0.62, 0.81, 0.42, 1) // charging/healthy green
+                  cr.setSourceRGBA(BATTERY_GREEN[0], BATTERY_GREEN[1], BATTERY_GREEN[2], 1)
                 }
 
                 // Draw base fill
@@ -104,7 +108,7 @@ export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
                     const extraWidth = remainWidth * progress
 
                     // Lighter cyan-green for the growing part
-                    cr.setSourceRGBA(0.4, 0.9, 0.8, 0.6)
+                    cr.setSourceRGBA(BATTERY_CHARGE[0], BATTERY_CHARGE[1], BATTERY_CHARGE[2], 0.6)
                     cr.rectangle(baseWidth, 0, extraWidth, h)
                     cr.fill()
                   } else {
@@ -112,7 +116,7 @@ export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
                     const t = (cycle - HOLD_MS - GROW_MS) / FADE_MS // 0→1
                     const opacity = 0.6 * (1 - t)
 
-                    cr.setSourceRGBA(0.4, 0.9, 0.8, opacity)
+                    cr.setSourceRGBA(BATTERY_CHARGE[0], BATTERY_CHARGE[1], BATTERY_CHARGE[2], opacity)
                     cr.rectangle(baseWidth, 0, remainWidth, h)
                     cr.fill()
                   }

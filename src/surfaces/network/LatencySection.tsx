@@ -5,18 +5,24 @@ import { createMemo } from "gnim"
 import type { Accessor } from "gnim"
 import type { LatencySnapshot } from "../../runtime/latency-source.ts"
 import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
+import { COLORS } from "../../shared/theme-tokens.ts"
 
 const MAX_MS = 200
+const LATENCY_BG = COLORS.rgb["np-border"]
+const LATENCY_DIM = COLORS.rgb["chart-dim"]
+const LATENCY_GREEN = COLORS.rgb["chart-green"]
+const LATENCY_AMBER = COLORS.rgb["chart-amber"]
+const LATENCY_RED = COLORS.rgb["chart-red"]
 
 export interface LatencySectionProps {
   latencySnapshot: Accessor<LatencySnapshot>
 }
 
-function latencyColorRgb(ms: number): [number, number, number] {
-  if (ms < 0) return [0.36, 0.42, 0.5]     // dim
-  if (ms < 30) return [0, 1, 0.62]           // green
-  if (ms < 100) return [1, 0.71, 0.15]       // amber
-  return [1, 0.24, 0.24]                      // red
+function latencyColorRgb(ms: number): readonly [number, number, number] {
+  if (ms < 0) return LATENCY_DIM
+  if (ms < 30) return LATENCY_GREEN
+  if (ms < 100) return LATENCY_AMBER
+  return LATENCY_RED
 }
 
 function latencyColorClass(ms: number): string {
@@ -73,7 +79,7 @@ export default function LatencySection(props: LatencySectionProps) {
                   const ms = t?.ms ?? -1
 
                   // Background
-                  cr.setSourceRGBA(0.1, 0.14, 0.21, 0.5)
+                  cr.setSourceRGBA(LATENCY_BG[0], LATENCY_BG[1], LATENCY_BG[2], 0.5)
                   cr.rectangle(0, 0, w, 3)
                   cr.fill()
 

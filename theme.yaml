@@ -84,6 +84,9 @@ dim:
 
 # ── バー ────────────────────────────────────
 bar:
+  battery-green:  "#9ecf6b"
+  battery-amber:  "#e3a669"
+  battery-charge: "#66e6cc"
   margin:        "2px 2px 0"     # 外側余白 (上 左右 下)
   padding:       "2px 8px"      # 内側余白 (上下 左右)
   border-radius: 6px
@@ -97,6 +100,13 @@ bar:
   indicator:
     icon-size:  13px
     label-size: 13px
+
+chart:
+  green: "#00ff9e"
+  cyan:  "#008fff"
+  dim:   "#5c6b80"
+  amber: "#ffb526"
+  red:   "#ff3d3d"
 
 # ── ダッシュボード ──────────────────────────
 dashboard:

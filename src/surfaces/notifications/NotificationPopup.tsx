@@ -6,10 +6,14 @@ import { createMemo } from "gnim"
 
 import type { NotificationSource } from "../../runtime/notification-source.ts"
 import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
+import { COLORS } from "../../shared/theme-tokens.ts"
 
 const MAX_POPUPS = 3
 const TIMER_BAR_HEIGHT = 3
 const TICK_MS = 30
+const URGENCY_CRITICAL = COLORS.rgb["hud-pink"]
+const URGENCY_LOW = COLORS.rgb["colors-muted"]
+const URGENCY_NORMAL = COLORS.rgb["colors-accent"]
 
 export interface NotificationPopupProps {
   gdkmonitor: Gdk.Monitor
@@ -23,10 +27,10 @@ function urgencyClass(urgency: number): string {
   return "NotifCard"
 }
 
-function urgencyColor(urgency: number): [number, number, number] {
-  if (urgency === 2) return [255 / 255, 34 / 255, 102 / 255]
-  if (urgency === 0) return [138 / 255, 149 / 255, 179 / 255]
-  return [122 / 255, 162 / 255, 247 / 255]
+function urgencyColor(urgency: number): readonly [number, number, number] {
+  if (urgency === 2) return URGENCY_CRITICAL
+  if (urgency === 0) return URGENCY_LOW
+  return URGENCY_NORMAL
 }
 
 function timeAgo(epoch: number): string {

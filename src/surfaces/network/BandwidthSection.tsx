@@ -4,6 +4,7 @@ import { createMemo } from "gnim"
 import type { Accessor } from "gnim"
 import type { BandwidthSnapshot } from "../../runtime/bandwidth-source.ts"
 import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
+import { COLORS } from "../../shared/theme-tokens.ts"
 
 export interface BandwidthSectionProps {
   bandwidthSnapshot: Accessor<BandwidthSnapshot>
@@ -16,8 +17,8 @@ function formatSpeed(bps: number): string {
   return `${(bps / (1024 * 1024 * 1024)).toFixed(2)} GB/s`
 }
 
-const CYAN = [0, 0.898, 1] as const    // #00e5ff
-const MAGENTA = [1, 0.176, 0.471] as const // #ff2d78
+const CYAN = COLORS.rgb["np-cyan"]
+const MAGENTA = COLORS.rgb["np-magenta"]
 
 export default function BandwidthSection(props: BandwidthSectionProps) {
   const txLabel = createMemo(() => `TX ${formatSpeed(props.bandwidthSnapshot().currentTx)}`)

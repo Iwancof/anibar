@@ -7,6 +7,7 @@ import { createMemo } from "gnim"
 
 import type { PlayerSource } from "../../runtime/player-source.ts"
 import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
+import { COLORS } from "../../shared/theme-tokens.ts"
 
 const VISIBLE_WIDTH = 200
 const VISIBLE_HEIGHT = 20
@@ -14,6 +15,7 @@ const SCROLL_SPEED_PX = 0.75
 const SCROLL_INTERVAL_MS = 30
 const PAUSE_MS = 2000
 const PAUSE_TICKS = Math.ceil(PAUSE_MS / SCROLL_INTERVAL_MS)
+const MUTED_RGB = COLORS.rgb["colors-muted"]
 
 export interface PlayerWidgetProps {
   player: PlayerSource
@@ -87,7 +89,7 @@ export default function PlayerWidget(props: PlayerWidgetProps) {
             const [tw, th] = layout.get_pixel_size()
             textWidth = tw
 
-            cr.setSourceRGBA(138 / 255, 149 / 255, 179 / 255, 1)
+            cr.setSourceRGBA(MUTED_RGB[0], MUTED_RGB[1], MUTED_RGB[2], 1)
             const y = (VISIBLE_HEIGHT - th) / 2
             cr.moveTo(-offsetPx, y)
             PangoCairo.show_layout(cr, layout)
