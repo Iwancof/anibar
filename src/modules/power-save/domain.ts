@@ -43,9 +43,9 @@ export const LID_ACTIONS = ["suspend", "hibernate", "ignore"] as const
 export type LidAction = (typeof LID_ACTIONS)[number]
 
 export const LID_ACTION_LABELS: Record<LidAction, string> = {
-  suspend: "Sleep",
-  hibernate: "Hibernate",
-  ignore: "Ignore",
+  suspend: "SLEEP",
+  hibernate: "HIBERNATE",
+  ignore: "IGNORE",
 }
 
 export function parseLidAction(raw: string): LidAction {

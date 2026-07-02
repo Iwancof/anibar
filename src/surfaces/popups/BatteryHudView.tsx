@@ -3,6 +3,7 @@ import { createState } from "gnim"
 import type { Accessor } from "gnim"
 import {
   estimateBatteryMinutes,
+  batteryTone,
   batteryHealthPercent,
   isOnAC,
   type BatterySnapshot,
@@ -35,17 +36,26 @@ export interface BatteryHudViewProps {
 }
 
 const SEGMENTS = 10
+type HudTone = "normal" | "charge" | "warning" | "critical"
+
+function hudTone(snapshot: BatterySnapshot | null): HudTone {
+  if (!snapshot || !snapshot.present) return "normal"
+  if (isOnAC(snapshot)) return "charge"
+  const tone = batteryTone(snapshot)
+  if (tone === "critical") return "critical"
+  if (tone === "warning") return "warning"
+  return "normal"
+}
 
 function segmentClass(
   i: number,
   filledCount: number,
-  isCharging: boolean,
+  tone: HudTone,
 ): string {
-  if (isCharging && i === filledCount && i < SEGMENTS) return "HudSeg HudSegBlink"
   if (i >= filledCount) return "HudSeg HudSegEmpty"
-  if (i < SEGMENTS * 0.2) return "HudSeg HudSegCrit"
-  if (i < SEGMENTS * 0.5) return "HudSeg HudSegWarn"
-  return isCharging ? "HudSeg HudSegCharge" : "HudSeg HudSegOk"
+  if (tone === "critical") return "HudSeg HudSegCrit"
+  if (tone === "warning") return "HudSeg HudSegWarn"
+  return tone === "charge" ? "HudSeg HudSegCharge" : "HudSeg HudSegOk"
 }
 
 const MEASURE_META: Record<MeasureName, { label: string; sub: string }> = {
@@ -64,8 +74,10 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
 
   const dotClass = props.snapshot((s) => {
     if (!s || !s.present) return "HudDot"
-    if (isOnAC(s)) return "HudDot HudDotCharge"
-    if (s.percent < 20) return "HudDot HudDotCrit"
+    const tone = hudTone(s)
+    if (tone === "charge") return "HudDot HudDotCharge"
+    if (tone === "critical") return "HudDot HudDotCrit"
+    if (tone === "warning") return "HudDot HudDotWarn"
     return "HudDot HudDotNormal"
   })
 
@@ -75,14 +87,16 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
 
   const percentClass = props.snapshot((s) => {
     if (!s || !s.present) return "HudPercent"
-    if (s.percent < 20) return "HudPercent HudPercentCrit"
-    if (isOnAC(s)) return "HudPercent HudPercentCharge"
+    const tone = hudTone(s)
+    if (tone === "critical") return "HudPercent HudPercentCrit"
+    if (tone === "warning") return "HudPercent HudPercentWarn"
+    if (tone === "charge") return "HudPercent HudPercentCharge"
     return "HudPercent HudPercentNormal"
   })
 
   const segState = props.snapshot((s) => ({
     filled: !s || !s.present ? 0 : Math.round((s.percent / 100) * SEGMENTS),
-    charging: s?.present === true && s.state === "charging",
+    tone: hudTone(s),
   }))
 
   const timeLeft = props.snapshot((s) => {
@@ -172,7 +186,7 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
             <box class="HudSegBar" spacing={3} homogeneous>
               {Array.from({ length: SEGMENTS }).map((_, i) => (
                 <box
-                  class={segState((s) => segmentClass(i, s.filled, s.charging))}
+                  class={segState((s) => segmentClass(i, s.filled, s.tone))}
                   heightRequest={20}
                 />
               ))}

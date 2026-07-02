@@ -144,48 +144,41 @@
 .UiToggleTrack {
   min-width: 51px;
   min-height: 31px;
-  border-radius: 16px;
-  background: rgba($np-bg3, 0.6);
-  border: 1.5px solid rgba($hud-border, 0.9);
-  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: $radius-sm;
+  background: $np-bg2;
+  border: 1px solid $np-border;
+  transition: background 200ms ease, border-color 200ms ease;
 }
 
 .UiToggleTrackOn {
-  background: rgba($hud-cyan, 0.18);
-  border-color: rgba($hud-cyan, 0.30);
-  box-shadow: 0 0 16px rgba($hud-cyan, 0.08);
+  background: rgba($colors-accent, 0.18);
+  border-color: $colors-accent;
 }
 
 .UiToggleKnob {
   min-width: 25px;
   min-height: 25px;
-  border-radius: 13px;
-  background: rgba($hud-text, 0.24);
+  border-radius: $radius-xs;
+  background: $np-text-sec;
   margin-top: 2px;
   margin-bottom: 2px;
   margin-left: 2px;
-  box-shadow: 0 1px 2px rgba($np-bg0, 0.8),
-              0 3px 6px rgba($np-bg0, 0.55);
-  transition: margin-left 350ms cubic-bezier(0.5, 1.5, 0.4, 0.85),
-              background 300ms ease,
-              box-shadow 300ms ease,
-              min-width 180ms ease;
+  transition: margin-left 200ms ease, background 200ms ease;
 }
 
 .UiToggleKnobOn {
-  background: $hud-cyan;
+  background: $colors-accent;
   margin-left: 22px;
-  box-shadow: 0 0 8px rgba($hud-cyan, 0.45),
-              0 0 3px rgba($hud-cyan, 0.7),
-              0 2px 4px rgba($np-bg0, 0.7);
 }
 
-.UiToggleSwitchBtn:active .UiToggleKnob {
-  min-width: 30px;
+.UiToggleSwitchBtn:hover .UiToggleTrack,
+.UiToggleSwitchBtn:active .UiToggleTrack {
+  border-color: rgba($colors-accent, 0.35);
 }
 
-.UiToggleSwitchBtn:active .UiToggleKnobOn {
-  margin-left: 17px;
+.UiToggleSwitchBtn:hover .UiToggleTrackOn,
+.UiToggleSwitchBtn:active .UiToggleTrackOn {
+  border-color: $colors-accent;
 }
 
 .UiPlayerControls {
@@ -211,6 +204,8 @@
 
 .DmMusicControls .UiPlayerBtn {
   padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: $radius-md;
 }
 
 .DmMusicControls .UiPlayerBtn .UiIcon {
@@ -218,8 +213,14 @@
   color: $np-text-sec;
 }
 
-.DmMusicControls .UiPlayerBtn:hover .UiIcon {
-  color: $np-text;
+.DmMusicControls .UiPlayerBtn:hover,
+.DmMusicControls .UiPlayerBtn:active {
+  border-color: rgba($colors-accent, 0.35);
+}
+
+.DmMusicControls .UiPlayerBtn:hover .UiIcon,
+.DmMusicControls .UiPlayerBtn:active .UiIcon {
+  color: $np-text-sec;
 }
 
 .UiNotificationCard {

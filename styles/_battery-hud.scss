@@ -9,12 +9,11 @@
 }
 
 @include popup-anim(".BatPopup") {
-  animation: popup-slide-in 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards,
-             glow-pulse 3s ease-in-out 400ms infinite;
+  animation: popup-slide-in 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .BatPopupPanel {
-  @include popup-panel(rgba($hud-border, 0.8), 8px, 420px);
+  @include popup-panel(rgba($hud-border, 0.8), $radius-lg, 420px);
   margin-top: 6px;
   margin-right: 8px;
   box-shadow: $popup-shadow;
@@ -33,6 +32,7 @@
 
 .HudHeaderLabel {
   @extend %eyebrow-label;
+  letter-spacing: 0.10em;
   color: rgba($hud-text, 0.5);
 }
 
@@ -42,11 +42,12 @@
 }
 
 .HudDot {
-  border-radius: 99px;
-  background: #555;
+  border-radius: $radius-pill;
+  background: $np-text-sec;
 }
-.HudDotNormal { background: $hud-blue; }
-.HudDotCharge { background: $hud-cyan; }
+.HudDotNormal { background: $colors-accent; }
+.HudDotCharge { background: $colors-accent; }
+.HudDotWarn   { background: $colors-warning; }
 .HudDotCrit   { background: $colors-critical; }
 
 .HudBody {
@@ -55,13 +56,14 @@
 
 .HudPercent {
   font-size: 46px;
-  font-weight: 700;
+  font-weight: 800;
   font-family: $font-family;
-  color: $hud-blue;
+  color: $colors-accent;
   min-width: 120px;
 }
-.HudPercentNormal { color: $hud-blue; }
-.HudPercentCharge { color: $hud-cyan; }
+.HudPercentNormal { color: $colors-accent; }
+.HudPercentCharge { color: $colors-accent; }
+.HudPercentWarn   { color: $colors-warning; }
 .HudPercentCrit   { color: $colors-critical; }
 
 .HudPercentUnit {
@@ -75,20 +77,20 @@
 }
 
 .HudSeg {
-  border-radius: 2px;
+  border-radius: $radius-sm;
   min-width: 1px;
 }
 .HudSegEmpty {
-  background: #151822;
-  border: 1px solid #1e2235;
+  background: $np-bg3;
+  border: 1px solid $np-border;
 }
 .HudSegOk,
 .HudSegCharge {
-  background: $hud-cyan;
+  background: $colors-accent;
   border: 1px solid transparent;
 }
 .HudSegWarn {
-  background: $hud-amber;
+  background: $colors-warning;
   border: 1px solid transparent;
 }
 .HudSegCrit {
@@ -96,17 +98,10 @@
   border: 1px solid transparent;
 }
 
-
-.HudSegBlink {
-  animation: seg-blink 1.2s ease-in-out infinite;
-  border: 1px solid rgba($hud-cyan, 0.3);
-  border-radius: 2px;
-}
-
 .HudSegScale {
   font-size: 9px;
   color: rgba($hud-text, 0.3);
-  letter-spacing: 1px;
+  letter-spacing: 0.10em;
 }
 
 .HudFooterLine {
@@ -135,23 +130,23 @@
 }
 
 .HudProcBarBg {
-  background: #151822;
-  border-radius: 2px;
+  background: $np-bg3;
+  border-radius: $radius-sm;
 }
 
 .HudProcBar {
-  border-radius: 2px;
+  border-radius: $radius-sm;
   min-height: 3px;
 }
-.HudProcBarLow  { background: $hud-cyan; }
-.HudProcBarMed  { background: $hud-amber; }
+.HudProcBarLow  { background: $colors-accent; }
+.HudProcBarMed  { background: $colors-warning; }
 .HudProcBarHigh { background: $colors-critical; }
 
 .HudProcCpu {
   font-size: 11px;
 }
-.HudProcCpuLow  { color: $hud-cyan; }
-.HudProcCpuMed  { color: $hud-amber; }
+.HudProcCpuLow  { color: $colors-accent; }
+.HudProcCpuMed  { color: $colors-warning; }
 .HudProcCpuHigh { color: $colors-critical; }
 
 // ── Power Controls (HUD内) ───────────────
@@ -172,49 +167,48 @@
 
 .HudPulldownSub {
   font-size: 9px;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.10em;
   color: rgba($hud-text, 0.3);
 }
 
 .HudPulldownTrigger {
-  background: rgba(21, 24, 34, 0.6);
-  border: 1px solid rgba(42, 46, 62, 0.7);
-  border-radius: 8px;
+  background: rgba($np-bg2, 0.6);
+  border: 1px solid $np-border;
+  border-radius: $radius-md;
   padding: 5px 12px;
   min-width: 100px;
 }
 
 .HudPulldownTrigger label {
-  color: $hud-blue;
+  color: $colors-accent;
   font-size: 13px;
 }
 
 .HudPulldownTriggerOpen {
-  border-color: rgba($hud-blue, 0.4);
+  border-color: $colors-accent;
 }
 
 // ── Pull-down menu (overlay) ──
 .HudPdMenu {
-  background: rgba(17, 20, 32, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
+  background: rgba($np-bg1, 0.92);
+  border: 1px solid $np-border;
+  border-radius: $radius-lg;
   padding: 4px;
   margin-top: 6px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55),
-              0 0 1px rgba($hud-blue, 0.15);
 }
 
 .HudPdSection {
   @extend %eyebrow-label;
   font-size: 9px;
   font-weight: 600;
+  letter-spacing: 0.10em;
   color: rgba($hud-text, 0.3);
   padding: 6px 14px 4px;
 }
 
 .HudPdItem {
   @extend %icon-btn-reset;
-  border-radius: 8px;
+  border-radius: $radius-md;
   padding: 8px 14px;
 }
 
@@ -224,16 +218,16 @@
 }
 
 .HudPdItemSelected {
-  background: rgba($hud-blue, 0.08);
+  background: rgba($colors-accent, 0.08);
 }
 
 .HudPdItemSelected label {
-  color: $hud-cyan;
+  color: $colors-accent;
 }
 
 .HudPdCheck {
   font-size: 13px;
-  color: $hud-cyan;
+  color: $colors-accent;
   min-width: 18px;
 }
 
