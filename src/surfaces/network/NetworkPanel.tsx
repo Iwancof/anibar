@@ -27,6 +27,7 @@ import WifiTab from "./WifiTab.tsx"
 
 export interface NetworkPanelProps {
   gdkmonitor: Gdk.Monitor
+  monitor: string
   monitorIndex: number
   networkSnapshot: Accessor<NetworkSnapshot>
   wifiSnapshot: Accessor<WifiSnapshot>
@@ -47,7 +48,7 @@ export default function NetworkPanel(props: NetworkPanelProps) {
 
   return (
     <window
-      name={`network-popup:${props.monitorIndex}`}
+      name={`network-popup:${props.monitor}`}
       class="NpWindow"
       visible={false}
       application={app}

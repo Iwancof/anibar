@@ -1,6 +1,11 @@
 import { anyDashboardVisible, setDashboardVisibility, toggleDashboardVisibility } from "./dashboard-controller.ts"
 import { anyLauncherVisible, toggleLauncher, openLauncher, closeLauncher } from "./launcher-controller.ts"
-import { anySwipeDashboardVisible, setSwipeDashboardVisibility, toggleSwipeDashboard } from "./swipe-dashboard-controller.ts"
+import {
+  anySwipeDashboardVisible,
+  closeSwipeDashboard,
+  openSwipeDashboard,
+  toggleSwipeDashboard,
+} from "./swipe-dashboard-controller.ts"
 import { toggleBatteryPopup, openBatteryPopup, closeBatteryPopup, anyBatteryPopupVisible } from "./popup-controller.ts"
 import { toggleNetworkPopup, openNetworkPopup, closeNetworkPopup } from "./network-controller.ts"
 import { toggleNotifCenter, openNotifCenter, closeNotifCenter } from "./notification-controller.ts"
@@ -55,11 +60,11 @@ export function handleAppRequest(args: string[]): string {
         return `swipe-dashboard ${anySwipeDashboardVisible() ? "visible" : "hidden"}`
       case "open":
       case "show":
-        setSwipeDashboardVisibility(true)
+        openSwipeDashboard()
         return "swipe-dashboard visible"
       case "close":
       case "hide":
-        setSwipeDashboardVisibility(false)
+        closeSwipeDashboard()
         return "swipe-dashboard hidden"
       case "status":
         return anySwipeDashboardVisible() ? "swipe-dashboard visible" : "swipe-dashboard hidden"

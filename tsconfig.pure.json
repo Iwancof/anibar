@@ -13,6 +13,7 @@
     "src/shared/format.ts",
     "src/shared/health.ts",
     "src/shared/bar-indicator.ts",
+    "src/shared/monitor-diff.ts",
     "src/modules/**/domain.ts",
     "src/modules/**/view-model.ts",
     "src/modules/**/bar-view-model.ts"

@@ -22,7 +22,6 @@ import { createLatencySource } from "../runtime/latency-source.ts"
 import { createSessionSource } from "../runtime/session-source.ts"
 import { createConnectionsSource } from "../runtime/connections-source.ts"
 import { createFlowsSource, createLogSource } from "../runtime/netmon-source.ts"
-import { safeExec } from "../runtime/command.ts"
 import Bar from "../surfaces/bar/Bar.tsx"
 import WorkspaceWindow from "../surfaces/workspace/WorkspaceWindow.tsx"
 import BatteryPopup from "../surfaces/popups/BatteryPopup.tsx"
@@ -34,46 +33,13 @@ import SwipeDashboard from "../surfaces/dashboard/SwipeDashboard.tsx"
 import DashboardMode from "../surfaces/dashboard-mode/DashboardMode.tsx"
 import { toggleNotifCenter } from "./notification-controller.ts"
 import { toggleDashboardVisibility } from "./dashboard-controller.ts"
-import { toggleSwipeDashboard } from "./swipe-dashboard-controller.ts"
+import { closeSwipeDashboard } from "./swipe-dashboard-controller.ts"
 import { toggleBatteryPopup } from "./popup-controller.ts"
 import { toggleNetworkPopup } from "./network-controller.ts"
 import { handleAppRequest } from "./request-handler.ts"
+import { createMonitorRegistry, getMonitorsListModel } from "./monitor-registry.ts"
 
-const MONITOR_POLL_MS = 1000
-
-function disposeWindow(window: Gtk.Window) {
-  try {
-    window.close()
-  } catch {}
-
-  try {
-    app.remove_window(window)
-  } catch {}
-
-  try {
-    window.destroy()
-  } catch {}
-}
-
-async function readHyprMonitorSignature(): Promise<string | null> {
-  const output = await safeExec(["hyprctl", "monitors", "-j"])
-  if (!output) return null
-
-  try {
-    const monitors = JSON.parse(output) as Array<Record<string, unknown>>
-    // Only compare physical layout fields. Focus changes as the pointer moves.
-    return JSON.stringify(monitors.map((monitor) => ({
-      name: monitor.name ?? "",
-      x: monitor.x ?? 0,
-      y: monitor.y ?? 0,
-      width: monitor.width ?? 0,
-      height: monitor.height ?? 0,
-      scale: monitor.scale ?? 1,
-    })))
-  } catch {
-    return null
-  }
-}
+const MONITOR_SAFETY_POLL_MS = 5000
 
 export function startMainApp() {
   const modules = createRuntimeAppModules()
@@ -100,11 +66,13 @@ export function startMainApp() {
 
   function createMonitorWindows(
     gdkmonitor: Gdk.Monitor,
+    monitor: string,
     monitorIndex: number,
   ): Gtk.Window[] {
     return [
       Bar({
         gdkmonitor,
+        monitor,
         monitorIndex,
         clock: barClock,
         indicators,
@@ -127,6 +95,7 @@ export function startMainApp() {
 
       NetworkPanel({
         gdkmonitor,
+        monitor,
         monitorIndex,
         networkSnapshot: modules.network.snapshot,
         wifiSnapshot: wifiSource.snapshot,
@@ -144,6 +113,7 @@ export function startMainApp() {
 
       BatteryPopup({
         gdkmonitor,
+        monitor,
         monitorIndex,
         snapshot: modules.battery.snapshot,
         systemStats: systemStats.snapshot,
@@ -161,29 +131,33 @@ export function startMainApp() {
 
       NotificationPopup({
         gdkmonitor,
+        monitor,
         monitorIndex,
         notifications: notificationSource,
       }),
 
       NotificationCenter({
         gdkmonitor,
+        monitor,
         monitorIndex,
         notifications: notificationSource,
       }),
 
       SwipeDashboard({
         gdkmonitor,
+        monitor,
         monitorIndex,
         batterySnapshot: modules.battery.snapshot,
         notifications: notificationSource,
         player: playerSource,
         onClose: () => {
-          toggleSwipeDashboard()
+          closeSwipeDashboard()
         },
       }),
 
       DashboardMode({
         gdkmonitor,
+        monitor,
         monitorIndex,
         clock,
         networkSnapshot: modules.network.snapshot,
@@ -209,6 +183,7 @@ export function startMainApp() {
 
       WorkspaceWindow({
         gdkmonitor,
+        monitor,
         monitorIndex,
         snapshot: workspaceSource.snapshot,
         onClose: () => {
@@ -224,74 +199,64 @@ export function startMainApp() {
       respond(handleAppRequest(args))
     },
     main() {
-      let monitorWindows: Gtk.Window[] = []
-      let pendingSyncSource = 0
-      let hyprMonitorPollSource = 0
-      let hyprMonitorPollInFlight = false
-      let lastHyprMonitorSignature: string | null = null
+      const bootT = GLib.get_monotonic_time() / 1000
+      console.log(`[bootstrap] ${bootT.toFixed(1)}ms main() start`)
 
-      const syncMonitorWindows = () => {
-        monitorWindows.forEach(disposeWindow)
-        monitorWindows = []
+      const reg = createMonitorRegistry((monitor, connector, index) =>
+        createMonitorWindows(monitor, connector, index),
+      )
 
-        app.get_monitors().forEach((gdkmonitor, monitorIndex) => {
-          monitorWindows.push(...createMonitorWindows(gdkmonitor, monitorIndex))
-        })
-      }
-
-      const pollHyprMonitorTopology = async () => {
-        if (hyprMonitorPollInFlight) return
-        hyprMonitorPollInFlight = true
-
-        const signature = await readHyprMonitorSignature()
-        hyprMonitorPollInFlight = false
-
-        if (!signature) return
-
-        if (lastHyprMonitorSignature == null) {
-          lastHyprMonitorSignature = signature
+      const monitorsModel = getMonitorsListModel()
+      let reconcilePending = false
+      const scheduleReconcile = (source: string) => {
+        const t = GLib.get_monotonic_time() / 1000
+        if (reconcilePending) {
+          console.log(`[bootstrap] ${t.toFixed(1)}ms scheduleReconcile(${source}) — already pending, skip`)
           return
         }
-
-        if (signature !== lastHyprMonitorSignature) {
-          lastHyprMonitorSignature = signature
-          scheduleMonitorSync()
-        }
-      }
-
-      const scheduleMonitorSync = () => {
-        if (pendingSyncSource !== 0) return
-
-        pendingSyncSource = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 150, () => {
-          pendingSyncSource = 0
-          syncMonitorWindows()
-          void pollHyprMonitorTopology()
-          return false
+        reconcilePending = true
+        console.log(`[bootstrap] ${t.toFixed(1)}ms scheduleReconcile(${source}) → idle`)
+        GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+          const t2 = GLib.get_monotonic_time() / 1000
+          console.log(`[bootstrap] ${t2.toFixed(1)}ms reconcile idle fire (source=${source})`)
+          reconcilePending = false
+          reg.reconcile()
+          return GLib.SOURCE_REMOVE
         })
       }
+      const itemsChangedId = monitorsModel.connect(
+        "items-changed",
+        (_model: unknown, position: number, removed: number, added: number) => {
+          const t = GLib.get_monotonic_time() / 1000
+          console.log(`[bootstrap] ${t.toFixed(1)}ms items-changed pos=${position} removed=${removed} added=${added}`)
+          scheduleReconcile("items-changed")
+        },
+      )
 
-      const monitorSignalId = app.connect("notify::monitors", scheduleMonitorSync)
-      hyprMonitorPollSource = GLib.timeout_add(GLib.PRIORITY_DEFAULT, MONITOR_POLL_MS, () => {
-        void pollHyprMonitorTopology()
-        return true
-      })
+      const safetyPollId = GLib.timeout_add(
+        GLib.PRIORITY_DEFAULT,
+        MONITOR_SAFETY_POLL_MS,
+        () => {
+          scheduleReconcile("safety-poll")
+          return GLib.SOURCE_CONTINUE
+        },
+      )
 
       app.connect("shutdown", () => {
-        if (pendingSyncSource !== 0) {
-          GLib.source_remove(pendingSyncSource)
-          pendingSyncSource = 0
+        const t = GLib.get_monotonic_time() / 1000
+        console.log(`[bootstrap] ${t.toFixed(1)}ms shutdown`)
+        try {
+          monitorsModel.disconnect(itemsChangedId)
+        } catch (e) {
+          console.warn(`bootstrap: disconnect items-changed failed: ${e}`)
         }
-        if (hyprMonitorPollSource !== 0) {
-          GLib.source_remove(hyprMonitorPollSource)
-          hyprMonitorPollSource = 0
-        }
-        app.disconnect(monitorSignalId)
-        monitorWindows.forEach(disposeWindow)
-        monitorWindows = []
+        GLib.source_remove(safetyPollId)
+        reg.disposeAll()
       })
 
-      syncMonitorWindows()
-      void pollHyprMonitorTopology()
+      reg.reconcile()
+      const bootT2 = GLib.get_monotonic_time() / 1000
+      console.log(`[bootstrap] ${bootT2.toFixed(1)}ms main() initial reconcile done (registry size=${reg.registry.size})`)
     },
   })
 }

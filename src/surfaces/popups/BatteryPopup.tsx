@@ -11,6 +11,7 @@ import BatteryHudView from "./BatteryHudView.tsx"
 
 export interface BatteryPopupProps {
   gdkmonitor: Gdk.Monitor
+  monitor: string
   monitorIndex: number
   snapshot: Accessor<BatterySnapshot | null>
   systemStats: Accessor<SystemStatsSnapshot | null>
@@ -26,7 +27,7 @@ export default function BatteryPopup(props: BatteryPopupProps) {
 
   return (
     <window
-      name={`battery-popup:${props.monitorIndex}`}
+      name={`battery-popup:${props.monitor}`}
       class="BatPopup"
       visible={false}
       application={app}

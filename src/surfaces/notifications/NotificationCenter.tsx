@@ -11,6 +11,7 @@ const MAX_HISTORY = 20
 
 export interface NotificationCenterProps {
   gdkmonitor: Gdk.Monitor
+  monitor: string
   monitorIndex: number
   notifications: NotificationSource
 }
@@ -40,7 +41,7 @@ export default function NotificationCenter(props: NotificationCenterProps) {
 
   return (
     <window
-      name={`notif-center:${props.monitorIndex}`}
+      name={`notif-center:${props.monitor}`}
       class="NotifCenter"
       visible={false}
       application={app}

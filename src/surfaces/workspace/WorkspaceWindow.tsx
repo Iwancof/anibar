@@ -8,6 +8,7 @@ import WorkspaceView from "./WorkspaceView.tsx"
 
 export interface WorkspaceWindowProps {
   gdkmonitor: Gdk.Monitor
+  monitor: string
   monitorIndex: number
   snapshot: Accessor<WorkspaceSnapshot | null>
   onClose: () => void
@@ -18,7 +19,7 @@ export default function WorkspaceWindow(props: WorkspaceWindowProps) {
 
   return (
     <window
-      name={`dashboard:${props.monitorIndex}`}
+      name={`dashboard:${props.monitor}`}
       class="WsOverview"
       visible={false}
       application={app}

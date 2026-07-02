@@ -23,6 +23,14 @@ export function setSwipeDashboardVisibility(visible: boolean): number {
   return windows.length
 }
 
+export function openSwipeDashboard(): number {
+  return setSwipeDashboardVisibility(true)
+}
+
+export function closeSwipeDashboard(): number {
+  return setSwipeDashboardVisibility(false)
+}
+
 export function toggleSwipeDashboard(): number {
   return setSwipeDashboardVisibility(!anySwipeDashboardVisible())
 }

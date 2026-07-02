@@ -19,6 +19,7 @@ import PlayerWidget from "./PlayerWidget.tsx"
 
 export interface BarProps {
   gdkmonitor: Gdk.Monitor
+  monitor: string
   monitorIndex: number
   clock: Accessor<string>
   indicators: Accessor<BarIndicatorViewModel>[]
@@ -53,7 +54,7 @@ export default function Bar(props: BarProps) {
   return (
     <window
       visible
-      name={`bar:${props.monitorIndex}`}
+      name={`bar:${props.monitor}`}
       class="Bar"
       gdkmonitor={props.gdkmonitor}
       exclusivity={Astal.Exclusivity.EXCLUSIVE}

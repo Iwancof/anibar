@@ -3,6 +3,7 @@ import { Gtk } from "ags/gtk4"
 import { createMemo } from "gnim"
 import type { Accessor } from "gnim"
 import type { BandwidthSnapshot } from "../../runtime/bandwidth-source.ts"
+import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
 
 export interface BandwidthSectionProps {
   bandwidthSnapshot: Accessor<BandwidthSnapshot>
@@ -23,6 +24,11 @@ export default function BandwidthSection(props: BandwidthSectionProps) {
   const rxLabel = createMemo(() => `RX ${formatSpeed(props.bandwidthSnapshot().currentRx)}`)
 
   let drawingArea: any = null
+
+  scopedTimeoutAdd(GLib.PRIORITY_DEFAULT, 500, () => {
+    if (drawingArea) drawingArea.queue_draw()
+    return GLib.SOURCE_CONTINUE
+  }, "BandwidthSection")
 
   function drawSparkline(cr: any, w: number, h: number) {
     const snap = props.bandwidthSnapshot()
@@ -119,14 +125,6 @@ export default function BandwidthSection(props: BandwidthSectionProps) {
           drawingArea = self
           self.set_draw_func((_area: any, cr: any, w: number, h: number) => {
             drawSparkline(cr, w, h)
-          })
-          // Redraw every 500ms
-          GLib.timeout_add(GLib.PRIORITY_DEFAULT, 500, () => {
-            if (drawingArea) {
-              drawingArea.queue_draw()
-              return GLib.SOURCE_CONTINUE
-            }
-            return GLib.SOURCE_REMOVE
           })
         }}
       />

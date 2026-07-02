@@ -35,6 +35,7 @@ import BatteryHudView from "../popups/BatteryHudView.tsx"
 
 export interface DashboardModeProps {
   gdkmonitor: Gdk.Monitor
+  monitor: string
   monitorIndex: number
   clock: Accessor<string>
   // Network
@@ -66,7 +67,7 @@ export default function DashboardMode(props: DashboardModeProps) {
 
   return (
     <window
-      name={`dashboard-mode:${props.monitorIndex}`}
+      name={`dashboard-mode:${props.monitor}`}
       class="DmWindow"
       visible={false}
       application={app}

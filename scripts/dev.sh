@@ -3,14 +3,17 @@
 set -uo pipefail
 
 DIR="$(cd "$(dirname "$0")/.." && pwd)"
+RUNTIME_LOG="${TMPDIR:-/tmp}/ags-runtime.log"
 
 reload() {
   echo "[dev] テーマ生成中..."
   python3 "$DIR/scripts/gen-theme.py"
   echo "[dev] AGS 再起動中..."
   ags quit 2>/dev/null || true
-  ags run --gtk 4 &
+  : > "$RUNTIME_LOG"
+  ags run --gtk 4 >>"$RUNTIME_LOG" 2>&1 &
   echo "[dev] 起動完了 ($(date +%H:%M:%S))"
+  echo "[dev] AGS child log: $RUNTIME_LOG"
 }
 
 cleanup() {

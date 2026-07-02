@@ -10,6 +10,7 @@ import type { PlayerSource } from "../../runtime/player-source.ts"
 
 export interface SwipeDashboardProps {
   gdkmonitor: Gdk.Monitor
+  monitor: string
   monitorIndex: number
   batterySnapshot: Accessor<BatterySnapshot | null>
   notifications: NotificationSource
@@ -160,17 +161,17 @@ function PlayerSection(props: { player: PlayerSource }) {
 // ── Window ─────────────────────────────────
 
 export default function SwipeDashboard(props: SwipeDashboardProps) {
-  const { TOP, RIGHT, BOTTOM } = Astal.WindowAnchor
+  const { TOP, LEFT, RIGHT, BOTTOM } = Astal.WindowAnchor
 
   return (
     <window
-      name={`swipe-dashboard:${props.monitorIndex}`}
+      name={`swipe-dashboard:${props.monitor}`}
       class="SwipeDash"
       visible={false}
       application={app}
       gdkmonitor={props.gdkmonitor}
-      anchor={TOP | RIGHT | BOTTOM}
-      exclusivity={Astal.Exclusivity.NORMAL}
+      anchor={TOP | LEFT | RIGHT | BOTTOM}
+      exclusivity={Astal.Exclusivity.IGNORE}
       keymode={Astal.Keymode.ON_DEMAND}
       layer={Astal.Layer.OVERLAY}
       onRealize={(self: any) => {

@@ -4,6 +4,7 @@ import { Gtk } from "ags/gtk4"
 import { createMemo } from "gnim"
 import type { Accessor } from "gnim"
 import type { LatencySnapshot } from "../../runtime/latency-source.ts"
+import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
 
 const MAX_MS = 200
 
@@ -29,12 +30,12 @@ export default function LatencySection(props: LatencySectionProps) {
   const drawingAreas: (Gtk.DrawingArea | null)[] = [null, null, null, null]
 
   // 2秒ごとにバーを再描画
-  GLib.timeout_add(GLib.PRIORITY_DEFAULT, 2000, () => {
+  scopedTimeoutAdd(GLib.PRIORITY_DEFAULT, 2000, () => {
     for (const da of drawingAreas) {
       if (da) da.queue_draw()
     }
     return GLib.SOURCE_CONTINUE
-  })
+  }, "LatencySection")
 
   const cards = Array.from({ length: 4 }, (_, i) => {
     const target = createMemo(() => props.latencySnapshot().targets[i])

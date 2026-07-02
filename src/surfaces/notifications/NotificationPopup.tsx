@@ -5,6 +5,7 @@ import { Astal, Gdk, Gtk } from "ags/gtk4"
 import { createMemo } from "gnim"
 
 import type { NotificationSource } from "../../runtime/notification-source.ts"
+import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
 
 const MAX_POPUPS = 3
 const TIMER_BAR_HEIGHT = 3
@@ -12,6 +13,7 @@ const TICK_MS = 30
 
 export interface NotificationPopupProps {
   gdkmonitor: Gdk.Monitor
+  monitor: string
   monitorIndex: number
   notifications: NotificationSource
 }
@@ -49,7 +51,7 @@ export default function NotificationPopup(props: NotificationPopupProps) {
     }
   }
 
-  GLib.timeout_add(GLib.PRIORITY_DEFAULT, TICK_MS, () => {
+  scopedTimeoutAdd(GLib.PRIORITY_DEFAULT, TICK_MS, () => {
     for (let i = 0; i < MAX_POPUPS; i++) {
       if (drawingAreas[i]) drawingAreas[i]!.queue_draw()
     }
@@ -61,11 +63,11 @@ export default function NotificationPopup(props: NotificationPopupProps) {
       }
     }
     return GLib.SOURCE_CONTINUE
-  })
+  }, `NotificationPopup:${props.monitor}`)
 
   return (
     <window
-      name={`notifications:${props.monitorIndex}`}
+      name={`notifications:${props.monitor}`}
       class="NotifPopupWindow"
       visible={false}
       application={app}

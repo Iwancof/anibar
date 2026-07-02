@@ -5,6 +5,7 @@ import { Gtk } from "ags/gtk4"
 import type { Accessor } from "gnim"
 
 import type { BatterySnapshot } from "../../modules/battery/domain.ts"
+import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
 
 export interface BatteryBarWidgetProps {
   snapshot: Accessor<BatterySnapshot | null>
@@ -38,11 +39,11 @@ export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
   let drawingArea: Gtk.DrawingArea | null = null
   let animTime = 0
 
-  GLib.timeout_add(GLib.PRIORITY_DEFAULT, TICK_MS, () => {
+  scopedTimeoutAdd(GLib.PRIORITY_DEFAULT, TICK_MS, () => {
     animTime += TICK_MS
     if (drawingArea) drawingArea.queue_draw()
     return GLib.SOURCE_CONTINUE
-  })
+  }, "BatteryBarWidget")
 
   function setupClick(self: any) {
     const gesture = new Gtk.GestureClick()

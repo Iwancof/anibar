@@ -6,6 +6,7 @@ import { Gtk } from "ags/gtk4"
 import { createMemo } from "gnim"
 
 import type { PlayerSource } from "../../runtime/player-source.ts"
+import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
 
 const VISIBLE_WIDTH = 200
 const VISIBLE_HEIGHT = 20
@@ -31,7 +32,7 @@ export default function PlayerWidget(props: PlayerWidgetProps) {
   let pauseTicks = PAUSE_TICKS // start paused
   let drawingArea: Gtk.DrawingArea | null = null
 
-  GLib.timeout_add(GLib.PRIORITY_DEFAULT, SCROLL_INTERVAL_MS, () => {
+  scopedTimeoutAdd(GLib.PRIORITY_DEFAULT, SCROLL_INTERVAL_MS, () => {
     const text = player.label()
     if (text !== lastText) {
       lastText = text
@@ -61,7 +62,7 @@ export default function PlayerWidget(props: PlayerWidgetProps) {
 
     if (drawingArea) drawingArea.queue_draw()
     return GLib.SOURCE_CONTINUE
-  })
+  }, "PlayerWidget")
 
   return (
     <box class="Player" spacing={6} valign={Gtk.Align.CENTER} visible={visible}>

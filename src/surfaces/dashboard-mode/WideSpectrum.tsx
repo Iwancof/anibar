@@ -3,6 +3,8 @@ import GLib from "gi://GLib?version=2.0"
 import { Gtk } from "ags/gtk4"
 import type { Accessor } from "gnim"
 
+import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
+
 const BAR_WIDTH = 8
 const BAR_GAP = 3
 const BAR_MAX_HEIGHT = 48
@@ -14,10 +16,10 @@ export interface WideSpectrumProps {
 export default function WideSpectrum(props: WideSpectrumProps) {
   let drawingArea: Gtk.DrawingArea | null = null
 
-  GLib.timeout_add(GLib.PRIORITY_DEFAULT, 33, () => {
+  scopedTimeoutAdd(GLib.PRIORITY_DEFAULT, 33, () => {
     if (drawingArea) drawingArea.queue_draw()
     return GLib.SOURCE_CONTINUE
-  })
+  }, "WideSpectrum")
 
   return (
     <Gtk.DrawingArea
