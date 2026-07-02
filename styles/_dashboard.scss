@@ -1,0 +1,116 @@
+@use "../theme" as *;
+
+// ── ダッシュボード ────────────────────────
+window.Dashboard {
+  background: transparent;
+}
+
+.DashboardBackdrop {
+  background: $dashboard-backdrop;
+  padding: $dashboard-backdrop-padding;
+}
+
+.DashboardShell {
+  min-width: 1px;
+}
+
+.DashboardPanel {
+  min-width: $dashboard-panel-min-width;
+  background: $colors-panel;
+  border: 1px solid $colors-outline;
+  border-radius: $dashboard-panel-border-radius;
+  padding: $dashboard-panel-padding;
+  box-shadow: $dashboard-panel-shadow;
+}
+
+.DashboardHeader {
+  margin-bottom: $dashboard-header-margin-bottom;
+}
+
+.DashboardEyebrow {
+  color: $colors-accent;
+  font-size: $dashboard-header-eyebrow-size;
+  letter-spacing: 0.08em;
+}
+
+.DashboardTitle {
+  color: $colors-text;
+  font-size: $dashboard-header-title-size;
+  font-weight: 800;
+}
+
+.DashboardSubtitle,
+.DashboardHint {
+  color: $colors-muted;
+}
+
+.DashboardClose {
+  background: $colors-surface;
+  border: 1px solid $colors-outline;
+  color: $colors-text;
+  padding: $dashboard-close-padding;
+  border-radius: $dashboard-close-border-radius;
+}
+
+// ── モジュールカード ──────────────────────
+.ModuleCard {
+  background: $colors-surface;
+  border: 1px solid $colors-outline;
+  border-radius: $module-card-border-radius;
+  padding: $module-card-padding;
+}
+
+.ModuleCardTitle {
+  color: $colors-muted;
+  font-size: $module-card-title-size;
+  letter-spacing: 0.08em;
+}
+
+.ModuleCardHeadline {
+  color: $colors-text;
+  font-size: $module-card-headline-size;
+  font-weight: 800;
+}
+
+.ModuleCardDetail,
+.ModuleCardMeta,
+.ModuleCardFooter,
+.ServiceRow {
+  color: $colors-muted;
+}
+
+.ModuleCardMeta {
+  font-size: $module-card-meta-size;
+}
+
+.ModuleCardFooter {
+  font-size: $module-card-footer-size;
+}
+
+// ── トーン ────────────────────────────────
+.tone-healthy {
+  border-left: $tone-border-width solid $colors-healthy;
+}
+
+.tone-warning {
+  border-left: $tone-border-width solid $colors-warning;
+}
+
+.tone-critical {
+  border-left: $tone-border-width solid $colors-critical;
+}
+
+.tone-muted {
+  border-left: $tone-border-width solid $tone-muted-color;
+}
+
+// ── サービス行 ────────────────────────────
+.ServiceRows {
+  margin-top: 4px;
+}
+
+.ServiceRow {
+  background: $colors-surface-2;
+  border-radius: $service-row-border-radius;
+  padding: $service-row-padding;
+}

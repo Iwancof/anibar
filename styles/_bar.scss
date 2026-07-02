@@ -1,0 +1,230 @@
+@use "../theme" as *;
+
+// ── バー ──────────────────────────────────
+window.Bar {
+  background: transparent;
+  color: $colors-text;
+  font-family: $font-family;
+  font-weight: 600;
+
+  > centerbox {
+    background: $bar-background;
+    border: $bar-border $colors-outline;
+    border-radius: $bar-border-radius;
+    margin: $bar-margin;
+    padding: $bar-padding;
+  }
+
+  button {
+    border-radius: $bar-button-border-radius;
+    margin: 0;
+  }
+}
+
+.BarClock {
+  color: $colors-text;
+  font-size: $font-clock-size;
+}
+
+// ── スペクトラム ──────────────────────────
+.Spectrum {
+  min-height: 20px;
+  padding: 0 2px;
+}
+
+.SpectrumBar {
+  min-width: 7px;
+  border-radius: 1px;
+  transition: background 200ms ease;
+}
+
+.SpectrumBarLow {
+  background: rgba($colors-muted, 0.3);
+}
+
+.SpectrumBarMid {
+  background: rgba($colors-accent, 0.6);
+}
+
+.SpectrumBarHigh {
+  background: $hud-cyan;
+}
+
+// ── プレイヤー ────────────────────────────
+.Player {
+  padding: 0 4px;
+}
+
+.PlayerBtn {
+  background: transparent;
+  border: none;
+  padding: 0 3px;
+  margin: 0;
+  min-width: 20px;
+  min-height: 20px;
+}
+
+.PlayerBtn label, .PlayerBtnIcon {
+  font-size: 15px;
+  color: $colors-muted;
+}
+
+.PlayerBtn:hover label {
+  color: $colors-text;
+}
+
+// ── ワークスペースドット ──────────────────
+.WsDot {
+  font-family: $font-family;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 18px;
+  min-height: 18px;
+  border-radius: 5px;
+  padding: 0 2px;
+  border: none;
+  background: transparent;
+}
+
+.WsDot label {
+  font-family: $font-family;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.WsDotActive {
+  background: rgba($colors-accent, 0.3);
+  border: 1px solid rgba($colors-accent, 0.5);
+}
+
+.WsDotActive label {
+  color: $colors-text;
+}
+
+.WsDotOccupied {
+  background: rgba($colors-muted, 0.1);
+}
+
+.WsDotOccupied label {
+  color: $colors-muted;
+}
+
+.WsDotEmpty label {
+  color: rgba($colors-muted, 0.25);
+}
+
+// ── バーインジケータ ──────────────────────
+.BarIndicator {
+  padding: 0;
+}
+
+.BarIndicatorIcon {
+  font-size: $bar-indicator-icon-size;
+  color: $colors-muted;
+}
+
+.BarIndicatorLabel {
+  color: $colors-text;
+  font-size: $bar-indicator-label-size;
+}
+
+// ── IME インジケータ ──────────────────────
+.ImeIndicator {
+  font-family: "Noto Sans Mono CJK JP", $font-family;
+  font-size: 13px;
+  font-weight: 700;
+  color: $colors-muted;
+  background: rgba($colors-muted, 0.1);
+  border-radius: 4px;
+  padding: 0 5px;
+  min-width: 20px;
+}
+
+.ImeActive {
+  color: $hud-cyan;
+  background: rgba($hud-cyan, 0.1);
+}
+
+// ── バッテリー視覚インジケータ ────────────
+.BatIndicator {
+  padding: 0;
+}
+
+.BatBody {
+  border: 2px solid $colors-muted;
+  border-radius: 3px;
+  padding: 2px;
+}
+
+.BatBodyLow {
+  border-color: $colors-warning;
+}
+
+.BatBodyEmpty {
+  border-color: rgba($colors-muted, 0.4);
+}
+
+.BatNub {
+  background: $colors-muted;
+  border-radius: 0 2px 2px 0;
+}
+
+.BatChargingIcon {
+  font-family: "HackGen Console NF";
+  font-size: 12px;
+  color: $colors-bg;
+}
+
+// ── ネットワークアイコン (バー) ────────────
+.NetBarBtn {
+  background: transparent;
+  border: none;
+  padding: 0 4px;
+  margin: 0;
+}
+
+.NetBarGlobalIp {
+  font-family: $font-family;
+  font-size: 10px;
+  color: rgba($hud-text, 0.35);
+}
+
+.NetBarSsid {
+  font-family: $font-family;
+  font-size: 11px;
+  color: $colors-muted;
+}
+
+.NetBarIcon {
+  font-family: "HackGen Console NF";
+  font-size: 14px;
+  color: $colors-muted;
+}
+
+.NetBarIconWired {
+  color: rgba($colors-muted, 0.4);
+}
+
+.NetBarIconOff {
+  color: rgba($hud-pink, 0.5);
+}
+
+// ── 通知ベルアイコン (バー) ────────────────
+.NotifBellBtn {
+  background: transparent;
+  border: none;
+  padding: 0 4px;
+  margin: 0;
+}
+
+.NotifBellIcon {
+  font-family: "HackGen Console NF";
+  font-size: 14px;
+  color: $colors-muted;
+}
+
+.NotifBellBadge {
+  font-size: 10px;
+  font-weight: 700;
+  color: $hud-pink;
+}

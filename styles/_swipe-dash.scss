@@ -1,0 +1,110 @@
+@use "../theme" as *;
+
+// ── スワイプダッシュボード ──────────────────
+window.SwipeDash {
+  background: transparent;
+}
+
+.SwipeDashBackdrop {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.SwipeDashPanel {
+  min-width: 350px;
+  background: $colors-panel;
+  border-left: 1px solid $colors-outline;
+  padding: 16px;
+}
+
+.SwipeDashHeader {
+  margin-bottom: 4px;
+}
+
+.SwipeDashTitle {
+  color: $colors-text;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.SwipeDashCloseBtn {
+  background: $colors-surface;
+  border: 1px solid $colors-outline;
+  border-radius: 8px;
+  padding: 4px 10px;
+  color: $colors-muted;
+}
+
+.SwipeDashScroll {
+  min-width: 350px;
+}
+
+.SwipeDashSection {
+  background: $colors-surface;
+  border: 1px solid $colors-outline;
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.SwipeDashSectionTitle {
+  color: $colors-accent;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.SwipeDashSectionBody {
+  color: $colors-text;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.SwipeDashSectionMeta {
+  color: $colors-muted;
+  font-size: 12px;
+}
+
+.SwipeDashCritical {
+  border-left: 3px solid $colors-critical;
+}
+
+.SwipeDashWarning {
+  border-left: 3px solid $colors-warning;
+}
+
+// ── スワイプダッシュ 通知 ─────────────────
+.SwipeDashNotif {
+  background: $colors-surface-2;
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.SwipeDashNotifApp {
+  color: $colors-accent;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.SwipeDashNotifTime {
+  color: $colors-muted;
+  font-size: 11px;
+}
+
+.SwipeDashNotifSummary {
+  color: $colors-text;
+  font-size: 13px;
+}
+
+// ── スワイプダッシュ プレイヤー ──────────────
+.SwipeDashPlayerTrack {
+  color: $colors-text;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.SwipeDashPlayerBtn {
+  background: $colors-surface-2;
+  border: 1px solid $colors-outline;
+  border-radius: 8px;
+  padding: 4px 10px;
+  color: $colors-text;
+  font-size: 14px;
+}

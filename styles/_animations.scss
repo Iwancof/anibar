@@ -1,0 +1,50 @@
+@use "../theme" as *;
+
+@keyframes popup-slide-in {
+  from {
+    opacity: 0;
+    margin-top: -10px;
+  }
+  to {
+    opacity: 1;
+    margin-top: 6px;
+  }
+}
+
+@keyframes popup-slide-out {
+  from {
+    opacity: 1;
+    margin-top: 6px;
+  }
+  to {
+    opacity: 0;
+    margin-top: -10px;
+  }
+}
+
+@keyframes backdrop-fade-in {
+  from { background: transparent; }
+  to   { background: rgba($popup-backdrop, 0.3); }
+}
+
+@keyframes backdrop-fade-out {
+  from { background: rgba($popup-backdrop, 0.3); }
+  to   { background: transparent; }
+}
+
+@keyframes glow-pulse {
+  0%   { border-color: rgba($colors-accent, 0.4); }
+  50%  { border-color: rgba($colors-accent, 0.15); }
+  100% { border-color: rgba($colors-accent, 0.4); }
+}
+
+@keyframes seg-blink {
+  0%   { background: $hud-cyan; opacity: 0.15; }
+  50%  { background: $hud-cyan; opacity: 0.5; }
+  100% { background: $hud-cyan; opacity: 0.15; }
+}
+
+@keyframes np-pulse {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}

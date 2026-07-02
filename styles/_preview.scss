@@ -1,0 +1,38 @@
+@use "../theme" as *;
+
+// ── プレビュー ────────────────────────────
+window.PreviewWindow {
+  background: $colors-bg;
+  color: $colors-text;
+}
+
+.PreviewRoot {
+  background: $colors-bg;
+  padding: $preview-padding;
+}
+
+.PreviewTitle {
+  color: $colors-text;
+  font-size: $preview-title-size;
+  font-weight: 800;
+}
+
+.PreviewSubtitle {
+  color: $colors-muted;
+}
+
+// Preview 用 — opacity:0 を上書き
+.HudPreviewPanel {
+  background: $popup-panel-bg;
+  border: 1px solid $hud-border;
+  border-radius: 8px;
+  padding: 0;
+  min-width: 420px;
+}
+
+.DashboardPreviewFrame {
+  background: $dashboard-backdrop;
+  border: 1px solid $colors-outline;
+  border-radius: $preview-frame-radius;
+  padding: $preview-frame-padding;
+}
