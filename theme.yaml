@@ -11,21 +11,21 @@ colors:
   panel:     "#141a24"
   surface:   "#1a2230"
   surface-2: "#111722"
-  text:      "#d5def4"
+  text:      "#c8d3e0"
   muted:     "#8a95b3"
   outline:   "rgba(164, 178, 215, 0.18)"
-  healthy:   "#9ece6a"
-  warning:   "#e0af68"
-  critical:  "#f7768e"
-  accent:    "#7aa2f7"
+  healthy:   "#00ff9d"
+  warning:   "#ffb627"
+  critical:  "#ff3d3d"
+  accent:    "#00e5ff"
 
 hud:
-  cyan:   "#00ffcc"
+  cyan:   "#00e5ff"
   blue:   "#00aaff"
-  amber:  "#ffaa00"
-  pink:   "#ff2266"
-  border: "#1a1e2e"
-  text:   "#e0e6f0"
+  amber:  "#ffb627"
+  pink:   "#ff2d78"
+  border: "#1a2436"
+  text:   "#c8d3e0"
 
 np:
   bg0:       "#080c12"
@@ -84,9 +84,9 @@ dim:
 
 # ── バー ────────────────────────────────────
 bar:
-  battery-green:  "#9ecf6b"
-  battery-amber:  "#e3a669"
-  battery-charge: "#66e6cc"
+  battery-green:  "#00ff9d"
+  battery-amber:  "#ffb627"
+  battery-charge: "#00e5ff"
   margin:        "2px 2px 0"     # 外側余白 (上 左右 下)
   padding:       "2px 8px"      # 内側余白 (上下 左右)
   border-radius: 6px
@@ -102,10 +102,10 @@ bar:
     label-size: 13px
 
 chart:
-  green: "#00ff9e"
-  cyan:  "#008fff"
+  green: "#00ff9d"
+  cyan:  "#00e5ff"
   dim:   "#5c6b80"
-  amber: "#ffb526"
+  amber: "#ffb627"
   red:   "#ff3d3d"
 
 # ── ダッシュボード ──────────────────────────
