@@ -16,56 +16,6 @@ window.NotifPopupWindow {
   padding: 6px 8px;
 }
 
-.NotifCard {
-  background: $popup-panel-bg;
-  border: 1px solid rgba($colors-accent, 0.2);
-  border-radius: 12px;
-  padding: 12px 16px;
-  min-width: 320px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  margin-top: 4px;
-}
-
-.NotifCard:hover {
-  border-color: rgba($colors-accent, 0.4);
-}
-
-.NotifCritical {
-  border-color: rgba($colors-critical, 0.4);
-}
-
-.NotifCritical:hover {
-  border-color: rgba($colors-critical, 0.6);
-}
-
-.NotifLow {
-  border-color: rgba($colors-muted, 0.15);
-}
-
-.NotifAppName {
-  @extend %eyebrow-label;
-  font-size: 10px;
-  letter-spacing: 1px;
-  color: rgba($hud-text, 0.4);
-  font-weight: 600;
-}
-
-.NotifTime {
-  font-size: 10px;
-  color: rgba($hud-text, 0.25);
-}
-
-.NotifSummary {
-  font-size: 14px;
-  font-weight: 700;
-  color: $colors-text;
-}
-
-.NotifBody {
-  font-size: 12px;
-  color: $colors-muted;
-}
-
 // ── 通知センター ──────────────────────────
 window.NotifCenter {
   background: transparent;
@@ -121,10 +71,6 @@ window.NotifCenter {
   font-weight: 700;
 }
 
-.NotifIcon {
-  opacity: 0.9;
-}
-
 .NotifCenterClearBtn {
   background: rgba($colors-critical, 0.08);
   border: 1px solid rgba($colors-critical, 0.2);
@@ -149,48 +95,4 @@ window.NotifCenter {
   font-size: 13px;
   color: rgba($hud-text, 0.3);
   padding: 24px;
-}
-
-.NotifHistoryCard {
-  @extend %dark-card;
-  background: rgba(17, 20, 32, 0.5);
-  border: 1px solid rgba($hud-border, 0.7);
-  border-radius: 10px;
-  padding: 10px 14px;
-}
-
-.NotifHistoryCard:hover {
-  border-color: rgba($colors-accent, 0.3);
-}
-
-.NotifHistoryCritical {
-  border-color: rgba($colors-critical, 0.3);
-}
-
-.NotifHistoryLow {
-  border-color: rgba($colors-muted, 0.1);
-}
-
-.NotifHistoryApp {
-  @extend %eyebrow-label;
-  font-size: 10px;
-  letter-spacing: 1px;
-  color: rgba($hud-text, 0.35);
-  font-weight: 600;
-}
-
-.NotifHistoryTime {
-  font-size: 10px;
-  color: rgba($hud-text, 0.2);
-}
-
-.NotifHistorySummary {
-  font-size: 13px;
-  font-weight: 700;
-  color: $colors-text;
-}
-
-.NotifHistoryBody {
-  font-size: 11px;
-  color: $colors-muted;
 }

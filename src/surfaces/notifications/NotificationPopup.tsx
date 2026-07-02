@@ -5,8 +5,10 @@ import { Astal, Gdk, Gtk } from "ags/gtk4"
 import { createMemo } from "gnim"
 
 import type { NotificationSource } from "../../runtime/notification-source.ts"
+import { timeAgo } from "../../shared/format.ts"
 import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
 import { COLORS } from "../../shared/theme-tokens.ts"
+import NotificationCard from "../../shared/ui/NotificationCard.tsx"
 
 const MAX_POPUPS = 3
 const TIMER_BAR_HEIGHT = 3
@@ -21,23 +23,10 @@ export interface NotificationPopupProps {
   notifications: NotificationSource
 }
 
-function urgencyClass(urgency: number): string {
-  if (urgency === 2) return "NotifCard NotifCritical"
-  if (urgency === 0) return "NotifCard NotifLow"
-  return "NotifCard"
-}
-
 function urgencyColor(urgency: number): readonly [number, number, number] {
   if (urgency === 2) return URGENCY_CRITICAL
   if (urgency === 0) return URGENCY_LOW
   return URGENCY_NORMAL
-}
-
-function timeAgo(epoch: number): string {
-  const diff = Math.floor(Date.now() / 1000 - epoch)
-  if (diff < 60) return "now"
-  if (diff < 3600) return `${Math.floor(diff / 60)}m`
-  return `${Math.floor(diff / 3600)}h`
 }
 
 export default function NotificationPopup(props: NotificationPopupProps) {
@@ -96,7 +85,7 @@ export default function NotificationPopup(props: NotificationPopupProps) {
           {Array.from({ length: MAX_POPUPS }).map((_, i) => {
             const item = createMemo(() => notifications.popups()[i] ?? null)
             const cardVisible = createMemo(() => item() != null)
-            const cardClass = createMemo(() => urgencyClass(item()?.urgency ?? 1))
+            const urgency = createMemo(() => item()?.urgency ?? 1)
             const appName = createMemo(() => item()?.appName ?? "")
             const summary = createMemo(() => item()?.summary ?? "")
             const body = createMemo(() => item()?.body ?? "")
@@ -112,67 +101,39 @@ export default function NotificationPopup(props: NotificationPopupProps) {
             const hasIconName = createMemo(() => (iconName() ?? "").length > 0)
 
             return (
-              <button
-                class={cardClass}
+              <NotificationCard
+                variant="popup"
                 visible={cardVisible}
+                urgency={urgency}
+                appName={appName}
+                time={time}
+                summary={summary}
+                body={body}
+                bodyVisible={hasBody}
+                iconName={iconName}
+                iconVisible={hasIconName}
+                widthRequest={340}
+                timerHeight={TIMER_BAR_HEIGHT}
                 onClicked={() => {
                   const n = item()
                   if (n) notifications.dismiss(n.id)
                 }}
-              >
-                <box orientation={Gtk.Orientation.VERTICAL} spacing={4} widthRequest={340}>
-                  <box spacing={10}>
-                    <image
-                      class="NotifIcon"
-                      iconName={iconName}
-                      pixelSize={24}
-                      visible={hasIconName}
-                      valign={Gtk.Align.START}
-                    />
-                    <box orientation={Gtk.Orientation.VERTICAL} spacing={2} hexpand>
-                      <box spacing={8}>
-                        <label class="NotifAppName" label={appName} hexpand halign={Gtk.Align.START} />
-                        <label class="NotifTime" label={time} halign={Gtk.Align.END} />
-                      </box>
-                      <label
-                        class="NotifSummary"
-                        label={summary}
-                        halign={Gtk.Align.START}
-                        maxWidthChars={36}
-                        ellipsize={3}
-                      />
-                      <label
-                        class="NotifBody"
-                        label={body}
-                        visible={hasBody}
-                        halign={Gtk.Align.START}
-                        maxWidthChars={36}
-                        ellipsize={3}
-                        wrap
-                      />
-                    </box>
-                  </box>
-                  <Gtk.DrawingArea
-                    heightRequest={TIMER_BAR_HEIGHT}
-                    hexpand
-                    onRealize={(self: Gtk.DrawingArea) => {
-                      drawingAreas[i] = self
-                      self.set_draw_func((_area, cr, w, _h) => {
-                        const n = item()
-                        if (!n) return
-                        const startTime = notifications.popupTimestamps.get(n.id)
-                        if (!startTime) return
-                        const elapsed = Date.now() - startTime
-                        const ratio = Math.max(0, 1 - elapsed / notifications.popupTimeoutMs)
-                        const [r, g, b] = urgencyColor(n.urgency)
-                        cr.setSourceRGBA(r, g, b, 0.7)
-                        cr.rectangle(0, 0, w * ratio, TIMER_BAR_HEIGHT)
-                        cr.fill()
-                      })
-                    }}
-                  />
-                </box>
-              </button>
+                onTimerRealize={(self: Gtk.DrawingArea) => {
+                  drawingAreas[i] = self
+                  self.set_draw_func((_area, cr, w, _h) => {
+                    const n = item()
+                    if (!n) return
+                    const startTime = notifications.popupTimestamps.get(n.id)
+                    if (!startTime) return
+                    const elapsed = Date.now() - startTime
+                    const ratio = Math.max(0, 1 - elapsed / notifications.popupTimeoutMs)
+                    const [r, g, b] = urgencyColor(n.urgency)
+                    cr.setSourceRGBA(r, g, b, 0.7)
+                    cr.rectangle(0, 0, w * ratio, TIMER_BAR_HEIGHT)
+                    cr.fill()
+                  })
+                }}
+              />
             )
           })}
         </box>

@@ -4,6 +4,9 @@ import { createMemo } from "gnim"
 
 import type { NotificationSource } from "../../runtime/notification-source.ts"
 import { closeNotifCenter } from "../../app/notification-controller.ts"
+import { fixedSlots } from "../../shared/fixed-slots.ts"
+import { timeAgo } from "../../shared/format.ts"
+import NotificationCard from "../../shared/ui/NotificationCard.tsx"
 
 const MAX_HISTORY = 20
 
@@ -15,26 +18,12 @@ export interface NotificationCenterProps {
   notifications: NotificationSource
 }
 
-function timeAgo(epoch: number): string {
-  const diff = Math.floor(Date.now() / 1000 - epoch)
-  if (diff < 60) return "now"
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
-  return `${Math.floor(diff / 86400)}d ago`
-}
-
-function urgencyBorder(urgency: number): string {
-  if (urgency === 2) return "NotifHistoryCard NotifHistoryCritical"
-  if (urgency === 0) return "NotifHistoryCard NotifHistoryLow"
-  return "NotifHistoryCard"
-}
-
 export default function NotificationCenter(props: NotificationCenterProps) {
   const { TOP, LEFT, RIGHT, BOTTOM } = Astal.WindowAnchor
   const { notifications } = props
 
   const emptyLabel = createMemo(() =>
-    notifications.all().length === 0 ? "No notifications" : "",
+    notifications.all().length === 0 ? "NO HISTORY" : "",
   )
   const hasEmpty = createMemo(() => notifications.all().length === 0)
 
@@ -87,7 +76,7 @@ export default function NotificationCenter(props: NotificationCenterProps) {
                 class="NotifCenterClearBtn"
                 onClicked={() => notifications.clear()}
               >
-                <label label="Clear all" />
+                <label label="CLEAR ALL" />
               </button>
             </box>
             <Gtk.ScrolledWindow
@@ -104,10 +93,10 @@ export default function NotificationCenter(props: NotificationCenterProps) {
                   label={emptyLabel}
                   visible={hasEmpty}
                 />
-                {Array.from({ length: MAX_HISTORY }).map((_, i) => {
+                {fixedSlots(MAX_HISTORY).map((i) => {
                   const item = createMemo(() => notifications.all()[i] ?? null)
                   const cardVisible = createMemo(() => item() != null)
-                  const cardClass = createMemo(() => urgencyBorder(item()?.urgency ?? 1))
+                  const urgency = createMemo(() => item()?.urgency ?? 1)
                   const appName = createMemo(() => item()?.appName ?? "")
                   const summary = createMemo(() => item()?.summary ?? "")
                   const body = createMemo(() => item()?.body ?? "")
@@ -118,36 +107,20 @@ export default function NotificationCenter(props: NotificationCenterProps) {
                   const hasBody = createMemo(() => (item()?.body ?? "").length > 0)
 
                   return (
-                    <button
-                      class={cardClass}
+                    <NotificationCard
+                      variant="history"
                       visible={cardVisible}
+                      urgency={urgency}
+                      appName={appName}
+                      time={time}
+                      summary={summary}
+                      body={body}
+                      bodyVisible={hasBody}
                       onClicked={() => {
                         const n = item()
                         if (n) notifications.dismiss(n.id)
                       }}
-                    >
-                      <box orientation={Gtk.Orientation.VERTICAL} spacing={2}>
-                        <box spacing={8}>
-                          <label class="NotifHistoryApp" label={appName} hexpand halign={Gtk.Align.START} />
-                          <label class="NotifHistoryTime" label={time} halign={Gtk.Align.END} />
-                        </box>
-                        <label
-                          class="NotifHistorySummary"
-                          label={summary}
-                          halign={Gtk.Align.START}
-                          maxWidthChars={45}
-                          ellipsize={3}
-                        />
-                        <label
-                          class="NotifHistoryBody"
-                          label={body}
-                          visible={hasBody}
-                          halign={Gtk.Align.START}
-                          maxWidthChars={45}
-                          ellipsize={3}
-                        />
-                      </box>
-                    </button>
+                    />
                   )
                 })}
               </box>
