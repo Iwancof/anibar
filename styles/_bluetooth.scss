@@ -1,0 +1,125 @@
+@use "../theme" as *;
+@use "animations";
+@use "mixins" as *;
+
+window.BtPopup {
+  background: transparent;
+}
+
+@include popup-anim(".BtPopup") {
+  animation: popup-slide-in 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.BtPopupPanel {
+  @include popup-panel(rgba($hud-border, 0.8), $radius-lg, $dim-panel-side * 1px);
+  margin-top: 6px;
+  margin-right: 8px;
+  box-shadow: $popup-shadow;
+  opacity: 0;
+}
+
+.BtPreviewPanel {
+  opacity: 1;
+}
+
+.BtPreviewList {
+  padding: 0 2px 12px;
+}
+
+.BtPreviewLabel {
+  font-family: $network-panel-font-family, $font-family;
+  font-size: $fontsize-caption;
+  letter-spacing: 0.10em;
+  color: $np-text-sec;
+}
+
+.BtView {
+  font-family: $font-family;
+}
+
+.BtPanelHeaderDotPulse {
+  animation: np-pulse 1s ease-in-out infinite;
+}
+
+.BtBody {
+  padding: 14px 14px 12px;
+}
+
+.BtSection {
+  padding: 0;
+}
+
+.BtAdapterControls {
+  min-height: 36px;
+}
+
+.BtScanButton {
+  margin-top: 6px;
+}
+
+.BtDeviceList {
+  padding: 0;
+}
+
+.BtDeviceRow {
+  background: rgba($np-bg2, 0.48);
+  border: 1px solid $np-border;
+  border-radius: $radius-sm;
+  padding: 5px 7px;
+  min-height: 32px;
+}
+
+.BtDeviceRowConnected {
+  background: rgba($colors-accent, 0.08);
+  border-color: rgba($colors-accent, 0.55);
+}
+
+.BtDeviceRowEmpty {
+  background: transparent;
+  border-color: rgba($np-border, 0.35);
+}
+
+.BtDeviceIcon {
+  font-size: 15px;
+  color: $np-text-sec;
+}
+
+.BtDeviceRowConnected .BtDeviceIcon {
+  color: $np-cyan;
+}
+
+.BtDeviceName {
+  font-size: $fontsize-body;
+  font-weight: 700;
+  color: $np-text;
+}
+
+.BtDeviceBattery {
+  font-family: $font-icon, $network-panel-font-family, $font-family;
+  font-size: $fontsize-dense;
+  color: $np-text-sec;
+}
+
+.BtDeviceEmpty {
+  font-family: $network-panel-font-family, $font-family;
+  font-size: $fontsize-dense;
+  letter-spacing: 0.10em;
+  color: $np-text-sec;
+}
+
+.BtDeviceCommand {
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+.BtDeviceRowConnected .BtDeviceCommand {
+  border-color: rgba($colors-accent, 0.45);
+}
+
+.BtErrorRow {
+  border-top: 1px solid $np-border;
+  padding: 6px 14px 8px;
+  font-family: $network-panel-font-family, $font-family;
+  font-size: $fontsize-dense;
+  color: $np-red;
+}

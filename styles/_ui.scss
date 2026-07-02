@@ -220,6 +220,40 @@
   border-color: $colors-accent;
 }
 
+.UiCommandButton {
+  background: rgba($np-bg2, 0.65);
+  border: 1px solid $np-border;
+  border-radius: $radius-sm;
+  padding: 4px 9px;
+  margin: 0;
+  min-height: 24px;
+}
+
+.UiCommandButtonLabel {
+  font-family: $network-panel-font-family, $font-family;
+  font-size: $fontsize-dense;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: $np-text-sec;
+}
+
+.UiCommandButtonIcon {
+  font-size: 12px;
+  color: $np-text-sec;
+}
+
+.UiCommandButton:hover,
+.UiCommandButton:active {
+  border-color: rgba($colors-accent, 0.45);
+}
+
+.UiCommandButton:hover .UiCommandButtonLabel,
+.UiCommandButton:active .UiCommandButtonLabel,
+.UiCommandButton:hover .UiCommandButtonIcon,
+.UiCommandButton:active .UiCommandButtonIcon {
+  color: $np-text;
+}
+
 .UiPlayerControls {
   padding: 0;
 }
