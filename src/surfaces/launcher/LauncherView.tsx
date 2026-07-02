@@ -21,6 +21,7 @@ export default function LauncherView() {
   const results = createMemo(() =>
     searchApps(allApps, query(), MAX_RESULTS, recentIds()),
   )
+  const noMatchVisible = createMemo(() => query().trim().length > 0 && results().length === 0)
 
   function getResult(i: number): Accessor<AppEntry> {
     return createMemo(() => results()[i] ?? EMPTY_ENTRY)
@@ -91,7 +92,7 @@ export default function LauncherView() {
         <entry
           class="LauncherEntry"
           hexpand
-          placeholder_text="Search applications..."
+          placeholder_text="SEARCH::APPS"
           onChanged={onQueryChanged}
           onActivate={() => onActivateIndex(selectedIndex())}
           onRealize={(self: any) => {
@@ -102,6 +103,13 @@ export default function LauncherView() {
       </box>
 
       <box class="LauncherResults" orientation={Gtk.Orientation.VERTICAL} spacing={0}>
+        <label
+          class="LauncherNoMatch"
+          label="NO MATCH"
+          visible={noMatchVisible}
+          halign={Gtk.Align.FILL}
+          xalign={0}
+        />
         {Array.from({ length: MAX_RESULTS }).map((_, i) => (
           <ResultRow
             entry={getResult(i)}
