@@ -1,0 +1,21 @@
+#!/bin/sh
+# usage: ./wrapper <workspace> <command> [args...]
+# 指定 workspace でコマンドを起動する (Hyprland の exec workspace rule 経由)
+set -eu
+
+case "${1-}" in
+  '' | *[!0-9]*)
+    echo "usage: wrapper <workspace> <command> [args...]" >&2
+    exit 1
+    ;;
+esac
+
+ws=$1
+shift
+
+if [ $# -eq 0 ]; then
+  echo "usage: wrapper <workspace> <command> [args...]" >&2
+  exit 1
+fi
+
+exec hyprctl dispatch exec "[workspace $ws] $*"
