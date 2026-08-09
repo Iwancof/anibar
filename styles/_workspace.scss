@@ -211,3 +211,17 @@ window.WsOverview {
 .DisplayProfilesScroll {
   min-height: 180px;
 }
+
+// ── ワークスペース番号ジャンプ ────────────
+window.WsGoto {
+  background: transparent;
+  font-family: $font-family;
+}
+
+.WsGotoPanel {
+  background: rgba($np-bg1, 0.92);
+  border: 1px solid $np-border;
+  border-radius: $radius-lg;
+  box-shadow: $popup-shadow;
+  padding: 14px 18px;
+}

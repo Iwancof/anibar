@@ -44,6 +44,9 @@ const notifCenter = makeWindowController(WINDOW_PREFIXES.notifCenter, {
 })
 const swipeDashboard = makeWindowController(WINDOW_PREFIXES.swipeDashboard)
 const workspace = makeWindowController(WINDOW_PREFIXES.workspace)
+const wsGoto = makeWindowController(WINDOW_PREFIXES.wsGoto, {
+  pick: (windows) => pickFocusedMonitorWindow(WINDOW_PREFIXES.wsGoto, windows),
+})
 
 export const anyBatteryPopupVisible = batteryPopup.anyVisible
 export const openBatteryPopup = batteryPopup.open
@@ -86,3 +89,8 @@ export const toggleWorkspaceVisibility = workspace.toggle
 export const anyDashboardVisible = anyWorkspaceVisible
 export const setDashboardVisibility = setWorkspaceVisibility
 export const toggleDashboardVisibility = toggleWorkspaceVisibility
+
+export const anyWsGotoVisible = wsGoto.anyVisible
+export const openWsGoto = wsGoto.open
+export const closeWsGoto = wsGoto.close
+export const toggleWsGoto = wsGoto.toggle

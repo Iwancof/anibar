@@ -25,6 +25,9 @@ import {
   toggleNotifCenter,
   toggleSwipeDashboard,
   toggleWorkspaceVisibility,
+  openWsGoto,
+  closeWsGoto,
+  toggleWsGoto,
 } from "./controllers.ts"
 
 function normalizeArgs(args: string[]): string[] {
@@ -125,8 +128,17 @@ export function handleAppRequest(args: string[]): string {
     }
   }
 
+  if (scope === "ws-goto") {
+    switch (action) {
+      case "toggle": toggleWsGoto(); return "ok"
+      case "open": openWsGoto(); return "ok"
+      case "close": closeWsGoto(); return "ok"
+      default: return `unknown ws-goto action "${action}"`
+    }
+  }
+
   if (scope !== "dashboard" && scope !== "workspace") {
-    return 'unknown request. use "ags request battery|bluetooth|network|notif-center|dashboard|workspace|launcher|swipe-dashboard toggle"'
+    return 'unknown request. use "ags request battery|bluetooth|network|notif-center|dashboard|workspace|ws-goto|launcher|swipe-dashboard toggle"'
   }
 
   const label = scope === "workspace" ? "workspace" : "dashboard"

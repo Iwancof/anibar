@@ -15,6 +15,7 @@ export const WINDOW_PREFIXES = {
   notifCenter: "notif-center:",
   swipeDashboard: "swipe-dashboard:",
   workspace: "workspace:",
+  wsGoto: "ws-goto:",
 } as const
 
 export const WINDOW_CLOSE_ANIM_MS = DIM["anim-close-ms"]

@@ -26,6 +26,7 @@ import { createFlowsSource, createLogSource } from "../runtime/netmon-source.ts"
 import { createBluetoothSource } from "../runtime/bluetooth-source.ts"
 import Bar from "../surfaces/bar/Bar.tsx"
 import WorkspaceWindow from "../surfaces/workspace/WorkspaceWindow.tsx"
+import WsGotoWindow from "../surfaces/workspace/WsGotoWindow.tsx"
 import BatteryPopup from "../surfaces/popups/BatteryPopup.tsx"
 import BluetoothPopup from "../surfaces/popups/BluetoothPopup.tsx"
 import NetworkPanel from "../surfaces/network/NetworkPanel.tsx"
@@ -140,6 +141,11 @@ export function startMainApp() {
       }),
 
       LauncherWindow({
+        gdkmonitor,
+        monitor,
+      }),
+
+      WsGotoWindow({
         gdkmonitor,
         monitor,
       }),
