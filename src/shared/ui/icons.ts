@@ -9,6 +9,7 @@ export const ICONS = {
   chevronRight: "󰁔",
   appFallback: "󰘔",
   bell: "󰂚",
+  bellOff: "󰂛",
   volumeHigh: "󰕾",
   volumeMedium: "󰖀",
   volumeLow: "󰖁",

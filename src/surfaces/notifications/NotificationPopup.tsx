@@ -30,18 +30,11 @@ function urgencyColor(urgency: number): readonly [number, number, number] {
 }
 
 export default function NotificationPopup(props: NotificationPopupProps) {
-  const { TOP, LEFT, RIGHT, BOTTOM } = Astal.WindowAnchor
+  const { TOP, RIGHT } = Astal.WindowAnchor
   const { notifications } = props
 
   const drawingAreas: (Gtk.DrawingArea | null)[] = new Array(MAX_POPUPS).fill(null)
   let windowRef: any = null
-
-  function dismissAll() {
-    const list = notifications.popups()
-    for (const n of list) {
-      notifications.dismiss(n.id)
-    }
-  }
 
   scopedTimeoutAdd(GLib.PRIORITY_DEFAULT, TICK_MS, () => {
     for (let i = 0; i < MAX_POPUPS; i++) {
@@ -64,27 +57,25 @@ export default function NotificationPopup(props: NotificationPopupProps) {
       visible={false}
       application={app}
       gdkmonitor={props.gdkmonitor}
-      anchor={TOP | LEFT | RIGHT | BOTTOM}
+      anchor={TOP | RIGHT}
       exclusivity={Astal.Exclusivity.NORMAL}
-      keymode={Astal.Keymode.ON_DEMAND}
+      // キーボードを絶対に取らない。ON_DEMAND だと表示された瞬間に
+      // フォーカスが移り、IME の preedit (日本語入力途中の文字列) が
+      // 切断される。カードはポインタ操作のみで dismiss できる。
+      keymode={Astal.Keymode.NONE}
       layer={Astal.Layer.OVERLAY}
       // onRealize は一度も表示されない window では発火せず windowRef が
       // null のままポップアップが永遠に出ない。$ (構築時 setup) で取る。
       $={(self: Astal.Window) => { windowRef = self }}
     >
-      <overlay>
-        {/* バックドロップ: クリックで全ポップアップを閉じる */}
-        <button class="NotifPopupBackdrop" hexpand vexpand onClicked={dismissAll} />
-        {/* 通知カード: 右上に配置 */}
-        <box
-          $type="overlay"
-          orientation={Gtk.Orientation.VERTICAL}
-          spacing={6}
-          valign={Gtk.Align.START}
-          halign={Gtk.Align.END}
-          class="NotifPopupList"
-        >
-          {Array.from({ length: MAX_POPUPS }).map((_, i) => {
+      {/* 右上アンカーの小窓。全画面アンカー + バックドロップだと
+          表示中の最初のクリックを画面のどこでも食ってしまうため廃止 */}
+      <box
+        orientation={Gtk.Orientation.VERTICAL}
+        spacing={6}
+        class="NotifPopupList"
+      >
+        {Array.from({ length: MAX_POPUPS }).map((_, i) => {
             const item = createMemo(() => notifications.popups()[i] ?? null)
             const cardVisible = createMemo(() => item() != null)
             const urgency = createMemo(() => item()?.urgency ?? 1)
@@ -139,7 +130,6 @@ export default function NotificationPopup(props: NotificationPopupProps) {
             )
           })}
         </box>
-      </overlay>
     </window>
   )
 }
