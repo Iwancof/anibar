@@ -12,9 +12,15 @@ export interface SpectrumSource {
 export function createSpectrumSource(): SpectrumSource {
   const [bars, setBars] = createState<number[]>([])
 
+  // 無音時 cava は同一行 (全ゼロ等) を出し続ける。変化のない行を無視しないと
+  // 毎フレーム新配列で通知され、無音でもバーが再描画され続ける。
+  let lastLine = ""
+
   subprocess(
     ["cava", "-p", CAVA_CONF],
     (line) => {
+      if (line === lastLine) return
+      lastLine = line
       const values = line
         .split(";")
         .filter(Boolean)

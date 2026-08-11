@@ -3,7 +3,7 @@ import Pango from "gi://Pango?version=1.0"
 import PangoCairo from "gi://PangoCairo?version=1.0"
 
 import { Gtk } from "ags/gtk4"
-import { createMemo } from "gnim"
+import { createMemo, onCleanup } from "gnim"
 
 import type { PlayerSource } from "../../runtime/player-source.ts"
 import { scopedTimeoutWhile } from "../../shared/runtime/scoped-timeout.ts"
@@ -34,8 +34,21 @@ export default function PlayerWidget(props: PlayerWidgetProps) {
   let pauseTicks = PAUSE_TICKS // start paused
   let drawingArea: Gtk.DrawingArea | null = null
 
-  // player 不在時はスクロールも描画も不要なので tick を止める
-  scopedTimeoutWhile(GLib.PRIORITY_DEFAULT, SCROLL_INTERVAL_MS, visible, () => {
+  // スクロール tick は再生中のみ。停止/一時停止中は静的表示で十分
+  const scrollActive = createMemo(() => visible() && player.isPlaying())
+
+  // 停止中の曲変更でも表示は追従させる (offset を先頭へ戻して一回描く)
+  onCleanup(player.label.subscribe(() => {
+    if (!scrollActive()) {
+      lastText = player.label()
+      offsetPx = 0
+      direction = 1
+      pauseTicks = PAUSE_TICKS
+      if (drawingArea) drawingArea.queue_draw()
+    }
+  }))
+
+  scopedTimeoutWhile(GLib.PRIORITY_DEFAULT, SCROLL_INTERVAL_MS, scrollActive, () => {
     const text = player.label()
     if (text !== lastText) {
       lastText = text
