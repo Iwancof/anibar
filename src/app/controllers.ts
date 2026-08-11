@@ -32,7 +32,10 @@ const batteryPopup = makeWindowController(WINDOW_PREFIXES.batteryPopup, {
 const bluetoothPopup = makeWindowController(WINDOW_PREFIXES.bluetoothPopup, {
   closeAnimMs: WINDOW_CLOSE_ANIM_MS,
 })
-const dashboardMode = makeWindowController(WINDOW_PREFIXES.dashboardMode)
+// closeAnimMs で .open/.closing class が付く (dashboard の起動シーケンス CSS が依存)
+const dashboardMode = makeWindowController(WINDOW_PREFIXES.dashboardMode, {
+  closeAnimMs: WINDOW_CLOSE_ANIM_MS,
+})
 const launcher = makeWindowController(WINDOW_PREFIXES.launcher, {
   pick: (windows) => pickFocusedMonitorWindow(WINDOW_PREFIXES.launcher, windows),
 })

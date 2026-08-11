@@ -1,4 +1,5 @@
 @use "../theme" as *;
+@use "animations";
 @use "mixins" as *;
 
 // ══════════════════════════════════════════
@@ -12,6 +13,37 @@ window.DmWindow {
 .DmBackdrop {
   background: rgba($popup-backdrop, 0.88);
   padding: 20px 32px;
+}
+
+// ── 起動シーケンス (開時のみの一発アニメ、fill-mode both で遅延中は非表示) ──
+// 暗転 0-500ms → 時計 0-700ms → 音楽 300-800ms → 左パネル 500-1100ms → 右パネル 700-1400ms
+@keyframes dm-backdrop-in {
+  from { background: transparent; }
+  to   { background: rgba($popup-backdrop, 0.88); }
+}
+
+.DmWindow.open .DmBackdrop {
+  animation: dm-backdrop-in 500ms ease-out both;
+}
+
+.DmWindow.open .DmClock {
+  animation: dm-clock-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.DmWindow.open .DmMusicArea {
+  animation: dm-rise 500ms cubic-bezier(0.16, 1, 0.3, 1) 300ms both;
+}
+
+.DmWindow.open .DmNetPanel {
+  animation: dm-slide-left 600ms cubic-bezier(0.16, 1, 0.3, 1) 500ms both;
+}
+
+.DmWindow.open .DmBatPanel {
+  animation: dm-slide-right 600ms cubic-bezier(0.16, 1, 0.3, 1) 700ms both;
+}
+
+.DmWindow.closing .DmBackdrop {
+  animation: dm-fade-out 200ms ease-in forwards;
 }
 
 .DmClockArea {
