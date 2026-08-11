@@ -1,10 +1,8 @@
-import GLib from "gi://GLib?version=2.0"
 
 import { Gtk } from "ags/gtk4"
-import { createMemo } from "gnim"
+import { createMemo, onCleanup } from "gnim"
 import type { Accessor } from "gnim"
 import type { LatencySnapshot } from "../../runtime/latency-source.ts"
-import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
 import { COLORS } from "../../shared/theme-tokens.ts"
 import SectionHeader from "../../shared/ui/SectionHeader.tsx"
 
@@ -36,13 +34,12 @@ function latencyColorClass(ms: number): string {
 export default function LatencySection(props: LatencySectionProps) {
   const drawingAreas: (Gtk.DrawingArea | null)[] = [null, null, null, null]
 
-  // 2秒ごとにバーを再描画
-  scopedTimeoutAdd(GLib.PRIORITY_DEFAULT, 2000, () => {
+  // データ更新に同期して再描画。非表示 (unmapped) 中は描かない
+  onCleanup(props.latencySnapshot.subscribe(() => {
     for (const da of drawingAreas) {
-      if (da) da.queue_draw()
+      if (da?.get_mapped()) da.queue_draw()
     }
-    return GLib.SOURCE_CONTINUE
-  }, "LatencySection")
+  }))
 
   const cards = Array.from({ length: 4 }, (_, i) => {
     const target = createMemo(() => props.latencySnapshot().targets[i])

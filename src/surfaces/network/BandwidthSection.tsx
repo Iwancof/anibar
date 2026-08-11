@@ -1,10 +1,8 @@
-import GLib from "gi://GLib?version=2.0"
 import { Gtk } from "ags/gtk4"
-import { createMemo } from "gnim"
+import { createMemo, onCleanup } from "gnim"
 import type { Accessor } from "gnim"
 import type { BandwidthSnapshot } from "../../runtime/bandwidth-source.ts"
 import { formatBytesPerSecond } from "../../shared/format.ts"
-import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
 import { COLORS } from "../../shared/theme-tokens.ts"
 import SectionHeader from "../../shared/ui/SectionHeader.tsx"
 
@@ -21,10 +19,10 @@ export default function BandwidthSection(props: BandwidthSectionProps) {
 
   let drawingArea: any = null
 
-  scopedTimeoutAdd(GLib.PRIORITY_DEFAULT, 500, () => {
-    if (drawingArea) drawingArea.queue_draw()
-    return GLib.SOURCE_CONTINUE
-  }, "BandwidthSection")
+  // データ更新に同期して再描画。非表示 (unmapped) 中は描かない
+  onCleanup(props.bandwidthSnapshot.subscribe(() => {
+    if (drawingArea?.get_mapped()) drawingArea.queue_draw()
+  }))
 
   function drawSparkline(cr: any, w: number, h: number) {
     const snap = props.bandwidthSnapshot()
