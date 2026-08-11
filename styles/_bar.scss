@@ -193,29 +193,6 @@ window.Bar {
   padding: 0 2px;
 }
 
-.BatGlyph {
-  padding: 0;
-}
-
-.BatBody {
-  border: 2px solid $np-text-sec;
-  border-radius: 3px;
-  padding: 2px;
-}
-
-.BatBodyLow {
-  border-color: $colors-warning;
-}
-
-.BatBodyEmpty {
-  border-color: rgba($np-text-sec, 0.4);
-}
-
-.BatNub {
-  background: $np-text-sec;
-  border-radius: 0 2px 2px 0;
-}
-
 .BatChargingIcon {
   font-family: "HackGen Console NF";
   font-size: 12px;
@@ -224,6 +201,23 @@ window.Bar {
 
 .BatValue {
   min-width: 17px;
+}
+
+// 残量トーンを数値にも反映 (セルゲージと同期)
+.BatValueOk {
+  color: $bar-battery-green;
+}
+
+.BatValueWarn {
+  color: $bar-battery-amber;
+}
+
+.BatValueCrit {
+  color: $colors-critical;
+}
+
+.BatValueCharge {
+  color: $bar-battery-charge;
 }
 
 // ── ネットワークアイコン (バー) ────────────

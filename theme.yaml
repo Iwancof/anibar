@@ -150,7 +150,7 @@ tone:
 # ── スペクトラム (CAVA) ──────────────────────
 spectrum:
   bars:            48
-  framerate:       60
+  framerate:       24   # 60 は無音時もバー再描画が張り付く (2026-08-11 CPU削減)
   sensitivity:     150
   noise-reduction: 0
 
