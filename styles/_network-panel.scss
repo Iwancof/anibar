@@ -10,6 +10,23 @@ window.NpWindow {
   background: transparent;
 }
 
+// 開閉演出 (中心から実体化 / 閉じはスライドアウト)
+.NpWindow.open .UiBackdrop {
+  animation: backdrop-fade-in 200ms ease-out forwards;
+}
+
+.NpWindow.open .UiPanel {
+  animation: hud-materialize 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.NpWindow.closing .UiBackdrop {
+  animation: backdrop-fade-out 200ms ease-in forwards;
+}
+
+.NpWindow.closing .UiPanel {
+  animation: popup-slide-out 200ms ease-in forwards;
+}
+
 // ── Section 共通 ──
 .NpSection {
   @extend %section-divider;

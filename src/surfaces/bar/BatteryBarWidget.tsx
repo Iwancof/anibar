@@ -36,11 +36,16 @@ const C_CHARGE = COLORS.rgb["bar-battery-charge"]
 const C_FRAME = COLORS.rgb["np-text-sec"]
 const C_EMPTY = COLORS.rgb["chart-dim"]
 
-function levelColor(pct: number): readonly [number, number, number] {
-  if (pct <= 20) return C_CRIT
-  if (pct <= 40) return C_WARN
-  return C_OK
-}
+// 計器式の位置固定色 (dB メーター方式): 埋まったセルは自分の位置色で光る。
+// 本数と色並びの両方で残量が読める。ユーザ裁定 2026-08-11 (design-system の
+// 「虹色ゲージ禁止」より優先、decisions.md 参照)
+const CELL_COLORS: ReadonlyArray<readonly [number, number, number]> = [
+  C_CRIT,
+  C_WARN,
+  C_OK,
+  C_OK,
+  C_CHARGE,
+]
 
 export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
   const isCharging = props.snapshot((s) => isOnAC(s))
@@ -114,7 +119,6 @@ export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
               if (!present) return
 
               const filled = Math.max(0, Math.min(CELLS, Math.round((pct / 100) * CELLS)))
-              const tone = levelColor(pct)
 
               // 充電マーチ: 残量セルの先を 0..span 個、周期的に cyan で埋める
               const span = CELLS - filled
@@ -126,7 +130,8 @@ export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
                 const ch = BODY_H - PAD * 2
 
                 if (i < filled) {
-                  cr.setSourceRGBA(tone[0], tone[1], tone[2], 1)
+                  const c = CELL_COLORS[i]
+                  cr.setSourceRGBA(c[0], c[1], c[2], 1)
                 } else if (charging && i < filled + march) {
                   cr.setSourceRGBA(C_CHARGE[0], C_CHARGE[1], C_CHARGE[2], 0.55)
                 } else {
