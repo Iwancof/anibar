@@ -112,19 +112,6 @@ export default function Bar(props: BarProps) {
       exclusivity={Astal.Exclusivity.EXCLUSIVE}
       anchor={TOP | LEFT | RIGHT}
       application={app}
-      onRealize={(self: Gtk.Window) => {
-        // クリック配送調査ログ: バー面に press/enter が届いているか
-        const clickLog = new Gtk.GestureClick()
-        clickLog.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
-        clickLog.connect("pressed", (_g: Gtk.GestureClick, _n: number, x: number, y: number) => {
-          console.log(`[click] bar press at (${x.toFixed(0)},${y.toFixed(0)})`)
-        })
-        self.add_controller(clickLog)
-        const motionLog = new Gtk.EventControllerMotion()
-        motionLog.connect("enter", () => console.log("[click] bar pointer enter"))
-        motionLog.connect("leave", () => console.log("[click] bar pointer leave"))
-        self.add_controller(motionLog)
-      }}
     >
       <centerbox cssName="centerbox">
         <box $type="start" spacing={8} halign={Gtk.Align.START} valign={Gtk.Align.CENTER}>

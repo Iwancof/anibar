@@ -45,13 +45,21 @@ export default function PopupShell(props: PopupShellProps) {
         })
         self.add_controller(keyCtrl)
 
-        // クリック配送調査ログ: このパネル面のどこに press が届いたか
-        const clickLog = new Gtk.GestureClick()
-        clickLog.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
-        clickLog.connect("pressed", (_g: Gtk.GestureClick, _n: number, x: number, y: number) => {
-          console.log(`[click] ${props.name} press at (${x.toFixed(0)},${y.toFixed(0)})`)
+        // Hyprland はパネルのマップ直後、カーソルが動くまでポインタフォーカスを
+        // このパネル面に残す。その間バー上でクリックすると press は領域外の
+        // 負座標でここへ届く (バーには届かない)。領域外 press は「外側クリック」
+        // として閉じる — 開いたボタンを動かさず再クリックで閉じられるようにする。
+        const outsidePress = new Gtk.GestureClick()
+        outsidePress.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+        outsidePress.connect("pressed", (_g: Gtk.GestureClick, _n: number, x: number, y: number) => {
+          const w = self.get_width()
+          const h = self.get_height()
+          if (x < 0 || y < 0 || x >= w || y >= h) {
+            console.log(`[click] ${props.name} outside press (${x.toFixed(0)},${y.toFixed(0)}) -> close`)
+            props.onClose()
+          }
         })
-        self.add_controller(clickLog)
+        self.add_controller(outsidePress)
       }}
     >
       <overlay>
