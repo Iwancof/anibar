@@ -1,9 +1,10 @@
-import { createPoll } from "ags/time"
+import { createState, type Accessor } from "gnim"
 
 import { parseTopOutput, type SystemStatsSnapshot } from "../modules/system-stats/domain.ts"
 import type { SystemStatsSource } from "../modules/system-stats/ports.ts"
 import { safeExec } from "./command.ts"
 import { readTextFile } from "./fs.ts"
+import { pollWhile } from "./visibility-gate.ts"
 
 import GLib from "gi://GLib?version=2.0"
 
@@ -39,7 +40,13 @@ async function readSnapshot(): Promise<SystemStatsSnapshot> {
   return { cpuPercent, topProcesses }
 }
 
-export function createSystemStatsSource(): SystemStatsSource {
-  const snapshot = createPoll<SystemStatsSnapshot | null>(null, POLL_MS, readSnapshot)
+export function createSystemStatsSource(active: Accessor<boolean>): SystemStatsSource {
+  const [snapshot, setSnapshot] = createState<SystemStatsSnapshot | null>(null)
+
+  // top -bn1 は全プロセス走査で重いので、表示パネルが開いている間のみ実行
+  pollWhile(active, POLL_MS, () => {
+    readSnapshot().then(setSnapshot)
+  })
+
   return { snapshot }
 }

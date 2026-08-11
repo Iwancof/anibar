@@ -49,6 +49,7 @@ const wsGoto = makeWindowController(WINDOW_PREFIXES.wsGoto, {
 })
 
 export const anyBatteryPopupVisible = batteryPopup.anyVisible
+export const batteryPopupVisible = batteryPopup.visible
 export const openBatteryPopup = batteryPopup.open
 export const closeBatteryPopup = batteryPopup.close
 export const toggleBatteryPopup = batteryPopup.toggle
@@ -59,6 +60,7 @@ export const closeBluetoothPopup = bluetoothPopup.close
 export const toggleBluetoothPopup = bluetoothPopup.toggle
 
 export const anyDashboardModeVisible = dashboardMode.anyVisible
+export const dashboardModeVisible = dashboardMode.visible
 export const openDashboardMode = dashboardMode.open
 export const closeDashboardMode = dashboardMode.close
 export const toggleDashboardMode = dashboardMode.toggle
@@ -68,6 +70,7 @@ export const openLauncher = launcher.open
 export const closeLauncher = launcher.close
 export const toggleLauncher = launcher.toggle
 
+export const networkPopupVisible = networkPopup.visible
 export const openNetworkPopup = networkPopup.open
 export const closeNetworkPopup = networkPopup.close
 export const toggleNetworkPopup = networkPopup.toggle

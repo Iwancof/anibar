@@ -1,6 +1,6 @@
-import GLib from "gi://GLib?version=2.0"
 import { createState, type Accessor } from "gnim"
 import { safeExec } from "./command.ts"
+import { pollWhile } from "./visibility-gate.ts"
 
 const DNS_POLL_MS = 30_000
 
@@ -73,14 +73,11 @@ export interface DnsSource {
   snapshot: Accessor<DnsSnapshot>
 }
 
-export function createDnsSource(): DnsSource {
+export function createDnsSource(active: Accessor<boolean>): DnsSource {
   const [snapshot, setSnapshot] = createState<DnsSnapshot>(EMPTY)
 
-  fetchDns().then(setSnapshot)
-
-  GLib.timeout_add(GLib.PRIORITY_DEFAULT, DNS_POLL_MS, () => {
+  pollWhile(active, DNS_POLL_MS, () => {
     fetchDns().then(setSnapshot)
-    return GLib.SOURCE_CONTINUE
   })
 
   return { snapshot }

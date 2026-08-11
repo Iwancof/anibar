@@ -1,6 +1,6 @@
-import GLib from "gi://GLib?version=2.0"
 import { createState, type Accessor } from "gnim"
 import { safeExec } from "./command.ts"
+import { pollWhile } from "./visibility-gate.ts"
 
 const CONN_POLL_MS = 5_000
 
@@ -34,14 +34,12 @@ export interface ConnectionsSource {
   snapshot: Accessor<ConnectionsSnapshot>
 }
 
-export function createConnectionsSource(): ConnectionsSource {
+export function createConnectionsSource(active: Accessor<boolean>): ConnectionsSource {
   const [snapshot, setSnapshot] = createState<ConnectionsSnapshot>(EMPTY)
 
-  fetchConnections().then(setSnapshot)
-
-  GLib.timeout_add(GLib.PRIORITY_DEFAULT, CONN_POLL_MS, () => {
+  // パネル可視時のみポーリング (ss×3 の fork を常時走らせない)
+  pollWhile(active, CONN_POLL_MS, () => {
     fetchConnections().then(setSnapshot)
-    return GLib.SOURCE_CONTINUE
   })
 
   return { snapshot }

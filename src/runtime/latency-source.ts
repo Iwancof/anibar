@@ -1,6 +1,6 @@
-import GLib from "gi://GLib?version=2.0"
 import { createState, type Accessor } from "gnim"
 import { safeExec } from "./command.ts"
+import { pollWhile } from "./visibility-gate.ts"
 
 const LATENCY_POLL_MS = 2_000
 
@@ -54,14 +54,12 @@ export interface LatencySource {
   snapshot: Accessor<LatencySnapshot>
 }
 
-export function createLatencySource(): LatencySource {
+export function createLatencySource(active: Accessor<boolean>): LatencySource {
   const [snapshot, setSnapshot] = createState<LatencySnapshot>(EMPTY)
 
-  fetchLatency().then(setSnapshot)
-
-  GLib.timeout_add(GLib.PRIORITY_DEFAULT, LATENCY_POLL_MS, () => {
+  // パネル可視時のみ実行 (sudo netmonctl ping-multi を常時 2秒毎に叩かない)
+  pollWhile(active, LATENCY_POLL_MS, () => {
     fetchLatency().then(setSnapshot)
-    return GLib.SOURCE_CONTINUE
   })
 
   return { snapshot }

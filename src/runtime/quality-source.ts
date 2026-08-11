@@ -1,6 +1,6 @@
-import GLib from "gi://GLib?version=2.0"
 import { createState, type Accessor } from "gnim"
 import { safeExec } from "./command.ts"
+import { pollWhile } from "./visibility-gate.ts"
 
 const PING_INTERVAL_MS = 2_000
 const IW_INTERVAL_MS = 5_000
@@ -74,7 +74,7 @@ function parseIwInfo(output: string): { channel: number | null } {
   return { channel: null }
 }
 
-export function createQualitySource(): QualitySource {
+export function createQualitySource(active: Accessor<boolean>): QualitySource {
   const [snapshot, setSnapshot] = createState<QualitySnapshot>(EMPTY)
 
   let rttHistory: number[] = []
@@ -82,21 +82,17 @@ export function createQualitySource(): QualitySource {
   let pingTotalCount = 0
   let wifiIface: string | null = null
 
-  // Detect Wi-Fi interface
-  detectWifiIface().then((iface) => {
-    wifiIface = iface
-  })
+  // 以下すべてパネル可視時のみ実行 (ping/iw/nmcli を常時 fork しない)
 
-  // Re-detect Wi-Fi interface every 30s
-  GLib.timeout_add(GLib.PRIORITY_DEFAULT, 30_000, () => {
+  // Wi-Fi interface detection (開いた瞬間 + 30s 毎)
+  pollWhile(active, 30_000, () => {
     detectWifiIface().then((iface) => {
       wifiIface = iface
     })
-    return GLib.SOURCE_CONTINUE
   })
 
   // Ping polling
-  GLib.timeout_add(GLib.PRIORITY_DEFAULT, PING_INTERVAL_MS, () => {
+  pollWhile(active, PING_INTERVAL_MS, () => {
     safeExec(["ping", "-c", "1", "-W", "1", "1.1.1.1"]).then((out) => {
       pingTotalCount++
       const rtt = parsePingRtt(out)
@@ -127,12 +123,11 @@ export function createQualitySource(): QualitySource {
         loss,
       })
     })
-    return GLib.SOURCE_CONTINUE
   })
 
   // iw polling
-  GLib.timeout_add(GLib.PRIORITY_DEFAULT, IW_INTERVAL_MS, () => {
-    if (!wifiIface) return GLib.SOURCE_CONTINUE
+  pollWhile(active, IW_INTERVAL_MS, () => {
+    if (!wifiIface) return
 
     Promise.all([
       safeExec(["iw", "dev", wifiIface, "station", "dump"]),
@@ -149,7 +144,6 @@ export function createQualitySource(): QualitySource {
         channel,
       })
     })
-    return GLib.SOURCE_CONTINUE
   })
 
   return { snapshot }

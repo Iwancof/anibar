@@ -36,13 +36,17 @@ import NotificationCenter from "../surfaces/notifications/NotificationCenter.tsx
 import SwipeDashboard from "../surfaces/dashboard/SwipeDashboard.tsx"
 import DashboardMode from "../surfaces/dashboard-mode/DashboardMode.tsx"
 import {
+  batteryPopupVisible,
   closeSwipeDashboard,
+  dashboardModeVisible,
+  networkPopupVisible,
   toggleBatteryPopup,
   toggleBluetoothPopup,
   toggleNetworkPopup,
   toggleNotifCenter,
   toggleWorkspaceVisibility,
 } from "./controllers.ts"
+import { orAccessors } from "../runtime/visibility-gate.ts"
 import { handleAppRequest } from "./request-handler.ts"
 import { createMonitorRegistry, getMonitorsListModel, setActiveRegistry } from "./monitor-registry.ts"
 
@@ -51,7 +55,12 @@ const MONITOR_SAFETY_POLL_MS = 5000
 export function startMainApp() {
   const modules = createRuntimeAppModules()
   const bluetoothModule = createBluetoothModule(createBluetoothSource())
-  const systemStats = createSystemStatsSource()
+
+  // fork を伴う重いポーラーは、それを表示するパネルが開いている間だけ回す
+  const networkPanelActive = orAccessors(networkPopupVisible, dashboardModeVisible)
+  const statsActive = orAccessors(batteryPopupVisible, dashboardModeVisible)
+
+  const systemStats = createSystemStatsSource(statsActive)
   const workspaceSource = createWorkspaceSource()
   const imeSource = createImeSource()
   const clock = createClock()
@@ -63,12 +72,12 @@ export function startMainApp() {
   const spectrumSource = createSpectrumSource()
   const playerSource = createPlayerSource()
   const bandwidthSource = createBandwidthSource()
-  const qualitySource = createQualitySource()
-  const dnsSource = createDnsSource()
-  const latencySource = createLatencySource()
-  const sessionSource = createSessionSource()
-  const connectionsSource = createConnectionsSource()
-  const flowsSource = createFlowsSource()
+  const qualitySource = createQualitySource(networkPanelActive)
+  const dnsSource = createDnsSource(networkPanelActive)
+  const latencySource = createLatencySource(networkPanelActive)
+  const sessionSource = createSessionSource(networkPanelActive)
+  const connectionsSource = createConnectionsSource(networkPanelActive)
+  const flowsSource = createFlowsSource(networkPanelActive)
   const logSource = createLogSource()
 
   function createMonitorWindows(

@@ -14,7 +14,8 @@ import {
   type DisplayProfile,
 } from "../modules/display-layout/domain.ts"
 
-const POLL_MS = 2_500
+// 表示構成の変化は稀。apply/refresh 操作時は即時更新されるため低頻度で十分
+const POLL_MS = 10_000
 const CONFIG_DIR = `${GLib.get_user_config_dir()}/ags`
 const CONFIG_FILE = resolveDisplayLayoutConfigPath(CONFIG_DIR)
 

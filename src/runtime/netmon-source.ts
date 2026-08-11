@@ -4,6 +4,7 @@ import { subprocess } from "ags/process"
 import { createState, type Accessor } from "gnim"
 
 import { safeExec } from "./command.ts"
+import { pollWhile } from "./visibility-gate.ts"
 
 // ── Config ──
 
@@ -118,24 +119,16 @@ export interface FlowsSource {
   flows: Accessor<FlowEntry[]>
 }
 
-export function createFlowsSource(): FlowsSource {
+export function createFlowsSource(active: Accessor<boolean>): FlowsSource {
   const [flows, setFlows] = createState<FlowEntry[]>([])
 
-  // 初回取得
-  safeExec(["sudo", "netmonctl", "flows"]).then(async (out) => {
-    const entries = parseFlows(out)
-    setFlows(entries)
-    setFlows(await resolveFlowHostnames(entries))
-  })
-
-  // 定期ポーリング
-  GLib.timeout_add(GLib.PRIORITY_DEFAULT, FLOW_POLL_MS, () => {
+  // パネル可視時のみポーリング (sudo netmonctl + getent を常時走らせない)
+  pollWhile(active, FLOW_POLL_MS, () => {
     safeExec(["sudo", "netmonctl", "flows"]).then(async (out) => {
       const entries = parseFlows(out)
       setFlows(entries)
       setFlows(await resolveFlowHostnames(entries))
     })
-    return GLib.SOURCE_CONTINUE
   })
 
   return { flows }

@@ -2,6 +2,7 @@ import GLib from "gi://GLib?version=2.0"
 
 import app from "ags/gtk4/app"
 import { Gtk } from "ags/gtk4"
+import { createState, type Accessor } from "gnim"
 
 import { DIM } from "../shared/theme-tokens.ts"
 import { isConnectorAvailable } from "./monitor-registry.ts"
@@ -22,6 +23,8 @@ export const WINDOW_CLOSE_ANIM_MS = DIM["anim-close-ms"]
 
 export interface WindowController {
   anyVisible(): boolean
+  /** open/close に追従するリアクティブな可視状態 (ポーリングのゲートに使う) */
+  visible: Accessor<boolean>
   open(): number
   close(): number
   toggle(): number
@@ -53,6 +56,7 @@ export function makeWindowController(
   opts: WindowControllerOptions = {},
 ): WindowController {
   let animating = false
+  const [visibleState, setVisibleState] = createState(false)
 
   function allWindows(): Gtk.Window[] {
     return app.windows.filter((window) => connectorForWindow(prefix, window) != null)
@@ -73,7 +77,13 @@ export function makeWindowController(
     return getWindows().some((window) => window.visible)
   }
 
+  // クリック配送の不具合調査用に、ユーザ操作起点の遷移を常時ログする (低頻度)
+  function logAction(action: string): void {
+    console.log(`[winctl] ${prefix} ${action} (visible=${anyVisible()}, animating=${animating})`)
+  }
+
   function open(): number {
+    logAction("open")
     if (animating) return 0
 
     const windows = getWindows()
@@ -98,11 +108,16 @@ export function makeWindowController(
       }
     }
 
+    if (selected.length > 0) setVisibleState(true)
     return selected.length
   }
 
   function close(): number {
+    logAction("close")
     if (animating) return 0
+
+    // クローズアニメ中もポーリング等は即止めてよいので先に落とす
+    setVisibleState(false)
 
     const windows = allWindows()
 
@@ -136,9 +151,10 @@ export function makeWindowController(
   }
 
   function toggle(): number {
+    logAction("toggle")
     if (animating) return 0
     return setVisibility(!anyVisible())
   }
 
-  return { anyVisible, open, close, toggle, setVisibility, getWindows }
+  return { anyVisible, visible: visibleState, open, close, toggle, setVisibility, getWindows }
 }

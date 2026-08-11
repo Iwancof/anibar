@@ -1,6 +1,6 @@
-import GLib from "gi://GLib?version=2.0"
 import { createState, type Accessor } from "gnim"
 import { safeExec } from "./command.ts"
+import { pollWhile } from "./visibility-gate.ts"
 
 const SESSION_POLL_MS = 5_000
 
@@ -65,14 +65,13 @@ export interface SessionSource {
   snapshot: Accessor<SessionSnapshot>
 }
 
-export function createSessionSource(): SessionSource {
+export function createSessionSource(active: Accessor<boolean>): SessionSource {
   const [snapshot, setSnapshot] = createState<SessionSnapshot>(EMPTY)
 
-  fetchSession().then(setSnapshot)
-
-  GLib.timeout_add(GLib.PRIORITY_DEFAULT, SESSION_POLL_MS, () => {
+  // パネル可視時のみポーリング (nmcli + iw の fork を常時走らせない)。
+  // 注: reconnect 検出も可視時のみ観測になる (閉じている間の切断は数えない)
+  pollWhile(active, SESSION_POLL_MS, () => {
     fetchSession().then(setSnapshot)
-    return GLib.SOURCE_CONTINUE
   })
 
   return { snapshot }
