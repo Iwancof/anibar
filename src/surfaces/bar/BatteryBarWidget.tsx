@@ -24,7 +24,9 @@ const HOLD_MS = 1000
 const GROW_MS = 2000
 const FADE_MS = 500
 const CYCLE_MS = HOLD_MS + GROW_MS + FADE_MS
-const TICK_MS = 30
+// 3.5s 周期・22px 幅のゆっくりしたアニメなので 10fps で十分滑らか。
+// 30ms (33fps) だと充電中ずっとバー全体の再合成が走り CPU を数%食う
+const TICK_MS = 100
 const BATTERY_GREEN = COLORS.rgb["bar-battery-green"]
 const BATTERY_AMBER = COLORS.rgb["bar-battery-amber"]
 const BATTERY_CHARGE = COLORS.rgb["bar-battery-charge"]
