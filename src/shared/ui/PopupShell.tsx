@@ -44,6 +44,14 @@ export default function PopupShell(props: PopupShellProps) {
           return false
         })
         self.add_controller(keyCtrl)
+
+        // クリック配送調査ログ: このパネル面のどこに press が届いたか
+        const clickLog = new Gtk.GestureClick()
+        clickLog.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
+        clickLog.connect("pressed", (_g: Gtk.GestureClick, _n: number, x: number, y: number) => {
+          console.log(`[click] ${props.name} press at (${x.toFixed(0)},${y.toFixed(0)})`)
+        })
+        self.add_controller(clickLog)
       }}
     >
       <overlay>
