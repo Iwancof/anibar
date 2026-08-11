@@ -1,9 +1,7 @@
-import GLib from "gi://GLib?version=2.0"
-
 import { Gtk } from "ags/gtk4"
+import { onCleanup } from "gnim"
 import type { Accessor } from "gnim"
 
-import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
 import { COLORS } from "../../shared/theme-tokens.ts"
 
 const BAR_WIDTH = 8
@@ -20,10 +18,10 @@ export interface WideSpectrumProps {
 export default function WideSpectrum(props: WideSpectrumProps) {
   let drawingArea: Gtk.DrawingArea | null = null
 
-  scopedTimeoutAdd(GLib.PRIORITY_DEFAULT, 33, () => {
-    if (drawingArea) drawingArea.queue_draw()
-    return GLib.SOURCE_CONTINUE
-  }, "WideSpectrum")
+  // cava の更新 (bars 変化) に同期して再描画。非表示 (unmapped) 中は描かない。
+  onCleanup(props.bars.subscribe(() => {
+    if (drawingArea?.get_mapped()) drawingArea.queue_draw()
+  }))
 
   return (
     <Gtk.DrawingArea

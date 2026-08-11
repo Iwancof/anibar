@@ -2,10 +2,11 @@ import GLib from "gi://GLib?version=2.0"
 
 import { Gtk } from "ags/gtk4"
 
+import { onCleanup } from "gnim"
 import type { Accessor } from "gnim"
 
 import { isOnAC, type BatterySnapshot } from "../../modules/battery/domain.ts"
-import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
+import { scopedTimeoutWhile } from "../../shared/runtime/scoped-timeout.ts"
 import { COLORS } from "../../shared/theme-tokens.ts"
 import { ICONS } from "../../shared/ui/icons.ts"
 
@@ -48,10 +49,18 @@ export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
   let drawingArea: Gtk.DrawingArea | null = null
   let animTime = 0
 
-  scopedTimeoutAdd(GLib.PRIORITY_DEFAULT, TICK_MS, () => {
+  // アニメーション (grow/fade) は充電中かつ 100% 未満のときだけ描かれるので、
+  // tick もその間だけ回す。静的な残量変化は snapshot 購読で再描画。
+  const animActive = props.snapshot(
+    (s) => s != null && s.present && isOnAC(s) && s.percent < 100,
+  )
+  onCleanup(props.snapshot.subscribe(() => {
+    if (drawingArea) drawingArea.queue_draw()
+  }))
+
+  scopedTimeoutWhile(GLib.PRIORITY_DEFAULT, TICK_MS, animActive, () => {
     animTime += TICK_MS
     if (drawingArea) drawingArea.queue_draw()
-    return GLib.SOURCE_CONTINUE
   }, "BatteryBarWidget")
 
   function setupClick(self: any) {

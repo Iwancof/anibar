@@ -2,11 +2,11 @@ import GLib from "gi://GLib?version=2.0"
 
 import app from "ags/gtk4/app"
 import { Astal, Gdk, Gtk } from "ags/gtk4"
-import { createMemo } from "gnim"
+import { createMemo, onCleanup } from "gnim"
 
 import type { NotificationSource } from "../../runtime/notification-source.ts"
 import { timeAgo } from "../../shared/format.ts"
-import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
+import { scopedTimeoutWhile } from "../../shared/runtime/scoped-timeout.ts"
 import { COLORS } from "../../shared/theme-tokens.ts"
 import NotificationCard from "../../shared/ui/NotificationCard.tsx"
 
@@ -36,18 +36,24 @@ export default function NotificationPopup(props: NotificationPopupProps) {
   const drawingAreas: (Gtk.DrawingArea | null)[] = new Array(MAX_POPUPS).fill(null)
   let windowRef: any = null
 
-  scopedTimeoutAdd(GLib.PRIORITY_DEFAULT, TICK_MS, () => {
+  const hasPopups = createMemo(() => notifications.popups().length > 0)
+
+  // 可視状態はイベント駆動で同期し、タイマーバー再描画の tick は
+  // ポップアップ表示中だけ回す (非表示時の常時 30ms tick を排除)。
+  const syncVisibility = () => {
+    if (!windowRef) return
+    const show = hasPopups()
+    if (windowRef.visible !== show) {
+      windowRef.visible = show
+      if (show) windowRef.present()
+    }
+  }
+  onCleanup(hasPopups.subscribe(syncVisibility))
+
+  scopedTimeoutWhile(GLib.PRIORITY_DEFAULT, TICK_MS, hasPopups, () => {
     for (let i = 0; i < MAX_POPUPS; i++) {
       if (drawingAreas[i]) drawingAreas[i]!.queue_draw()
     }
-    if (windowRef) {
-      const hasPopups = notifications.popups().length > 0
-      if (windowRef.visible !== hasPopups) {
-        windowRef.visible = hasPopups
-        if (hasPopups) windowRef.present()
-      }
-    }
-    return GLib.SOURCE_CONTINUE
   }, `NotificationPopup:${props.monitor}`)
 
   return (

@@ -6,7 +6,7 @@ import { Gtk } from "ags/gtk4"
 import { createMemo } from "gnim"
 
 import type { PlayerSource } from "../../runtime/player-source.ts"
-import { scopedTimeoutAdd } from "../../shared/runtime/scoped-timeout.ts"
+import { scopedTimeoutWhile } from "../../shared/runtime/scoped-timeout.ts"
 import { COLORS } from "../../shared/theme-tokens.ts"
 import PlayerControls from "../../shared/ui/PlayerControls.tsx"
 
@@ -34,7 +34,8 @@ export default function PlayerWidget(props: PlayerWidgetProps) {
   let pauseTicks = PAUSE_TICKS // start paused
   let drawingArea: Gtk.DrawingArea | null = null
 
-  scopedTimeoutAdd(GLib.PRIORITY_DEFAULT, SCROLL_INTERVAL_MS, () => {
+  // player 不在時はスクロールも描画も不要なので tick を止める
+  scopedTimeoutWhile(GLib.PRIORITY_DEFAULT, SCROLL_INTERVAL_MS, visible, () => {
     const text = player.label()
     if (text !== lastText) {
       lastText = text
@@ -63,7 +64,6 @@ export default function PlayerWidget(props: PlayerWidgetProps) {
     }
 
     if (drawingArea) drawingArea.queue_draw()
-    return GLib.SOURCE_CONTINUE
   }, "PlayerWidget")
 
   return (
