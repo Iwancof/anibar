@@ -60,6 +60,7 @@ export default function PanelHeader(props: PanelHeaderProps) {
         class="UiPanelHeaderTitle"
         label={staticTitle == null ? props.title : ""}
         halign={Gtk.Align.START}
+        xalign={0}
         hexpand
         onRealize={(self: Gtk.Label) => {
           // Accessor タイトルは動的更新があるためタイプライターは静的文字列のみ

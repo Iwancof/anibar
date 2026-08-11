@@ -52,19 +52,42 @@
   background: $np-bg3;
   border: 1px solid $np-border;
 }
-.HudSegOk,
-.HudSegCharge {
-  background: $colors-accent;
-  border: 1px solid transparent;
-}
-.HudSegWarn {
-  background: $colors-warning;
-  border: 1px solid transparent;
-}
-.HudSegCrit {
+
+// 位置バンド色 (バーのセルゲージと同じ計器ランプ)
+.HudSegBandCrit {
   background: $colors-critical;
   border: 1px solid transparent;
 }
+.HudSegBandWarn {
+  background: $colors-warning;
+  border: 1px solid transparent;
+}
+.HudSegBandOk {
+  background: $colors-healthy;
+  border: 1px solid transparent;
+}
+.HudSegBandCharge {
+  background: $colors-accent;
+  border: 1px solid transparent;
+}
+
+// ── 開時のセグメント順点灯 (左→右へ 70ms 刻み、一発アニメ) ──
+@keyframes hud-seg-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@mixin hud-seg-stagger($root, $base) {
+  @for $i from 1 through 10 {
+    #{$root} .HudSegBar > box:nth-child(#{$i}) {
+      animation: hud-seg-in 160ms ease-out ($base + ($i - 1) * 70ms) both;
+    }
+  }
+}
+
+// BatPopup はパネル実体化 (450ms) の途中から、DmWindow は右パネル到着後に点灯開始
+@include hud-seg-stagger(".BatPopup.open", 250ms);
+@include hud-seg-stagger(".DmWindow.open", 900ms);
 
 .HudSegScale {
   font-size: 9px;

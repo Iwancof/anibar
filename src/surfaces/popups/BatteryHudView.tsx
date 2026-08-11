@@ -49,15 +49,13 @@ function hudTone(snapshot: BatterySnapshot | null): HudTone {
   return "normal"
 }
 
-function segmentClass(
-  i: number,
-  filledCount: number,
-  tone: HudTone,
-): string {
+// 位置固定の計器ランプ (バーのセルゲージと同じ意味論: 赤2/amber2/緑4/cyan2)
+function segmentClass(i: number, filledCount: number): string {
   if (i >= filledCount) return "HudSeg HudSegEmpty"
-  if (tone === "critical") return "HudSeg HudSegCrit"
-  if (tone === "warning") return "HudSeg HudSegWarn"
-  return tone === "charge" ? "HudSeg HudSegCharge" : "HudSeg HudSegOk"
+  if (i < 2) return "HudSeg HudSegBandCrit"
+  if (i < 4) return "HudSeg HudSegBandWarn"
+  if (i < 8) return "HudSeg HudSegBandOk"
+  return "HudSeg HudSegBandCharge"
 }
 
 const MEASURE_META: Record<MeasureName, { label: string; sub: string }> = {
@@ -97,10 +95,9 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
     return "HudPercent HudPercentNormal"
   })
 
-  const segState = props.snapshot((s) => ({
-    filled: !s || !s.present ? 0 : Math.round((s.percent / 100) * SEGMENTS),
-    tone: hudTone(s),
-  }))
+  const segFilled = props.snapshot((s) =>
+    !s || !s.present ? 0 : Math.round((s.percent / 100) * SEGMENTS),
+  )
 
   const timeLeft = props.snapshot((s) => {
     if (!s || !s.present) return "—"
@@ -182,7 +179,7 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
             <box class="HudSegBar" spacing={3} homogeneous>
               {Array.from({ length: SEGMENTS }).map((_, i) => (
                 <box
-                  class={segState((s) => segmentClass(i, s.filled, s.tone))}
+                  class={segFilled((filled) => segmentClass(i, filled))}
                   heightRequest={20}
                 />
               ))}
