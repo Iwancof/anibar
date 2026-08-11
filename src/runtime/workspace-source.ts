@@ -118,3 +118,8 @@ export function createWorkspaceSource() {
 export function switchToWorkspace(id: number): void {
   safeExec(["hyprctl", "dispatch", "workspace", `${id}`])
 }
+
+/** フォーカス中のウィンドウを指定 workspace へ移動し、一緒に移る */
+export function moveWindowToWorkspace(id: number): void {
+  safeExec(["hyprctl", "dispatch", "movetoworkspace", `${id}`])
+}

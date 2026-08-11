@@ -1,7 +1,8 @@
 import { Astal, Gdk, Gtk } from "ags/gtk4"
+import { createState } from "gnim"
 
 import { closeWsGoto } from "../../app/controllers.ts"
-import { switchToWorkspace } from "../../runtime/workspace-source.ts"
+import { moveWindowToWorkspace, switchToWorkspace } from "../../runtime/workspace-source.ts"
 import PopupShell from "../../shared/ui/PopupShell.tsx"
 
 export interface WsGotoWindowProps {
@@ -9,13 +10,30 @@ export interface WsGotoWindowProps {
   monitor: string
 }
 
+// goto = 移動のみ / move = フォーカス中のウィンドウごと移動。
+// モードは開く側 (request-handler) が open 前にセットする
+export type WsGotoMode = "goto" | "move"
+
+const [mode, setMode] = createState<WsGotoMode>("goto")
+
+export function setWsGotoMode(next: WsGotoMode): void {
+  setMode(next)
+}
+
+const placeholder = mode((m) => (m === "move" ? "WS::MOVE" : "WS::GOTO"))
+const promptIcon = mode((m) => (m === "move" ? ">#" : "#"))
+
 export default function WsGotoWindow(props: WsGotoWindowProps) {
   let entryRef: any = null
 
   function onActivate(self: any) {
     const n = Number.parseInt(self.text ?? "", 10)
     if (Number.isInteger(n) && n >= 1) {
-      switchToWorkspace(n)
+      if (mode() === "move") {
+        moveWindowToWorkspace(n)
+      } else {
+        switchToWorkspace(n)
+      }
     }
     closeWsGoto()
   }
@@ -46,11 +64,11 @@ export default function WsGotoWindow(props: WsGotoWindowProps) {
           })
         }}
       >
-        <label class="LauncherSearchIcon" label="#" />
+        <label class="LauncherSearchIcon" label={promptIcon} />
         <entry
           class="LauncherEntry"
           hexpand
-          placeholder_text="WS::GOTO"
+          placeholder_text={placeholder}
           onActivate={onActivate}
           onRealize={(self: any) => {
             entryRef = self

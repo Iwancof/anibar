@@ -29,6 +29,7 @@ import {
   closeWsGoto,
   toggleWsGoto,
 } from "./controllers.ts"
+import { setWsGotoMode } from "../surfaces/workspace/WsGotoWindow.tsx"
 
 function normalizeArgs(args: string[]): string[] {
   return args.filter(Boolean).filter((arg, index) => {
@@ -130,8 +131,10 @@ export function handleAppRequest(args: string[]): string {
 
   if (scope === "ws-goto") {
     switch (action) {
-      case "toggle": toggleWsGoto(); return "ok"
-      case "open": openWsGoto(); return "ok"
+      case "toggle": setWsGotoMode("goto"); toggleWsGoto(); return "ok"
+      case "open": setWsGotoMode("goto"); openWsGoto(); return "ok"
+      // フォーカス中のウィンドウを番号入力先へ移動するモードで開く
+      case "move": setWsGotoMode("move"); openWsGoto(); return "ok"
       case "close": closeWsGoto(); return "ok"
       default: return `unknown ws-goto action "${action}"`
     }

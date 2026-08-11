@@ -45,7 +45,9 @@ export interface BarProps {
   onToggleNetworkPopup: () => void
 }
 
-const MAX_WS_DOTS = 9
+// ponytail: 事前生成の上限。ws 31 以上はバーに出ない (ws-goto では移動可能)。
+// 動的生成 (For) が必要になったら置き換える
+const MAX_WS_DOTS = 30
 
 function volumeIcon(snapshot: VolumeSnapshot | null): string {
   if (!snapshot || snapshot.sinkMuted) return ICONS.volumeMuted
@@ -132,9 +134,9 @@ export default function Bar(props: BarProps) {
             const visible = createMemo(() => {
               const s = props.workspaceSnapshot()
               if (!s) return wsId <= 5
-              // Show: active, occupied, or up to the highest occupied
-              const maxId = Math.max(...s.workspaces.map((w) => w.id), 1)
-              return wsId <= Math.max(maxId, s.activeId)
+              // 占有中と active だけ表示 (空き番号のドットは出さない)。
+              // 9個超でもバーが崩れず、飛び番でもコンパクトに並ぶ
+              return s.activeId === wsId || s.workspaces.some((w) => w.id === wsId)
             })
 
             return (
