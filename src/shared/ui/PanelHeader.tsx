@@ -10,9 +10,9 @@ export interface PanelHeaderProps {
 }
 
 // タイプライター表示: パネルが開くたびにタイトルを左から打ち出す。
-// 全体 ~300ms の一発アニメ (motion policy の open 200ms + α に収める)
-const TYPE_INTERVAL_MS = 25
-const TYPE_STEPS = 12
+// パネル展開 (450ms) と重ねてゆっくり見せる ~650ms の一発アニメ
+const TYPE_INTERVAL_MS = 40
+const TYPE_STEPS = 16
 const CURSOR = "_"
 
 function attachTypewriter(label: Gtk.Label, text: string): void {

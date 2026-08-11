@@ -17,7 +17,7 @@ window.NotifCenter {
 }
 
 @include popup-anim(".NotifCenter") {
-  animation: hud-materialize 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: hud-materialize 450ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .NotifCenterPanel {

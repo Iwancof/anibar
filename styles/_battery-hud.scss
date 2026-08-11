@@ -9,7 +9,7 @@
 }
 
 @include popup-anim(".BatPopup") {
-  animation: hud-materialize 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: hud-materialize 450ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .BatPopupPanel {
