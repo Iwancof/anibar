@@ -25,11 +25,13 @@ import { createConnectionsSource } from "../runtime/connections-source.ts"
 import { createFlowsSource, createLogSource } from "../runtime/netmon-source.ts"
 import { createBluetoothSource } from "../runtime/bluetooth-source.ts"
 import { createWeatherSource } from "../runtime/weather-source.ts"
+import { createGcalSource } from "../runtime/gcal-source.ts"
 import Bar from "../surfaces/bar/Bar.tsx"
 import WorkspaceWindow from "../surfaces/workspace/WorkspaceWindow.tsx"
 import WsGotoWindow from "../surfaces/workspace/WsGotoWindow.tsx"
 import BatteryPopup from "../surfaces/popups/BatteryPopup.tsx"
 import WeatherPopup from "../surfaces/popups/WeatherPopup.tsx"
+import CalendarPopup, { resetCalendarView } from "../surfaces/popups/CalendarPopup.tsx"
 import BluetoothPopup from "../surfaces/popups/BluetoothPopup.tsx"
 import NetworkPanel from "../surfaces/network/NetworkPanel.tsx"
 import LauncherWindow from "../surfaces/launcher/LauncherWindow.tsx"
@@ -44,6 +46,7 @@ import {
   networkPopupVisible,
   toggleBatteryPopup,
   toggleBluetoothPopup,
+  toggleCalendarPopup,
   toggleNetworkPopup,
   toggleNotifCenter,
   toggleWeatherPopup,
@@ -83,6 +86,7 @@ export function startMainApp() {
   const flowsSource = createFlowsSource(networkPanelActive)
   const logSource = createLogSource()
   const weatherSource = createWeatherSource()
+  const gcalSource = createGcalSource()
 
   function createMonitorWindows(
     gdkmonitor: Gdk.Monitor,
@@ -105,7 +109,12 @@ export function startMainApp() {
         imeSnapshot: imeSource.snapshot,
         workspaceSnapshot: workspaceSource.snapshot,
         weatherSnapshot: weatherSource.snapshot,
+        bandwidthSnapshot: bandwidthSource.snapshot,
         onToggleDashboard: toggleWorkspaceVisibility,
+        onToggleCalendarPopup: () => {
+          resetCalendarView()
+          toggleCalendarPopup()
+        },
         onToggleBatteryPopup: toggleBatteryPopup,
         onToggleBluetoothPopup: toggleBluetoothPopup,
         onToggleNotifCenter: () => {
@@ -120,6 +129,12 @@ export function startMainApp() {
         gdkmonitor,
         monitor,
         snapshot: weatherSource.snapshot,
+      }),
+
+      CalendarPopup({
+        gdkmonitor,
+        monitor,
+        gcal: gcalSource.snapshot,
       }),
 
       NetworkPanel({

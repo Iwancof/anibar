@@ -1,0 +1,100 @@
+@use "../theme" as *;
+@use "animations";
+@use "mixins" as *;
+
+// ── カレンダーポップアップ ────────────────
+
+.CalPopup {
+  background: transparent;
+}
+
+@include popup-anim(".CalPopup") {
+  animation: hud-materialize 450ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.CalPopupPanel {
+  min-width: 340px;
+  opacity: 0;
+}
+
+.CalBody {
+  padding: 12px 16px;
+}
+
+.CalNavBtn {
+  @extend %icon-btn-reset;
+  border: 1px solid $np-border;
+  border-radius: $radius-md;
+  padding: 2px 10px;
+}
+
+.CalNavBtn label {
+  font-size: $fontsize-caption;
+  letter-spacing: 0.10em;
+  color: rgba($hud-text, 0.7);
+}
+
+.CalHeaderIcon {
+  font-size: 15px;
+  color: rgba($hud-text, 0.4);
+}
+
+.CalDow {
+  font-size: 9px;
+  letter-spacing: 0.10em;
+  color: rgba($hud-text, 0.35);
+  padding: 2px 0;
+}
+
+.CalDay {
+  font-size: 12px;
+  padding: 3px 0;
+  border-radius: $radius-sm;
+  border: 1px solid transparent;
+  color: $np-text;
+}
+
+.CalDayDim {
+  color: $np-text-dim;
+}
+
+.CalDayHasEvent {
+  color: $np-cyan;
+  font-weight: 800;
+}
+
+.CalDayToday {
+  border-color: $colors-accent;
+  background: rgba($colors-accent, 0.08);
+  color: $colors-accent;
+}
+
+// ── AGENDA ──
+.CalAgendaRow {
+  padding: 2px 0;
+}
+
+.CalAgendaWhen {
+  font-size: $fontsize-dense;
+  color: $np-cyan;
+  min-width: 100px;
+}
+
+.CalAgendaTitle {
+  font-family: "Noto Sans Mono CJK JP", $network-panel-font-family, $font-family;
+  font-size: 12px;
+  color: rgba($hud-text, 0.85);
+}
+
+.CalAgendaEmpty {
+  font-size: $fontsize-dense;
+  color: rgba($hud-text, 0.3);
+  letter-spacing: 0.10em;
+}
+
+.CalFooter {
+  font-size: 9px;
+  letter-spacing: 0.10em;
+  color: rgba($hud-text, 0.3);
+  margin-top: 4px;
+}

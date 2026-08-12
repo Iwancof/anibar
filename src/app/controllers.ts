@@ -32,6 +32,9 @@ const batteryPopup = makeWindowController(WINDOW_PREFIXES.batteryPopup, {
 const bluetoothPopup = makeWindowController(WINDOW_PREFIXES.bluetoothPopup, {
   closeAnimMs: WINDOW_CLOSE_ANIM_MS,
 })
+const calendarPopup = makeWindowController(WINDOW_PREFIXES.calendarPopup, {
+  closeAnimMs: WINDOW_CLOSE_ANIM_MS,
+})
 // closeAnimMs で .open/.closing class が付く (dashboard の起動シーケンス CSS が依存)
 const dashboardMode = makeWindowController(WINDOW_PREFIXES.dashboardMode, {
   closeAnimMs: WINDOW_CLOSE_ANIM_MS,
@@ -64,6 +67,10 @@ export const anyBluetoothPopupVisible = bluetoothPopup.anyVisible
 export const openBluetoothPopup = bluetoothPopup.open
 export const closeBluetoothPopup = bluetoothPopup.close
 export const toggleBluetoothPopup = bluetoothPopup.toggle
+
+export const openCalendarPopup = calendarPopup.open
+export const closeCalendarPopup = calendarPopup.close
+export const toggleCalendarPopup = calendarPopup.toggle
 
 export const anyDashboardModeVisible = dashboardMode.anyVisible
 export const dashboardModeVisible = dashboardMode.visible

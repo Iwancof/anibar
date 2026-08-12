@@ -31,7 +31,11 @@ import {
   openWeatherPopup,
   closeWeatherPopup,
   toggleWeatherPopup,
+  openCalendarPopup,
+  closeCalendarPopup,
+  toggleCalendarPopup,
 } from "./controllers.ts"
+import { resetCalendarView } from "../surfaces/popups/CalendarPopup.tsx"
 import { setWsGotoMode } from "../surfaces/workspace/WsGotoWindow.tsx"
 
 function normalizeArgs(args: string[]): string[] {
@@ -132,6 +136,15 @@ export function handleAppRequest(args: string[]): string {
     }
   }
 
+  if (scope === "calendar") {
+    switch (action) {
+      case "toggle": resetCalendarView(); toggleCalendarPopup(); return "ok"
+      case "open": resetCalendarView(); openCalendarPopup(); return "ok"
+      case "close": closeCalendarPopup(); return "ok"
+      default: return `unknown calendar action "${action}"`
+    }
+  }
+
   if (scope === "weather") {
     switch (action) {
       case "toggle": toggleWeatherPopup(); return "ok"
@@ -153,7 +166,7 @@ export function handleAppRequest(args: string[]): string {
   }
 
   if (scope !== "dashboard" && scope !== "workspace") {
-    return 'unknown request. use "ags request battery|bluetooth|network|notif-center|weather|dashboard|workspace|ws-goto|launcher|swipe-dashboard toggle"'
+    return 'unknown request. use "ags request battery|bluetooth|calendar|network|notif-center|weather|dashboard|workspace|ws-goto|launcher|swipe-dashboard toggle"'
   }
 
   const label = scope === "workspace" ? "workspace" : "dashboard"

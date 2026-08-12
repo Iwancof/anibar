@@ -10,6 +10,7 @@ import { isConnectorAvailable } from "./monitor-registry.ts"
 export const WINDOW_PREFIXES = {
   batteryPopup: "battery-popup:",
   bluetoothPopup: "bluetooth-popup:",
+  calendarPopup: "calendar-popup:",
   dashboardMode: "dashboard-mode:",
   launcher: "launcher:",
   networkPopup: "network-popup:",

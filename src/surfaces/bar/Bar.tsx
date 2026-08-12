@@ -1,5 +1,6 @@
 import app from "ags/gtk4/app"
 import { Astal, Gdk, Gtk } from "ags/gtk4"
+import { execAsync } from "ags/process"
 import { createMemo } from "gnim"
 
 import type { Accessor } from "gnim"
@@ -14,6 +15,7 @@ import type { VolumeSnapshot } from "../../modules/volume/domain.ts"
 import type { WorkspaceSnapshot } from "../../modules/workspace/domain.ts"
 import type { ImeSnapshot } from "../../runtime/ime-source.ts"
 import type { WeatherSnapshot } from "../../runtime/weather-source.ts"
+import type { BandwidthSnapshot } from "../../runtime/bandwidth-source.ts"
 import { switchToWorkspace } from "../../runtime/workspace-source.ts"
 import type { NetworkSnapshot } from "../../modules/network/domain.ts"
 import { signalIcon, signalLevel, type WifiSnapshot } from "../../modules/wifi/domain.ts"
@@ -40,7 +42,9 @@ export interface BarProps {
   bluetoothSnapshot: Accessor<BluetoothSnapshot>
   notifUnreadCount: Accessor<number>
   weatherSnapshot: Accessor<WeatherSnapshot | null>
+  bandwidthSnapshot: Accessor<BandwidthSnapshot>
   onToggleDashboard: () => void
+  onToggleCalendarPopup: () => void
   onToggleBatteryPopup: () => void
   onToggleBluetoothPopup: () => void
   onToggleNotifCenter: () => void
@@ -51,6 +55,15 @@ export interface BarProps {
 // ponytail: 事前生成の上限。ws 31 以上はバーに出ない (ws-goto では移動可能)。
 // 動的生成 (For) が必要になったら置き換える
 const MAX_WS_DOTS = 30
+
+// 帯域の表示文字列は粗く量子化する: アイドル時 (数KB/s未満) は "0" で不変になり
+// ラベル再描画が起きない (アイドルCPU削減の方針を守る)
+function compactRate(bps: number): string {
+  if (bps < 2048) return "0"
+  if (bps < 1024 * 1024) return `${Math.round(bps / 1024)}K`
+  const m = bps / (1024 * 1024)
+  return m < 10 ? `${m.toFixed(1)}M` : `${Math.round(m)}M`
+}
 
 function volumeIcon(snapshot: VolumeSnapshot | null): string {
   if (!snapshot || snapshot.sinkMuted) return ICONS.volumeMuted
@@ -154,7 +167,14 @@ export default function Bar(props: BarProps) {
             )
           })}
         </box>
-        <label $type="center" class="BarClock" label={props.clock} />
+        <button
+          $type="center"
+          class="ClockBtn"
+          valign={Gtk.Align.CENTER}
+          onClicked={props.onToggleCalendarPopup}
+        >
+          <label class="BarClock" label={props.clock} />
+        </button>
         <box $type="end" class="BarRightModules" spacing={0} halign={Gtk.Align.END} valign={Gtk.Align.CENTER}>
           <box class="BarGroup" spacing={4} valign={Gtk.Align.CENTER}>
             <button
@@ -196,6 +216,24 @@ export default function Bar(props: BarProps) {
               />
             </button>
             <button
+              class="BwBarBtn"
+              valign={Gtk.Align.CENTER}
+              onClicked={props.onToggleNetworkPopup}
+            >
+              <box spacing={4}>
+                <BarModule
+                  icon={ICONS.arrowDown}
+                  value={props.bandwidthSnapshot((s) => compactRate(s.currentRx))}
+                  tone={props.bandwidthSnapshot((s) => (s.currentRx < 2048 ? "muted" : "normal"))}
+                />
+                <BarModule
+                  icon={ICONS.arrowUp}
+                  value={props.bandwidthSnapshot((s) => compactRate(s.currentTx))}
+                  tone={props.bandwidthSnapshot((s) => (s.currentTx < 2048 ? "muted" : "normal"))}
+                />
+              </box>
+            </button>
+            <button
               class="BtBarBtn"
               valign={Gtk.Align.CENTER}
               onClicked={props.onToggleBluetoothPopup}
@@ -220,6 +258,18 @@ export default function Bar(props: BarProps) {
                 icon={ICONS.bell}
                 value={props.notifUnreadCount((c) => c > 0 ? `${c}` : "")}
                 tone={props.notifUnreadCount((c) => c > 0 ? "accent" : "muted")}
+              />
+            </button>
+            <button
+              class="MicBarBtn"
+              valign={Gtk.Align.CENTER}
+              onClicked={() => {
+                void execAsync(["wpctl", "set-mute", "@DEFAULT_AUDIO_SOURCE@", "toggle"]).catch(() => {})
+              }}
+            >
+              <BarModule
+                icon={props.volumeSnapshot((s) => (s && !s.sourceMuted ? ICONS.mic : ICONS.micOff))}
+                tone={props.volumeSnapshot((s) => (s && !s.sourceMuted ? "crit" : "muted"))}
               />
             </button>
             <label class={imeClass} label={imeLabel} valign={Gtk.Align.CENTER} />
