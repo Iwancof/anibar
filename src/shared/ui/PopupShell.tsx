@@ -37,7 +37,15 @@ interface SweepEntry {
   label: Gtk.Label
   text: string
   startMs: number
+  /** 現在表示しているべきスライス (notify 監視の自己書き込み判定に使う) */
+  expected: string
+  notifyId: number
+  /** true = 1文字ずつでなく出番で全体を一度に出す (数値の誤読防止) */
+  atomic: boolean
 }
+
+// 部分表示だと別の値に誤読される数値ラベルは一括表示する
+const ATOMIC_CLASSES = ["HudPercent", "HudPercentUnit"]
 
 function collectLabels(root: Gtk.Widget, out: Gtk.Label[]): void {
   for (let c = root.get_first_child(); c != null; c = c.get_next_sibling()) {
@@ -55,8 +63,12 @@ function attachTypeSweep(win: Gtk.Window, baseDelayMs: number): void {
       GLib.source_remove(sourceId)
       sourceId = 0
     }
-    // 中断でも完了でも確定文字列に戻す (部分表示のまま残さない)
-    for (const e of entries) e.label.label = e.text
+    // 中断でも完了でも確定文字列に戻す (部分表示のまま残さない)。
+    // notify 監視は復元前に外す
+    for (const e of entries) {
+      e.label.disconnect(e.notifyId)
+      e.label.label = e.text
+    }
     entries = []
   }
 
@@ -73,12 +85,31 @@ function attachTypeSweep(win: Gtk.Window, baseDelayMs: number): void {
         !l.cssClasses.includes("DmClock"),
     )
     const n = Math.max(1, targets.length - 1)
-    entries = targets.map((label, i) => ({
-      label,
-      text: label.label,
-      startMs: baseDelayMs + (i / n) * SWEEP_SPREAD_MS,
-    }))
-    for (const e of entries) e.label.label = ""
+    entries = targets.map((label, i) => {
+      const e: SweepEntry = {
+        label,
+        text: label.label,
+        startMs: baseDelayMs + (i / n) * SWEEP_SPREAD_MS,
+        expected: "",
+        notifyId: 0,
+        atomic: ATOMIC_CLASSES.some((c) => label.cssClasses.includes(c)),
+      }
+      // スイープ中にバインディングが新しい値を書き込んでも、同フレーム内で
+      // 現在のスライスへ戻す (開いた直後の可視ゲートポーラー由来のフラッシュ防止)。
+      // 新しい値はスイープの残りで打ち出す対象として採用する
+      e.notifyId = label.connect("notify::label", () => {
+        const current = e.label.label
+        if (current !== e.expected) {
+          e.text = current
+          e.label.label = e.expected
+        }
+      })
+      return e
+    })
+    for (const e of entries) {
+      e.expected = ""
+      e.label.label = ""
+    }
 
     let elapsed = 0
     sourceId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, SWEEP_TICK_MS, () => {
@@ -90,13 +121,20 @@ function attachTypeSweep(win: Gtk.Window, baseDelayMs: number): void {
           continue
         }
         const frac = Math.min(1, (elapsed - e.startMs) / LABEL_TYPE_MS)
-        const chars = Math.ceil(frac * e.text.length)
-        e.label.label = e.text.slice(0, chars)
-        if (frac < 1) allDone = false
+        const slice = e.atomic
+          ? e.text
+          : e.text.slice(0, Math.ceil(frac * e.text.length))
+        if (e.expected !== slice) {
+          e.expected = slice
+          e.label.label = slice
+        }
+        if (frac < 1 && !e.atomic) allDone = false
       }
       if (allDone) {
-        sourceId = 0
+        for (const e of entries) e.label.disconnect(e.notifyId)
+        for (const e of entries) e.label.label = e.text
         entries = []
+        sourceId = 0
         return GLib.SOURCE_REMOVE
       }
       return GLib.SOURCE_CONTINUE
