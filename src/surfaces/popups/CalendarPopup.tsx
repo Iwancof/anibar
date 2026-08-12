@@ -177,7 +177,7 @@ export default function CalendarPopup(props: CalendarPopupProps) {
             ))}
             <label
               class="CalAgendaEmpty"
-              label="NO EVENTS::7D"
+              label="NO EVENTS::30D"
               visible={agenda((list) => list.length === 0)}
               halign={Gtk.Align.START}
             />

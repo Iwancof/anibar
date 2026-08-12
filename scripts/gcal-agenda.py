@@ -13,7 +13,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 URL_FILE = Path.home() / ".local/state/ags/gcal-ics.url"
-DAYS = 7
+DAYS = 30
 
 
 def out(status, events=None):
