@@ -24,10 +24,12 @@ import { createSessionSource } from "../runtime/session-source.ts"
 import { createConnectionsSource } from "../runtime/connections-source.ts"
 import { createFlowsSource, createLogSource } from "../runtime/netmon-source.ts"
 import { createBluetoothSource } from "../runtime/bluetooth-source.ts"
+import { createWeatherSource } from "../runtime/weather-source.ts"
 import Bar from "../surfaces/bar/Bar.tsx"
 import WorkspaceWindow from "../surfaces/workspace/WorkspaceWindow.tsx"
 import WsGotoWindow from "../surfaces/workspace/WsGotoWindow.tsx"
 import BatteryPopup from "../surfaces/popups/BatteryPopup.tsx"
+import WeatherPopup from "../surfaces/popups/WeatherPopup.tsx"
 import BluetoothPopup from "../surfaces/popups/BluetoothPopup.tsx"
 import NetworkPanel from "../surfaces/network/NetworkPanel.tsx"
 import LauncherWindow from "../surfaces/launcher/LauncherWindow.tsx"
@@ -44,6 +46,7 @@ import {
   toggleBluetoothPopup,
   toggleNetworkPopup,
   toggleNotifCenter,
+  toggleWeatherPopup,
   toggleWorkspaceVisibility,
 } from "./controllers.ts"
 import { orAccessors } from "../runtime/visibility-gate.ts"
@@ -79,6 +82,7 @@ export function startMainApp() {
   const connectionsSource = createConnectionsSource(networkPanelActive)
   const flowsSource = createFlowsSource(networkPanelActive)
   const logSource = createLogSource()
+  const weatherSource = createWeatherSource()
 
   function createMonitorWindows(
     gdkmonitor: Gdk.Monitor,
@@ -100,6 +104,7 @@ export function startMainApp() {
         batterySnapshot: modules.battery.snapshot,
         imeSnapshot: imeSource.snapshot,
         workspaceSnapshot: workspaceSource.snapshot,
+        weatherSnapshot: weatherSource.snapshot,
         onToggleDashboard: toggleWorkspaceVisibility,
         onToggleBatteryPopup: toggleBatteryPopup,
         onToggleBluetoothPopup: toggleBluetoothPopup,
@@ -108,6 +113,13 @@ export function startMainApp() {
           toggleNotifCenter()
         },
         onToggleNetworkPopup: toggleNetworkPopup,
+        onToggleWeatherPopup: toggleWeatherPopup,
+      }),
+
+      WeatherPopup({
+        gdkmonitor,
+        monitor,
+        snapshot: weatherSource.snapshot,
       }),
 
       NetworkPanel({

@@ -13,11 +13,12 @@ import {
 import type { VolumeSnapshot } from "../../modules/volume/domain.ts"
 import type { WorkspaceSnapshot } from "../../modules/workspace/domain.ts"
 import type { ImeSnapshot } from "../../runtime/ime-source.ts"
+import type { WeatherSnapshot } from "../../runtime/weather-source.ts"
 import { switchToWorkspace } from "../../runtime/workspace-source.ts"
 import type { NetworkSnapshot } from "../../modules/network/domain.ts"
 import { signalIcon, signalLevel, type WifiSnapshot } from "../../modules/wifi/domain.ts"
 import Icon from "../../shared/ui/Icon.tsx"
-import { ICONS } from "../../shared/ui/icons.ts"
+import { ICONS, weatherIcon } from "../../shared/ui/icons.ts"
 import type { PlayerSource } from "../../runtime/player-source.ts"
 import BarModule, { type BarModuleTone } from "./BarModule.tsx"
 import BatteryBarWidget from "./BatteryBarWidget.tsx"
@@ -38,11 +39,13 @@ export interface BarProps {
   wifiSnapshot: Accessor<WifiSnapshot>
   bluetoothSnapshot: Accessor<BluetoothSnapshot>
   notifUnreadCount: Accessor<number>
+  weatherSnapshot: Accessor<WeatherSnapshot | null>
   onToggleDashboard: () => void
   onToggleBatteryPopup: () => void
   onToggleBluetoothPopup: () => void
   onToggleNotifCenter: () => void
   onToggleNetworkPopup: () => void
+  onToggleWeatherPopup: () => void
 }
 
 // ponytail: 事前生成の上限。ws 31 以上はバーに出ない (ws-goto では移動可能)。
@@ -154,6 +157,17 @@ export default function Bar(props: BarProps) {
         <label $type="center" class="BarClock" label={props.clock} />
         <box $type="end" class="BarRightModules" spacing={0} halign={Gtk.Align.END} valign={Gtk.Align.CENTER}>
           <box class="BarGroup" spacing={4} valign={Gtk.Align.CENTER}>
+            <button
+              class="WxBarBtn"
+              valign={Gtk.Align.CENTER}
+              onClicked={props.onToggleWeatherPopup}
+            >
+              <BarModule
+                icon={props.weatherSnapshot((s) => (s ? weatherIcon(s.code, s.isDay) : ICONS.wxCloudy))}
+                value={props.weatherSnapshot((s) => (s ? `${Math.round(s.temp)}°` : ""))}
+                tone={props.weatherSnapshot((s) => (s ? "normal" : "muted"))}
+              />
+            </button>
             <BarModule
               icon={props.volumeSnapshot(volumeIcon)}
               value={props.volumeSnapshot(volumeValue)}

@@ -45,7 +45,7 @@ interface SweepEntry {
 }
 
 // 部分表示だと別の値に誤読される数値ラベルは一括表示する
-const ATOMIC_CLASSES = ["HudPercent", "HudPercentUnit"]
+const ATOMIC_CLASSES = ["HudPercent", "HudPercentUnit", "WxAtomic"]
 
 function collectLabels(root: Gtk.Widget, out: Gtk.Label[]): void {
   for (let c = root.get_first_child(); c != null; c = c.get_next_sibling()) {

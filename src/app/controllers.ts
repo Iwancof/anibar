@@ -46,6 +46,9 @@ const notifCenter = makeWindowController(WINDOW_PREFIXES.notifCenter, {
   closeAnimMs: WINDOW_CLOSE_ANIM_MS,
 })
 const swipeDashboard = makeWindowController(WINDOW_PREFIXES.swipeDashboard)
+const weatherPopup = makeWindowController(WINDOW_PREFIXES.weatherPopup, {
+  closeAnimMs: WINDOW_CLOSE_ANIM_MS,
+})
 const workspace = makeWindowController(WINDOW_PREFIXES.workspace)
 const wsGoto = makeWindowController(WINDOW_PREFIXES.wsGoto, {
   pick: (windows) => pickFocusedMonitorWindow(WINDOW_PREFIXES.wsGoto, windows),
@@ -87,6 +90,10 @@ export const setSwipeDashboardVisibility = swipeDashboard.setVisibility
 export const openSwipeDashboard = swipeDashboard.open
 export const closeSwipeDashboard = swipeDashboard.close
 export const toggleSwipeDashboard = swipeDashboard.toggle
+
+export const openWeatherPopup = weatherPopup.open
+export const closeWeatherPopup = weatherPopup.close
+export const toggleWeatherPopup = weatherPopup.toggle
 
 export const anyWorkspaceVisible = workspace.anyVisible
 export const setWorkspaceVisibility = workspace.setVisibility

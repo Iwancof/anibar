@@ -15,6 +15,7 @@ export const WINDOW_PREFIXES = {
   networkPopup: "network-popup:",
   notifCenter: "notif-center:",
   swipeDashboard: "swipe-dashboard:",
+  weatherPopup: "weather-popup:",
   workspace: "workspace:",
   wsGoto: "ws-goto:",
 } as const

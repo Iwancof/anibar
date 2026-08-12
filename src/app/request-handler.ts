@@ -28,6 +28,9 @@ import {
   openWsGoto,
   closeWsGoto,
   toggleWsGoto,
+  openWeatherPopup,
+  closeWeatherPopup,
+  toggleWeatherPopup,
 } from "./controllers.ts"
 import { setWsGotoMode } from "../surfaces/workspace/WsGotoWindow.tsx"
 
@@ -129,6 +132,15 @@ export function handleAppRequest(args: string[]): string {
     }
   }
 
+  if (scope === "weather") {
+    switch (action) {
+      case "toggle": toggleWeatherPopup(); return "ok"
+      case "open": openWeatherPopup(); return "ok"
+      case "close": closeWeatherPopup(); return "ok"
+      default: return `unknown weather action "${action}"`
+    }
+  }
+
   if (scope === "ws-goto") {
     switch (action) {
       case "toggle": setWsGotoMode("goto"); toggleWsGoto(); return "ok"
@@ -141,7 +153,7 @@ export function handleAppRequest(args: string[]): string {
   }
 
   if (scope !== "dashboard" && scope !== "workspace") {
-    return 'unknown request. use "ags request battery|bluetooth|network|notif-center|dashboard|workspace|ws-goto|launcher|swipe-dashboard toggle"'
+    return 'unknown request. use "ags request battery|bluetooth|network|notif-center|weather|dashboard|workspace|ws-goto|launcher|swipe-dashboard toggle"'
   }
 
   const label = scope === "workspace" ? "workspace" : "dashboard"

@@ -1,0 +1,149 @@
+@use "../theme" as *;
+@use "animations";
+@use "mixins" as *;
+
+// ── 天気ポップアップ ─────────────────────
+
+.WxPopup {
+  background: transparent;
+}
+
+@include popup-anim(".WxPopup") {
+  animation: hud-materialize 450ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.WxPopupPanel {
+  min-width: 380px;
+  opacity: 0;
+}
+
+.WxBody {
+  padding: 12px 16px 12px;
+}
+
+// ── Hero (現況) ──
+.WxHeroIcon {
+  font-size: 54px;
+}
+
+.WxHeroTemp {
+  font-size: 46px;
+  font-weight: 800;
+  font-family: $font-family;
+}
+
+.WxHeroUnit {
+  font-size: 20px;
+  color: rgba($hud-text, 0.5);
+  margin-bottom: 8px;
+}
+
+// 天候トーン (計器ランプと同じ役割トークンのみ)
+.WxHeroSun   { color: $colors-warning; }
+.WxHeroNight { color: $colors-accent; }
+.WxHeroCloud { color: rgba($hud-text, 0.6); }
+.WxHeroRain  { color: $hud-blue; }
+.WxHeroSnow  { color: $np-text; }
+.WxHeroStorm { color: $colors-warning; }
+
+.WxCond {
+  font-size: 14px;
+  letter-spacing: 0.10em;
+  color: rgba($hud-text, 0.8);
+}
+
+.WxFeels {
+  font-size: 11px;
+  color: rgba($hud-text, 0.5);
+}
+
+// ── 時間別ストリップ ──
+.WxHourCol {
+  padding: 4px 0;
+  border-radius: $radius-sm;
+}
+
+.WxHourTime {
+  font-size: 10px;
+  letter-spacing: 0.10em;
+  color: rgba($hud-text, 0.4);
+}
+
+.WxHourIcon {
+  font-size: 17px;
+  color: rgba($hud-text, 0.75);
+}
+
+.WxHourTemp {
+  font-size: 11px;
+  color: $np-text;
+}
+
+.WxHourRain {
+  font-size: 9px;
+  color: $hud-blue;
+  min-height: 12px;
+}
+
+// 開時: 列が左から順に点灯 (POWERゲージと同じ一発ブート演出)
+@keyframes wx-col-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@for $i from 1 through 8 {
+  .WxPopup.open .WxHourStrip > box:nth-child(#{$i}) {
+    animation: wx-col-in 160ms ease-out (350ms + ($i - 1) * 70ms) both;
+  }
+}
+
+// hero アイコンは実体化後にゆっくり呼吸する (ユーザ要望の天気アニメ。
+// ポップアップ表示中のみ稼働、閉じれば止まる)
+@keyframes wx-breathe {
+  from { opacity: 1; }
+  to   { opacity: 0.6; }
+}
+
+.WxPopup.open .WxHeroIcon {
+  animation:
+    wx-col-in 400ms ease-out 200ms both,
+    wx-breathe 2800ms ease-in-out 1600ms infinite alternate;
+}
+
+// ── 明日 ──
+.WxTomorrowRow {
+  padding: 2px 0;
+}
+
+.WxTomorrowIcon {
+  font-size: 22px;
+  color: rgba($hud-text, 0.75);
+}
+
+.WxTomorrowCond {
+  font-size: 12px;
+  letter-spacing: 0.10em;
+  color: rgba($hud-text, 0.8);
+}
+
+.WxTomorrowTemp {
+  font-size: 12px;
+  color: $np-text;
+}
+
+.WxTomorrowRainIcon {
+  font-size: 12px;
+  color: $hud-blue;
+}
+
+.WxTomorrowRain {
+  font-size: 12px;
+  color: $hud-blue;
+}
+
+// ── Footer (測位メタ) ──
+.WxFooter {
+  font-size: 9px;
+  letter-spacing: 0.10em;
+  color: rgba($hud-text, 0.3);
+}
