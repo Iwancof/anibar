@@ -97,6 +97,11 @@
   }
 }
 
+// 棒グラフは列の点灯が終わってからフェードイン
+.WxPopup.open .WxRainChart {
+  animation: wx-col-in 300ms ease-out 950ms both;
+}
+
 // hero アイコンは実体化後にゆっくり呼吸する (ユーザ要望の天気アニメ。
 // ポップアップ表示中のみ稼働、閉じれば止まる)
 @keyframes wx-breathe {

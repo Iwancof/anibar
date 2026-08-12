@@ -1,8 +1,9 @@
 import { Astal, Gdk, Gtk } from "ags/gtk4"
 
-import type { Accessor } from "gnim"
+import { onCleanup, type Accessor } from "gnim"
 
 import type { WeatherSnapshot } from "../../runtime/weather-source.ts"
+import { COLORS } from "../../shared/theme-tokens.ts"
 import { closeWeatherPopup } from "../../app/controllers.ts"
 import PopupShell from "../../shared/ui/PopupShell.tsx"
 import PanelHeader from "../../shared/ui/PanelHeader.tsx"
@@ -18,6 +19,45 @@ export interface WeatherPopupProps {
 }
 
 const HOUR_SLOTS = 8
+
+// ── 降水確率の棒グラフ (0-100% 固定スケール、Cairo一括描画) ──
+const CHART_H = 34
+const C_RAIN = COLORS.rgb["hud-blue"]
+const C_DIM = COLORS.rgb["chart-dim"]
+
+function RainChart(props: { snapshot: Accessor<WeatherSnapshot | null> }) {
+  let area: Gtk.DrawingArea | null = null
+  onCleanup(props.snapshot.subscribe(() => area?.queue_draw()))
+
+  return (
+    <Gtk.DrawingArea
+      cssClasses={["WxRainChart"]}
+      heightRequest={CHART_H}
+      hexpand
+      onRealize={(self: Gtk.DrawingArea) => {
+        area = self
+        self.set_draw_func((_a: any, cr: any, w: number, h: number) => {
+          const v = props.snapshot()
+          const slotW = w / HOUR_SLOTS
+          for (let i = 0; i < HOUR_SLOTS; i++) {
+            const p = v?.hours[i]?.precipProb ?? 0
+            const x = i * slotW + slotW * 0.25
+            const bw = slotW * 0.5
+            // 空スロットも薄いベースラインで見せる (固定スロット感)
+            cr.setSourceRGBA(C_DIM[0], C_DIM[1], C_DIM[2], 0.3)
+            cr.rectangle(x, h - 2, bw, 2)
+            cr.fill()
+            if (p <= 0) continue
+            const bh = Math.max(2, (p / 100) * (h - 4))
+            cr.setSourceRGBA(C_RAIN[0], C_RAIN[1], C_RAIN[2], 0.35 + 0.55 * (p / 100))
+            cr.rectangle(x, h - bh, bw, bh)
+            cr.fill()
+          }
+        })
+      }}
+    />
+  )
+}
 
 function heroTone(code: number, isDay: boolean): string {
   if (code === 0 || code <= 2) return isDay ? "WxHeroSun" : "WxHeroNight"
@@ -121,7 +161,7 @@ export default function WeatherPopup(props: WeatherPopupProps) {
                     class="WxHourIcon"
                     icon={s((v) => {
                       const h = v?.hours[i]
-                      return h ? weatherIcon(h.code, true) : ICONS.wxCloudy
+                      return h ? weatherIcon(h.code, h.isDay) : ICONS.wxCloudy
                     })}
                     halign={Gtk.Align.CENTER}
                   />
@@ -136,6 +176,7 @@ export default function WeatherPopup(props: WeatherPopupProps) {
                 </box>
               ))}
             </box>
+            <RainChart snapshot={s} />
           </box>
 
           {/* 明日 */}

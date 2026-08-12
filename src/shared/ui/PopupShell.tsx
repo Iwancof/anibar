@@ -47,6 +47,15 @@ interface SweepEntry {
 // 部分表示だと別の値に誤読される数値ラベルは一括表示する
 const ATOMIC_CLASSES = ["HudPercent", "HudPercentUnit", "WxAtomic"]
 
+// Nerd Font グリフ (U+F0000 超) は UTF-16 サロゲートペアなので、コード単位の
+// slice だと途中スライスが不正なサロゲート片になり GTK が U+FFFD に置換 →
+// notify 監視がそれを新値として採用し「�」で確定してしまう。
+// 必ずコードポイント境界で切る
+function sliceByCodePoint(text: string, frac: number): string {
+  const cps = Array.from(text)
+  return cps.slice(0, Math.ceil(frac * cps.length)).join("")
+}
+
 function collectLabels(root: Gtk.Widget, out: Gtk.Label[]): void {
   for (let c = root.get_first_child(); c != null; c = c.get_next_sibling()) {
     if (c instanceof Gtk.Label) out.push(c)
@@ -121,9 +130,7 @@ function attachTypeSweep(win: Gtk.Window, baseDelayMs: number): void {
           continue
         }
         const frac = Math.min(1, (elapsed - e.startMs) / LABEL_TYPE_MS)
-        const slice = e.atomic
-          ? e.text
-          : e.text.slice(0, Math.ceil(frac * e.text.length))
+        const slice = e.atomic ? e.text : sliceByCodePoint(e.text, frac)
         if (e.expected !== slice) {
           e.expected = slice
           e.label.label = slice

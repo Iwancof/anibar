@@ -14,6 +14,7 @@ export interface WeatherHour {
   temp: number
   code: number
   precipProb: number
+  isDay: boolean
 }
 
 export interface WeatherDay {
@@ -112,6 +113,7 @@ interface OpenMeteoResponse {
     temperature_2m: number[]
     weather_code: number[]
     precipitation_probability: number[]
+    is_day: number[]
   }
   daily: {
     weather_code: number[]
@@ -125,7 +127,7 @@ async function fetchForecast(lat: number, lng: number): Promise<OpenMeteoRespons
   const url =
     `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}` +
     "&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,is_day" +
-    "&hourly=temperature_2m,weather_code,precipitation_probability" +
+    "&hourly=temperature_2m,weather_code,precipitation_probability,is_day" +
     "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max" +
     "&timezone=auto&forecast_days=2&forecast_hours=9"
   return (await curlJson([url])) as OpenMeteoResponse
@@ -161,6 +163,7 @@ export function createWeatherSource(): WeatherSource {
         temp: wx.hourly.temperature_2m[i + 1],
         code: wx.hourly.weather_code[i + 1],
         precipProb: wx.hourly.precipitation_probability[i + 1] ?? 0,
+        isDay: wx.hourly.is_day[i + 1] === 1,
       }))
 
       setSnapshot({
