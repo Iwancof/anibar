@@ -84,6 +84,14 @@ export default function CalendarPopup(props: CalendarPopupProps) {
 
   const agenda = createMemo(() => upcomingEvents(props.gcal(), AGENDA_SLOTS))
 
+  // 出所の色分け: 1本目 (個人) = cyan、2本目以降 (仕事等) = amber
+  function agendaWhenClass(i: number): Accessor<string> {
+    return agenda((list) => {
+      const src = list[i]?.src ?? 0
+      return src === 0 ? "CalAgendaWhen WxAtomic" : "CalAgendaWhen CalAgendaWhenAlt WxAtomic"
+    })
+  }
+
   function agendaLabel(i: number, part: "when" | "title"): Accessor<string> {
     return agenda((list) => {
       const ev = list[i]
@@ -101,7 +109,8 @@ export default function CalendarPopup(props: CalendarPopupProps) {
     switch (s.status) {
       case "ok": {
         const d = new Date(s.updatedAt * 1000)
-        return `FEED::GCAL · UPD::${`${d.getHours()}`.padStart(2, "0")}:${`${d.getMinutes()}`.padStart(2, "0")}`
+        const feeds = s.feeds > 1 ? ` ${s.okFeeds}/${s.feeds}` : ""
+        return `FEED::GCAL${feeds} · UPD::${`${d.getHours()}`.padStart(2, "0")}:${`${d.getMinutes()}`.padStart(2, "0")}`
       }
       case "no-feed": return "FEED::NONE (gcal-ics.url 未設定)"
       case "fetch-error": return "FEED::FETCH-ERROR"
@@ -171,7 +180,7 @@ export default function CalendarPopup(props: CalendarPopupProps) {
                 spacing={8}
                 visible={agenda((list) => list[i] != null)}
               >
-                <label class="CalAgendaWhen WxAtomic" label={agendaLabel(i, "when")} />
+                <label class={agendaWhenClass(i)} label={agendaLabel(i, "when")} />
                 <label class="CalAgendaTitle" label={agendaLabel(i, "title")} hexpand halign={Gtk.Align.START} />
               </box>
             ))}

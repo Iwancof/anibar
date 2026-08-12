@@ -16,10 +16,14 @@ export interface GcalEvent {
   start: number // epoch sec (local tz 換算済み)
   end: number
   allDay: boolean
+  /** gcal-ics.url 内の行番号 (0始まり)。UI の出所色分けに使う */
+  src: number
 }
 
 export interface GcalSnapshot {
   status: GcalStatus
+  feeds: number
+  okFeeds: number
   events: GcalEvent[]
   updatedAt: number
 }
@@ -46,15 +50,28 @@ export function createGcalSource(): GcalSource {
   async function fetchAgenda(): Promise<void> {
     try {
       const raw = await execAsync(["python3", SCRIPT])
-      const parsed = JSON.parse(raw) as { status: GcalStatus; events: GcalEvent[] }
+      const parsed = JSON.parse(raw) as {
+        status: GcalStatus
+        feeds: number
+        okFeeds: number
+        events: GcalEvent[]
+      }
       setSnapshot({
         status: parsed.status,
+        feeds: parsed.feeds,
+        okFeeds: parsed.okFeeds,
         events: parsed.events,
         updatedAt: Math.floor(Date.now() / 1000),
       })
     } catch (e) {
       console.warn(`[gcal] agenda fetch failed: ${e}`)
-      setSnapshot({ status: "fetch-error", events: [], updatedAt: Math.floor(Date.now() / 1000) })
+      setSnapshot({
+        status: "fetch-error",
+        feeds: 0,
+        okFeeds: 0,
+        events: [],
+        updatedAt: Math.floor(Date.now() / 1000),
+      })
     }
   }
 

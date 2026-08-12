@@ -80,6 +80,11 @@
   min-width: 100px;
 }
 
+// 2本目以降のフィード (仕事カレンダー等) は amber で出所を示す
+.CalAgendaWhenAlt {
+  color: $np-amber;
+}
+
 .CalAgendaTitle {
   font-family: "Noto Sans Mono CJK JP", $network-panel-font-family, $font-family;
   font-size: 12px;
