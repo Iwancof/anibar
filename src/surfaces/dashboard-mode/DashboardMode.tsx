@@ -76,6 +76,7 @@ export default function DashboardMode(props: DashboardModeProps) {
       contentValign={Gtk.Align.FILL}
       contentHexpand
       contentVexpand
+      typeSweepDelayMs={700}
       onClose={closeDashboardMode}
     >
       {/* 上部: 時計 */}
