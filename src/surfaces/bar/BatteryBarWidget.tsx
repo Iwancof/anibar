@@ -1,12 +1,9 @@
-import GLib from "gi://GLib?version=2.0"
-
 import { Gtk } from "ags/gtk4"
 import { onCleanup } from "gnim"
 
 import type { Accessor } from "gnim"
 
 import { isOnAC, type BatterySnapshot } from "../../modules/battery/domain.ts"
-import { scopedTimeoutWhile } from "../../shared/runtime/scoped-timeout.ts"
 import { COLORS } from "../../shared/theme-tokens.ts"
 import { ICONS } from "../../shared/ui/icons.ts"
 
@@ -25,9 +22,6 @@ const PAD = 2
 const CELLS = 5
 const CELL_GAP = 1
 const CELL_W = (BODY_W - PAD * 2 - CELL_GAP * (CELLS - 1)) / CELLS
-
-// 充電マーチ: 300ms ごとに1セル進む離散アニメ (滑らか grow より速く安い)
-const TICK_MS = 300
 
 const C_OK = COLORS.rgb["bar-battery-green"]
 const C_WARN = COLORS.rgb["bar-battery-amber"]
@@ -69,20 +63,10 @@ export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
   })
 
   let drawingArea: Gtk.DrawingArea | null = null
-  let marchStep = 0
 
-  // 90% 以上は全セルが埋まりマーチの余地がないので tick 自体を止める
-  const animActive = props.snapshot(
-    (s) => s != null && s.present && isOnAC(s) && s.percent < 90,
-  )
   onCleanup(props.snapshot.subscribe(() => {
     if (drawingArea) drawingArea.queue_draw()
   }))
-
-  scopedTimeoutWhile(GLib.PRIORITY_DEFAULT, TICK_MS, animActive, () => {
-    marchStep++
-    if (drawingArea) drawingArea.queue_draw()
-  }, "BatteryBarWidget")
 
   function setupClick(self: any) {
     const gesture = new Gtk.GestureClick()
@@ -104,7 +88,6 @@ export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
               const s = props.snapshot()
               const present = s?.present ?? false
               const pct = present ? Math.max(0, Math.min(100, s!.percent)) : 0
-              const charging = present && isOnAC(s)
               const top = (h - BODY_H) / 2
 
               // 外枠 (1px) + ノブ
@@ -120,10 +103,6 @@ export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
 
               const filled = Math.max(0, Math.min(CELLS, Math.round((pct / 100) * CELLS)))
 
-              // 充電マーチ: 残量セルの先を 0..span 個、周期的に cyan で埋める
-              const span = CELLS - filled
-              const march = charging && span > 0 ? marchStep % (span + 1) : 0
-
               for (let i = 0; i < CELLS; i++) {
                 const x = PAD + i * (CELL_W + CELL_GAP)
                 const y = top + PAD
@@ -132,8 +111,6 @@ export default function BatteryBarWidget(props: BatteryBarWidgetProps) {
                 if (i < filled) {
                   const c = CELL_COLORS[i]
                   cr.setSourceRGBA(c[0], c[1], c[2], 1)
-                } else if (charging && i < filled + march) {
-                  cr.setSourceRGBA(C_CHARGE[0], C_CHARGE[1], C_CHARGE[2], 0.55)
                 } else {
                   // 空セルもスロットとして薄く見せる (HUD の固定スロット感)
                   cr.setSourceRGBA(C_EMPTY[0], C_EMPTY[1], C_EMPTY[2], 0.18)
