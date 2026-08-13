@@ -27,12 +27,15 @@ function pickFocusedMonitorWindow(prefix: string, windows: Gtk.Window[]): Gtk.Wi
 }
 
 const batteryPopup = makeWindowController(WINDOW_PREFIXES.batteryPopup, {
+  exclusive: true,
   closeAnimMs: WINDOW_CLOSE_ANIM_MS,
 })
 const bluetoothPopup = makeWindowController(WINDOW_PREFIXES.bluetoothPopup, {
+  exclusive: true,
   closeAnimMs: WINDOW_CLOSE_ANIM_MS,
 })
 const calendarPopup = makeWindowController(WINDOW_PREFIXES.calendarPopup, {
+  exclusive: true,
   closeAnimMs: WINDOW_CLOSE_ANIM_MS,
 })
 // closeAnimMs で .open/.closing class が付く (dashboard の起動シーケンス CSS が依存)
@@ -43,13 +46,16 @@ const launcher = makeWindowController(WINDOW_PREFIXES.launcher, {
   pick: (windows) => pickFocusedMonitorWindow(WINDOW_PREFIXES.launcher, windows),
 })
 const networkPopup = makeWindowController(WINDOW_PREFIXES.networkPopup, {
+  exclusive: true,
   closeAnimMs: WINDOW_CLOSE_ANIM_MS,
 })
 const notifCenter = makeWindowController(WINDOW_PREFIXES.notifCenter, {
+  exclusive: true,
   closeAnimMs: WINDOW_CLOSE_ANIM_MS,
 })
 const swipeDashboard = makeWindowController(WINDOW_PREFIXES.swipeDashboard)
 const weatherPopup = makeWindowController(WINDOW_PREFIXES.weatherPopup, {
+  exclusive: true,
   closeAnimMs: WINDOW_CLOSE_ANIM_MS,
 })
 const workspace = makeWindowController(WINDOW_PREFIXES.workspace)

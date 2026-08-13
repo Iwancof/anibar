@@ -37,7 +37,11 @@ export interface WindowController {
 export interface WindowControllerOptions {
   closeAnimMs?: number
   pick?: (windows: Gtk.Window[]) => Gtk.Window[]
+  /** true のとき、open() で他の exclusive コントローラを閉じる (popup 同時表示防止) */
+  exclusive?: boolean
 }
+
+const exclusiveControllers: WindowController[] = []
 
 function connectorForWindow(prefix: string, window: Gtk.Window): string | null {
   const name = window.name ?? ""
@@ -87,6 +91,12 @@ export function makeWindowController(
   function open(): number {
     logAction("open")
     if (animating) return 0
+
+    if (opts.exclusive) {
+      for (const other of exclusiveControllers) {
+        if (other !== controller && other.anyVisible()) other.close()
+      }
+    }
 
     const windows = getWindows()
     const selected = pickWindows(windows)
@@ -158,5 +168,15 @@ export function makeWindowController(
     return setVisibility(!anyVisible())
   }
 
-  return { anyVisible, visible: visibleState, open, close, toggle, setVisibility, getWindows }
+  const controller: WindowController = {
+    anyVisible,
+    visible: visibleState,
+    open,
+    close,
+    toggle,
+    setVisibility,
+    getWindows,
+  }
+  if (opts.exclusive) exclusiveControllers.push(controller)
+  return controller
 }
