@@ -7,6 +7,9 @@ export interface ProcessInfo {
 export interface SystemStatsSnapshot {
   cpuPercent: number
   topProcesses: ProcessInfo[]
+  cpuTempC: number | null
+  nvmeTempC: number | null
+  fanRpm: number | null
 }
 
 // top -bn1 format: PID USER PR NI VIRT RES SHR S %CPU %MEM TIME+ COMMAND

@@ -133,6 +133,34 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
     return "info"
   })
 
+  const cpuTemp = props.systemStats((s) =>
+    s?.cpuTempC != null ? `${s.cpuTempC}°C` : "—",
+  )
+
+  // Tctl はスロットル起点 ~95°C。手前で warn/crit
+  const cpuTempTone = props.systemStats((s): StatTileTone => {
+    if (s?.cpuTempC == null) return "info"
+    if (s.cpuTempC >= 90) return "crit"
+    if (s.cpuTempC >= 80) return "warn"
+    return "info"
+  })
+
+  const ssdTemp = props.systemStats((s) =>
+    s?.nvmeTempC != null ? `${s.nvmeTempC}°C` : "—",
+  )
+
+  // NVMe crit 84.8°C。ベッド上の熱こもり検知が主目的なので低めに警告
+  const ssdTempTone = props.systemStats((s): StatTileTone => {
+    if (s?.nvmeTempC == null) return "info"
+    if (s.nvmeTempC >= 75) return "crit"
+    if (s.nvmeTempC >= 60) return "warn"
+    return "info"
+  })
+
+  const fan = props.systemStats((s) =>
+    s?.fanRpm != null ? `${s.fanRpm}` : "—",
+  )
+
   const energyLabel = props.snapshot((s) => {
     if (!s || !s.present || s.energyNowWh == null || s.energyFullWh == null) return "—"
     return `${s.energyNowWh.toFixed(1)} / ${s.energyFullWh.toFixed(1)} Wh`
@@ -198,6 +226,13 @@ export default function BatteryHudView(props: BatteryHudViewProps) {
           <StatTile label="DRAW" value={draw} tone={drawTone} />
           <StatTile label="HEALTH" value={health} tone="charge" />
           <StatTile label="CPU" value={cpuText} tone={cpuTone} />
+        </box>
+
+        {/* Thermals */}
+        <box spacing={8} homogeneous>
+          <StatTile label="CPU TEMP" value={cpuTemp} tone={cpuTempTone} />
+          <StatTile label="SSD TEMP" value={ssdTemp} tone={ssdTempTone} />
+          <StatTile label="FAN RPM" value={fan} tone="info" />
         </box>
 
         {/* Energy + cycles */}
