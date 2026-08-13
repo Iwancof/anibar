@@ -147,6 +147,12 @@
 }
 
 // ── Footer (測位メタ) ──
+.WxFooterBtn {
+  @extend %icon-btn-reset;
+  padding: 0;
+  margin: 0;
+}
+
 .WxFooter {
   font-size: 9px;
   letter-spacing: 0.10em;

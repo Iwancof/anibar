@@ -71,6 +71,12 @@
   color: $np-text-sec;
 }
 
+.UiPanelHeaderMetaBtn {
+  @extend %icon-btn-reset;
+  padding: 0;
+  margin: 0;
+}
+
 .UiSectionHeader {
   margin-bottom: 4px;
 }

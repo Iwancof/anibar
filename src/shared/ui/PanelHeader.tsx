@@ -7,6 +7,8 @@ export interface PanelHeaderProps {
   title: string | Accessor<string>
   meta?: string | Accessor<string>
   dotClass?: string | Accessor<string>
+  /** 指定すると右肩メタがクリック可能になる (天気の地名トグル等) */
+  onMetaClicked?: () => void
 }
 
 // タイプライター表示: パネルが開くたびにタイトルを左から打ち出す。
@@ -67,12 +69,23 @@ export default function PanelHeader(props: PanelHeaderProps) {
           if (staticTitle != null) attachTypewriter(self, staticTitle)
         }}
       />
-      <label
-        class="UiPanelHeaderMeta"
-        label={props.meta ?? ""}
-        visible={props.meta ? true : false}
-        halign={Gtk.Align.END}
-      />
+      {props.onMetaClicked ? (
+        <button
+          class="UiPanelHeaderMetaBtn"
+          visible={props.meta ? true : false}
+          halign={Gtk.Align.END}
+          onClicked={props.onMetaClicked}
+        >
+          <label class="UiPanelHeaderMeta" label={props.meta ?? ""} />
+        </button>
+      ) : (
+        <label
+          class="UiPanelHeaderMeta"
+          label={props.meta ?? ""}
+          visible={props.meta ? true : false}
+          halign={Gtk.Align.END}
+        />
+      )}
     </box>
   )
 }

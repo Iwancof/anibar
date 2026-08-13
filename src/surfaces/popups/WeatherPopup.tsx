@@ -1,9 +1,12 @@
+import GLib from "gi://GLib?version=2.0"
+
 import { Astal, Gdk, Gtk } from "ags/gtk4"
 
-import { onCleanup, type Accessor } from "gnim"
+import { createMemo, createState, onCleanup, type Accessor } from "gnim"
 
 import type { WeatherSnapshot } from "../../runtime/weather-source.ts"
 import { COLORS } from "../../shared/theme-tokens.ts"
+import { fileExists } from "../../runtime/fs.ts"
 import { closeWeatherPopup } from "../../app/controllers.ts"
 import PopupShell from "../../shared/ui/PopupShell.tsx"
 import PanelHeader from "../../shared/ui/PanelHeader.tsx"
@@ -19,6 +22,20 @@ export interface WeatherPopupProps {
 }
 
 const HOUR_SLOTS = 8
+
+// 地名・座標のクリック非表示トグル (配信/スクショ用)。選択は再起動後も保持
+const LOC_HIDDEN_FLAG = `${GLib.getenv("HOME")}/.local/state/ags/wx-loc-hidden`
+const [locHidden, setLocHidden] = createState(fileExists(LOC_HIDDEN_FLAG))
+
+function toggleLocHidden(): void {
+  const next = !locHidden()
+  setLocHidden(next)
+  if (next) {
+    GLib.file_set_contents(LOC_HIDDEN_FLAG, "1")
+  } else {
+    GLib.unlink(LOC_HIDDEN_FLAG)
+  }
+}
 
 // ── 降水確率の棒グラフ (0-100% 固定スケール、Cairo一括描画) ──
 const CHART_H = 34
@@ -89,7 +106,12 @@ export default function WeatherPopup(props: WeatherPopupProps) {
       <box class="WxPopupPanel UiPanel" orientation={Gtk.Orientation.VERTICAL}>
         <PanelHeader
           title="WX::LOCAL"
-          meta={s((v) => (v?.place ? `${ICONS.mapMarker} ${v.place}` : "GEO::SCAN"))}
+          meta={createMemo(() => {
+            if (locHidden()) return `${ICONS.mapMarker} LOC::HIDDEN`
+            const v = s()
+            return v?.place ? `${ICONS.mapMarker} ${v.place}` : "GEO::SCAN"
+          })}
+          onMetaClicked={toggleLocHidden}
         />
 
         <box class="WxBody" orientation={Gtk.Orientation.VERTICAL} spacing={12}>
@@ -199,16 +221,19 @@ export default function WeatherPopup(props: WeatherPopupProps) {
             </box>
           </box>
 
-          {/* Footer: 測位の実データ */}
-          <label
-            class="WxFooter"
-            halign={Gtk.Align.START}
-            label={s((v) => {
-              if (!v) return "GEO::SCAN · SRC::—"
-              const src = v.locSource === "wifi" ? "BEACONDB" : "IP-FALLBACK"
-              return `POS::${v.lat.toFixed(3)},${v.lng.toFixed(3)} ±${v.accuracyKm}KM · SRC::${src}`
-            })}
-          />
+          {/* Footer: 測位の実データ (クリックで地名・座標を非表示トグル) */}
+          <button class="WxFooterBtn" halign={Gtk.Align.START} onClicked={toggleLocHidden}>
+            <label
+              class="WxFooter"
+              label={createMemo(() => {
+                const v = s()
+                if (!v) return "GEO::SCAN · SRC::—"
+                const src = v.locSource === "wifi" ? "BEACONDB" : "IP-FALLBACK"
+                if (locHidden()) return `POS::HIDDEN · SRC::${src}`
+                return `POS::${v.lat.toFixed(3)},${v.lng.toFixed(3)} ±${v.accuracyKm}KM · SRC::${src}`
+              })}
+            />
+          </button>
         </box>
       </box>
     </PopupShell>
