@@ -18,7 +18,11 @@ reload() {
     sleep 0.5
   fi
   : > "$RUNTIME_LOG"
-  ags run --gtk 4 >>"$RUNTIME_LOG" 2>&1 &
+  # GSK_DEBUG=full-redraw: 2026-08-11 のライブラリ更新 (pango 1.58.2 / mesa 26.1.6) 以降、
+  # GTK の部分再描画がラベルの旧グリフを残す (バーの帯域値が「重なって壊れる」)。
+  # 全再描画の強制で解消。描画頻度は変わらないためアイドルコストは増えない。
+  # GTK/mesa 側で直ったら外してよい (再現確認: 帯域値を高トラフィックで観察)
+  GSK_DEBUG=full-redraw ags run --gtk 4 >>"$RUNTIME_LOG" 2>&1 &
   echo "[dev] 起動完了 ($(date +%H:%M:%S))"
   echo "[dev] AGS child log: $RUNTIME_LOG"
 }
