@@ -19,7 +19,7 @@ export interface CalendarPopupProps {
 
 const GRID_SLOTS = 42 // 6週 × 7日 固定スロット
 const AGENDA_SLOTS = 5
-const DOW = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"]
+const DOW = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"]
 
 // 表示中の月 (今月からのオフセット)。開くたびに今月へ戻す
 const [viewOffset, setViewOffset] = createState(0)
@@ -60,8 +60,8 @@ export default function CalendarPopup(props: CalendarPopupProps) {
 
     const today = new Date()
     const view = new Date(today.getFullYear(), today.getMonth() + offset, 1)
-    // 月曜始まり
-    const lead = (view.getDay() + 6) % 7
+    // 日曜始まり
+    const lead = view.getDay()
     const cursor = new Date(view)
     cursor.setDate(1 - lead)
 
