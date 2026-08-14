@@ -17,7 +17,7 @@
 
 ### ディレクトリ構成（主要）
 ```
-/home/iwancof/.config/ags/
+~/.config/ags/
 ├── app.ts                     — エントリポイント (startMainApp 呼び出しのみ)
 ├── package.json               — npm run dev, run, check, test
 ├── tsconfig.pure.json         — 型チェック用（domain/view-model 層限定）
@@ -116,7 +116,7 @@ Stack trace of thread 131067:
 - `disposeWindow`: `try { close } catch; try { remove_window } catch; try { destroy } catch` — **エラーを全握り潰し**
 
 ### 新実装（現状）
-設計プランは `/home/iwancof/.claude/plans/serialized-puzzling-feigenbaum.md` にある。
+設計プランは `~/.claude/plans/serialized-puzzling-feigenbaum.md` にある。
 
 **`src/app/monitor-registry.ts`** (新規 232 行):
 - connector 名をキーにした `Map<string, MonitorEntry>`
@@ -311,7 +311,7 @@ gjs: 1.x (Arch packaged)
 GTK: 4.x (Arch packaged, debuginfo なし)
 
 ags package version: * (npm link or file), node_modules/ags/lib/gtk4/app.ts を直接参照
-gnim: v1.9.1 (/home/iwancof/.config/ags/node_modules/gnim)
+gnim: v1.9.1 (~/.config/ags/node_modules/gnim)
 ```
 
 ## 11. 関連する別系統の問題（参考）
@@ -368,7 +368,7 @@ AGS 側の本件は Hyprland 側が落ちなくても独立に発生する。S3 
 
 ## 13. 連絡先・ポインタ
 
-- プラン文書: `/home/iwancof/.claude/plans/serialized-puzzling-feigenbaum.md`
+- プラン文書: `~/.claude/plans/serialized-puzzling-feigenbaum.md`
 - coredump: `/var/lib/systemd/coredump/core.gjs.*.zst`（`coredumpctl dump <pid>` で展開可能）
 - gjs 実行中バンドル: `${XDG_RUNTIME_DIR:-/tmp}/ags.js`（`ags run` が base64 decode して配置）
 - AGS/Astal upstream: https://github.com/Aylur/astal, https://github.com/Aylur/gnim

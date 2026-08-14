@@ -4,3 +4,5 @@ _theme.scss
 nohup.out
 sessions/
 src/shared/theme-tokens.ts
+.agents/
+CLAUDE.md

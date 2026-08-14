@@ -1,7 +1,50 @@
-# AGS Overlay Dashboard
+# anibar
 
 AGS v3 / Astal GTK4 ベースの shell 設定です。  
 この構成では、`OverlayDashboard` を UI の中心にしつつ、データソース・ドメインロジック・view-model・widget を分離して、単体テストと GTK preview を両立させています。
+
+## Requirements
+
+作者の環境 (Arch Linux + Hyprland + ThinkPad P14s Gen 6 AMD) に合わせてあり、汎用化はしていません。別環境で使う場合は該当箇所を書き換えてください (リポジトリごと LLM に渡して調整させるのが早いです)。
+
+- AGS v3 (Astal / GTK4)。`ags` CLI が PATH にあり、lib が `/usr/share/ags/js` にあること (package-lock.json がそこへ symlink する。Arch なら `aylurs-gtk-shell` パッケージ)
+- Hyprland (`hyprctl` をワークスペース・モニタ操作に多用)
+- Node.js 22+ (`--experimental-strip-types` でテスト実行)
+- Python 3 + PyYAML (`scripts/gen-theme.py` によるテーマ生成)
+- コマンド類: `nmcli` (NetworkManager), `wpctl` (PipeWire), `playerctl`, `upower`, `cava`, `grim`, `ping`, `notify-send`, `inotify-tools` (dev hot reload)
+- フォント: HackGen Console NF (アイコン用)。本文フォントは `theme.yaml` の `font.family` を適宜変更
+
+ハードウェア依存 (該当しなければ表示が空になるだけで、起動はする):
+
+- 温度・ファン: hwmon 名 `k10temp` (AMD CPU) / `nvme` / `thinkpad` (ファン RPM) を名前解決 — `src/runtime/system-stats-source.ts`
+- バッテリー: `/sys/class/power_supply/BAT0`〜`BAT2`
+
+## Install
+
+一部のパスが `~/.config/ags` を前提にハードコードされているため、配置場所は固定です。
+
+```bash
+git clone git@github.com:Iwancof/anibar.git ~/.config/ags
+cd ~/.config/ags
+npm install        # ags/gnim は /usr/share/ags/js への symlink
+npm run theme      # theme.yaml → _theme.scss / theme-tokens.ts 生成
+ags run --gtk 4    # または npm run dev (hot reload 付き)
+```
+
+Hyprland 側の設定例:
+
+```conf
+exec-once = ags run --gtk 4
+bind = SUPER, I, exec, ags request dashboard toggle
+bind = SUPER, D, exec, ags request launcher toggle
+```
+
+surface の開閉は `ags request <scope> <open|close|toggle>` で統一しています (scope: `dashboard`, `launcher`, `network`, `bluetooth`, `battery`, `calendar`, `weather`, `notif-center` など。`src/app/request-handler.ts` 参照)。
+
+### Optional
+
+- **Google Calendar**: `~/.local/state/ags/gcal-ics.url` に ICS URL を置く (1行1URL)。Workspace 等で ICS が使えない場合は `scripts/gcal-oauth-setup.py` で OAuth 設定を `~/.local/state/ags/gcal-oauth.json` に作る。どちらも無ければ予定欄が空になるだけ。
+- **天気**: IP ジオロケーションで自動取得。設定不要。
 
 ## Layout
 
